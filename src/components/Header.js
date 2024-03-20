@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { styled } from "styled-components";
 
 function Header() {
   const [id, setId] = useState("");
@@ -16,7 +17,7 @@ function Header() {
   // 회원가입 및 토큰 관련 로직 구현 필요
 
   return (
-    <header>
+    <HeaderDiv>
       <input
         type="text"
         placeholder="ID"
@@ -32,8 +33,18 @@ function Header() {
       <button onClick={handleLogin}>로그인</button>
       <button onClick={handleLogout}>로그아웃</button>
       {/* 회원가입 버튼 및 JWT 토큰, 만료 시간 디스플레이 구현 필요 */}
-    </header>
+    </HeaderDiv>
   );
 }
+
+const HeaderDiv = styled.div`
+  width: 100%;
+  height: 100px;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  background: papayawhip;
+`;
 
 export default Header;

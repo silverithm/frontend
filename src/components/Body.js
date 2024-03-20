@@ -2,10 +2,12 @@ import InformationDisplay from "./InformationDisplay";
 import AssignmentComponent from "./AssignmentComponent";
 
 function Body() {
-  <body>
-    <InformationDisplay />
-    <AssignmentComponent />
-  </body>;
+  return (
+    <div id="body">
+      <InformationDisplay />
+      <AssignmentComponent />
+    </div>
+  );
 }
 
 export default Body;

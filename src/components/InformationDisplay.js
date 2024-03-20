@@ -4,7 +4,7 @@ import ElderInfo from "./ElderInfo.js";
 
 function InformationDisplay() {
   return (
-    <section>
+    <section id="information-display">
       <div className="employee-info">
         <EmployeeInfo />
       </div>

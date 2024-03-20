@@ -2,17 +2,21 @@ import React from "react";
 import Header from "./components/Header";
 import Body from "./components/Body";
 import Footer from "./components/Footer";
-
-import "./App.css"; // 스타일 시트
+import { styled } from "styled-components";
 
 function App() {
   return (
-    <div className="App">
+    <Container>
       <Header />
       <Body />
       <Footer />
-    </div>
+    </Container>
   );
 }
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 export default App;

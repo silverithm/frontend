@@ -1,8 +1,10 @@
 import VehicleAssignmentButton from "./VehicleAssignmentButton";
 function Footer() {
-  <footer>
-    <VehicleAssignmentButton />
-  </footer>;
+  return (
+    <div id="footer">
+      <VehicleAssignmentButton />
+    </div>
+  );
 }
 
 export default Footer;
