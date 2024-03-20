@@ -1,31 +1,57 @@
 import React from "react";
 import { styled } from "styled-components";
+import { useState } from "react";
 
-function EmployeeInfo({ onSelectEmployee }) {
-  // 직원 정보는 props 또는 API 호출을 통해 가져오는 것으로 가정
-  const employees = [
-    { id: 1, name: "직원 A" },
-    { id: 2, name: "직원 B" },
-    { id: 3, name: "직원 B" },
-    { id: 4, name: "직원 B" },
-    { id: 5, name: "직원 B" },
-    { id: 6, name: "직원 B" },
-    { id: 7, name: "직원 B" },
-    { id: 8, name: "직원 B" },
-    { id: 9, name: "직원 B" },
-    { id: 10, name: "직원 B" },
-    { id: 11, name: "직원 B" },
-    { id: 12, name: "직원 B" },
-    { id: 13, name: "직원 B" },
-    { id: 14, name: "직원 B" },
-    { id: 15, name: "직원 B" },
-  ];
+function EmployeeInfo({ onSelectEmployee, setJwt, jwt }) {
+  const [employees, setEmployees] = useState([]);
+
+  // const employees = [
+  //   { id: 1, name: "직원 A" },
+  //   { id: 2, name: "직원 B" },
+  //   { id: 3, name: "직원 B" },
+  //   { id: 4, name: "직원 B" },
+  //   { id: 5, name: "직원 B" },
+  //   { id: 6, name: "직원 B" },
+  //   { id: 7, name: "원 B" },
+  //   { id: 8, name: "직원 B" },
+  //   { id: 9, name: "직원 B" },
+  //   { id: 10, name: "직원 B" },
+  //   { id: 11, name: "직원 B" },
+  //   { id: 12, name: "직원 B" },
+  //   { id: 13, name: "직원 B" },
+  //   { id: 14, name: "직원 B" },
+  //   { id: 15, name: "직원 B" },
+  // ];
+  // 비동기 함수로 API 호출
+  const fetchEmployees = async () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const response = await fetch(
+      "http://localhost:8080/api/v1/employees",
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => console.error(error));
+
+    await setEmployees(response); // 상태 업데이트
+  };
 
   return (
     <ScrollableDiv>
-      <h2>직원 정보</h2>
-      {employees.map((employee) => (
-        <div key={employee.id}>
+      <h2>
+        직원 정보 <button onClick={fetchEmployees}> 불러오기 </button>
+      </h2>
+      {employees.map((employee, index) => (
+        <div key={index}>
           <input
             type="checkbox"
             onChange={() => onSelectEmployee(employee.id)}

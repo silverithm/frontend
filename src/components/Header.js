@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
 
-function Header() {
+function Header({ setJwt, jwt }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [jwt, setJwt] = useState("");
 
   const handleSignin = async () => {
     const myHeaders = new Headers();

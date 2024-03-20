@@ -2,11 +2,11 @@ import InformationDisplay from "./InformationDisplay";
 import AssignmentComponent from "./AssignmentComponent";
 import styled from "styled-components";
 
-function Body() {
+function Body({ setJwt, jwt }) {
   return (
     <BodyDiv>
-      <InformationDisplay />
-      <AssignmentComponent />
+      <InformationDisplay setJwt={setJwt} jwt={jwt} />
+      <AssignmentComponent setJwt={setJwt} jwt={jwt} />
     </BodyDiv>
   );
 }

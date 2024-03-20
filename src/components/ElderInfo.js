@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "styled-components";
 
-function ElderInfo({ onSelectElder }) {
+function ElderInfo({ onSelectElder, setJwt, jwt }) {
   // 어르신 정보는 props 또는 API 호출을 통해 가져오는 것으로 가정
   const elders = [
     { id: 1, name: "어르신 A" },
