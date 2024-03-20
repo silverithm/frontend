@@ -1,27 +1,38 @@
 import React from "react";
 import { styled } from "styled-components";
+import { useState } from "react";
 
 function ElderInfo({ onSelectElder, setJwt, jwt }) {
   // 어르신 정보는 props 또는 API 호출을 통해 가져오는 것으로 가정
-  const elders = [
-    { id: 1, name: "어르신 A" },
-    { id: 2, name: "어르신 B" },
-    { id: 3, name: "어르신 B" },
-    { id: 4, name: "어르신 B" },
-    { id: 5, name: "어르신 B" },
-    { id: 6, name: "어르신 B" },
-    { id: 7, name: "어르신 B" },
-    { id: 8, name: "어르신 B" },
-    { id: 9, name: "어르신 B" },
-    { id: 10, name: "어르신 B" },
-    { id: 11, name: "어르신 B" },
-    { id: 12, name: "어르신 B" },
-    { id: 13, name: "어르신 B" },
-  ];
 
+  const [elders, setElders] = useState([]);
+
+  const fetchElders = async () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const response = await fetch(
+      "http://localhost:8080/api/v1/elders",
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => console.error(error));
+
+    await setElders(response); // 상태 업데이트
+  };
   return (
     <ScrollableDiv>
-      <h2>어르신 정보</h2>
+      <h2>
+        어르신 정보 <button onClick={fetchElders}>불러오기</button>
+      </h2>
       {elders.map((elder) => (
         <div key={elder.id}>
           <input type="checkbox" onChange={() => onSelectElder(elder.id)} />

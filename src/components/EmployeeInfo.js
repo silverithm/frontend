@@ -5,24 +5,6 @@ import { useState } from "react";
 function EmployeeInfo({ onSelectEmployee, setJwt, jwt }) {
   const [employees, setEmployees] = useState([]);
 
-  // const employees = [
-  //   { id: 1, name: "직원 A" },
-  //   { id: 2, name: "직원 B" },
-  //   { id: 3, name: "직원 B" },
-  //   { id: 4, name: "직원 B" },
-  //   { id: 5, name: "직원 B" },
-  //   { id: 6, name: "직원 B" },
-  //   { id: 7, name: "원 B" },
-  //   { id: 8, name: "직원 B" },
-  //   { id: 9, name: "직원 B" },
-  //   { id: 10, name: "직원 B" },
-  //   { id: 11, name: "직원 B" },
-  //   { id: 12, name: "직원 B" },
-  //   { id: 13, name: "직원 B" },
-  //   { id: 14, name: "직원 B" },
-  //   { id: 15, name: "직원 B" },
-  // ];
-  // 비동기 함수로 API 호출
   const fetchEmployees = async () => {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
