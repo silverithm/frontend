@@ -101,12 +101,6 @@ function Header() {
         <button onClick={handleSignin}>로그인</button>
         <button onClick={handleLogout}>로그아웃</button>
         <button onClick={handleSignup}>회원가입</button>
-        <input
-          type="jwt-expired-time"
-          placeholder="JwtExpiredTime"
-          value={jwtExpiredTime}
-          onChange={(e) => setJwtExpiredTime(e.target.value)}
-        />
       </div>
 
       <div>
