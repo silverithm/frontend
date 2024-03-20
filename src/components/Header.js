@@ -13,10 +13,8 @@ function Header() {
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-      name: name,
       email: email,
       password: password,
-      role: "ROLE_ADMIN",
     });
 
     const requestOptions = {
@@ -40,14 +38,30 @@ function Header() {
   };
 
   const handleSignup = () => {
-    // 로그인 처리 로직
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      name: name,
+      email: email,
+      password: password,
+      role: "ROLE_ADMIN",
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch("http://localhost:8080/api/v1/signup", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
   };
 
-  const handleLogout = () => {
-    // 로그아웃 처리 로직
-  };
-
-  // 회원가입 및 토큰 관련 로직 구현 필요
+  const handleLogout = () => {};
 
   return (
     <HeaderDiv>
