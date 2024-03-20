@@ -4,7 +4,7 @@ import { styled } from "styled-components";
 function Header() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
-  // 토큰 및 만료 시간 상태 관리 필요
+  const [JwtExpiredTime, setJwtExpiredTime] = useState(0);
 
   const handleLogin = () => {
     // 로그인 처리 로직
@@ -32,7 +32,13 @@ function Header() {
       />
       <button onClick={handleLogin}>로그인</button>
       <button onClick={handleLogout}>로그아웃</button>
-      {/* 회원가입 버튼 및 JWT 토큰, 만료 시간 디스플레이 구현 필요 */}
+      <button onClick={handleLogout}>회원가입</button>
+      <input
+        type="jwt"
+        placeholder="JwtExpiredTime"
+        value={JwtExpiredTime}
+        onChange={(e) => setJwtExpiredTime(e.target.value)}
+      />{" "}
     </HeaderDiv>
   );
 }
@@ -44,6 +50,7 @@ const HeaderDiv = styled.div`
   justify-content: center;
   align-items: center;
   display: flex;
+
   background: papayawhip;
 `;
 
