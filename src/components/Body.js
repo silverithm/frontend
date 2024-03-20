@@ -20,7 +20,7 @@ const BodyDiv = styled.div`
   display: flex;
   flex-direction: row;
   background: papayawhip;
-  justify-content: space-between;
+  justify-content: space-around;
 `;
 
 export default Body;
