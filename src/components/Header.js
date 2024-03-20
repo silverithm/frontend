@@ -5,7 +5,6 @@ function Header() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [jwtExpiredTime, setJwtExpiredTime] = useState(0);
   const [jwt, setJwt] = useState("");
 
   const handleSignin = async () => {

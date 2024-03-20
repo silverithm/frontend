@@ -6,7 +6,17 @@ function AssignmentComponent({ onSelectElde }) {
   const elders = [
     { id: 1, name: "어르신 A" },
     { id: 2, name: "어르신 B" },
-    // 추가 어르신 데이터...
+    { id: 3, name: "어르신 B" },
+    { id: 4, name: "어르신 B" },
+    { id: 5, name: "어르신 B" },
+    { id: 6, name: "어르신 B" },
+    { id: 7, name: "어르신 B" },
+    { id: 8, name: "어르신 B" },
+    { id: 9, name: "어르신 B" },
+    { id: 10, name: "어르신 B" },
+    { id: 11, name: "어르신 B" },
+    { id: 12, name: "어르신 B" },
+    { id: 13, name: "어르신 B" },
   ];
   const employees = [
     { id: 1, name: "직원 A" },
@@ -15,15 +25,14 @@ function AssignmentComponent({ onSelectElde }) {
   ];
   return (
     <AssignmentComponentSection>
-      <div>
+      <ScrollableDiv>
         <h2>고정</h2>
         {elders.map((elder) => (
           <div key={elder.id}>
             {elder.name}
             <div style={{ display: "flex" }}>
-              <input type="checkbox" />
               <select style={{ marginLeft: "10px" }}>
-                <option value="">직원 선택</option>
+                <option value="">없음</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
                     {employee.name}
@@ -33,11 +42,19 @@ function AssignmentComponent({ onSelectElde }) {
             </div>
           </div>
         ))}
-      </div>
+      </ScrollableDiv>
     </AssignmentComponentSection>
   );
 }
 
+const ScrollableDiv = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; // 세로 스크롤 활성화
+  height: 100%; // 높이 설정, 원하는 값으로 조정 가능
+  width: 100%; // 너비 설정, 필요에 따라 조정 가능
+`;
 const AssignmentComponentSection = styled.section`
   width: 45%;
   height: 400px;
