@@ -4,7 +4,8 @@ import { styled } from "styled-components";
 function Header() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
-  const [JwtExpiredTime, setJwtExpiredTime] = useState(0);
+  const [jwtExpiredTime, setJwtExpiredTime] = useState(0);
+  const [jwt, setJwt] = useState("");
 
   const handleLogin = () => {
     // 로그인 처리 로직
@@ -34,11 +35,17 @@ function Header() {
       <button onClick={handleLogout}>로그아웃</button>
       <button onClick={handleLogout}>회원가입</button>
       <input
-        type="jwt"
+        type="jwt-expired-time"
         placeholder="JwtExpiredTime"
-        value={JwtExpiredTime}
+        value={jwtExpiredTime}
         onChange={(e) => setJwtExpiredTime(e.target.value)}
-      />{" "}
+      />
+      <input
+        type="jwt"
+        placeholder="Jwt"
+        value={jwt}
+        onChange={(e) => setJwt(e.target.value)}
+      />
     </HeaderDiv>
   );
 }
