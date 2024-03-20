@@ -26,13 +26,13 @@ function Header({ setJwt, jwt }) {
       "http://localhost:8080/api/v1/signin",
       requestOptions
     )
-      .then((response) => response.text())
+      .then((response) => response.json())
       .then((result) => {
         return result;
       })
       .catch((error) => console.error(error));
 
-    await setJwt(loginResult.substring(37, 218));
+    await setJwt(loginResult["accessToken"]);
   };
 
   const handleSignup = () => {
