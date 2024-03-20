@@ -34,7 +34,7 @@ function Header() {
       })
       .catch((error) => console.error(error));
 
-    await setJwt(loginResult.substring(37, 197));
+    await setJwt(loginResult.substring(37, 218));
   };
 
   const handleSignup = () => {
@@ -61,7 +61,21 @@ function Header() {
       .catch((error) => console.error(error));
   };
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    fetch("http://localhost:8080/api/v1/logout", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  };
 
   return (
     <HeaderDiv>
@@ -101,7 +115,7 @@ function Header() {
           placeholder="Jwt"
           value={jwt}
           onChange={(e) => setJwt(e.target.value)}
-          style={{ width: "1220px" }}
+          style={{ width: "1400px" }}
         />
       </div>
     </HeaderDiv>
