@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { styled } from "styled-components";
 
 function Header() {
+  const [name, setName] = useState("");
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [jwtExpiredTime, setJwtExpiredTime] = useState(0);
@@ -23,6 +24,12 @@ function Header() {
 
   return (
     <HeaderDiv>
+      <input
+        type="text"
+        placeholder="name"
+        value={name}
+        onChange={(e) => setId(e.target.value)}
+      />
       <input
         type="text"
         placeholder="ID"
