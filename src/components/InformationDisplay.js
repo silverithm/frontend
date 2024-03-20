@@ -1,6 +1,6 @@
 import React from "react";
 import EmployeeInfo from "./EmployeeInfo";
-import ElderInfo from "./ElderInfo";
+import ElderInfo from "./ElderInfo.js";
 
 function InformationDisplay() {
   return (

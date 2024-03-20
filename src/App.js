@@ -1,21 +1,16 @@
 import React from "react";
 import Header from "./components/Header";
-import InformationDisplay from "./components/InformationDisplay";
-import AssignmentComponent from "./components/AssignmentComponent";
-import VehicleAssignmentButton from "./components/VehicleAssignmentButton";
+import Body from "./components/Body";
+import Footer from "./components/Footer";
+
 import "./App.css"; // 스타일 시트
 
 function App() {
   return (
     <div className="App">
       <Header />
-      <main>
-        <InformationDisplay />
-        <AssignmentComponent />
-      </main>
-      <footer>
-        <VehicleAssignmentButton />
-      </footer>
+      <Body />
+      <Footer />
     </div>
   );
 }
