@@ -28,7 +28,9 @@ function App() {
     if (selectedElderIds.includes(elderId)) {
       setSelectedElderIds(selectedElderIds.filter((id) => id !== elderId));
     } else {
-      setSelectedEmployeeIds([...selectedElderIds, elderId]);
+      selectedElderIds.push(elderId);
+      setSelectedElderIds(selectedElderIds);
+      console.log(selectedElderIds);
     }
 
     // ... 추가적인 처리
@@ -39,7 +41,7 @@ function App() {
       <Header setJwt={setJwt} jwt={jwt} />
       <Body
         onSelectEmployee={onSelectEmployee}
-        onSelectElders={onSelectElder}
+        onSelectElder={onSelectElder}
         setJwt={setJwt}
         jwt={jwt}
       />
