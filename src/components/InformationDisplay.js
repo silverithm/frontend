@@ -3,14 +3,18 @@ import EmployeeInfo from "./EmployeeInfo";
 import ElderInfo from "./ElderInfo.js";
 import { styled } from "styled-components";
 
-function InformationDisplay({ setJwt, jwt }) {
+function InformationDisplay({ onSelectEmployee, onSelectElder, setJwt, jwt }) {
   return (
     <InformationDisplaySection>
       <div className="employee-info">
-        <EmployeeInfo setJwt={setJwt} jwt={jwt} />
+        <EmployeeInfo
+          onSelectEmployee={onSelectEmployee}
+          setJwt={setJwt}
+          jwt={jwt}
+        />
       </div>
       <div className="elder-info">
-        <ElderInfo setJwt={setJwt} jwt={jwt} />
+        <ElderInfo onSelectElder={onSelectElder} setJwt={setJwt} jwt={jwt} />
       </div>
     </InformationDisplaySection>
   );

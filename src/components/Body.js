@@ -2,10 +2,15 @@ import InformationDisplay from "./InformationDisplay";
 import AssignmentComponent from "./AssignmentComponent";
 import styled from "styled-components";
 
-function Body({ setJwt, jwt }) {
+function Body({ onSelectEmployee, onSelectElder, setJwt, jwt }) {
   return (
     <BodyDiv>
-      <InformationDisplay setJwt={setJwt} jwt={jwt} />
+      <InformationDisplay
+        onSelectEmployee={onSelectEmployee}
+        onSelectElder={onSelectElder}
+        setJwt={setJwt}
+        jwt={jwt}
+      />
       <AssignmentComponent setJwt={setJwt} jwt={jwt} />
     </BodyDiv>
   );

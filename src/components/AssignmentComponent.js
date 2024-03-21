@@ -5,7 +5,7 @@ function AssignmentComponent({ onSelectElde, jwtSet, jwt }) {
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
 
-  const fetchEmployeesAndElder = async () => {
+  const fetchEmployeesAndElders = async () => {
     await fetchEmployees();
     await fetchElders();
   };
@@ -56,7 +56,7 @@ function AssignmentComponent({ onSelectElde, jwtSet, jwt }) {
     <AssignmentComponentSection>
       <ScrollableDiv>
         <h2>
-          고정 <button onClick={fetchEmployeesAndElder}>불러오기</button>
+          고정 <button onClick={fetchEmployeesAndElders}>불러오기</button>
         </h2>
         {elders.map((elder) => (
           <div key={elder.id}>
