@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
 
-function ElderInfo({ onSelectElder, setJwt, jwt }) {
+function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt }) {
   // 어르신 정보는 props 또는 API 호출을 통해 가져오는 것으로 가정
 
   const [elders, setElders] = useState([]);
@@ -26,6 +26,7 @@ function ElderInfo({ onSelectElder, setJwt, jwt }) {
       })
       .catch((error) => console.error(error));
 
+    await setEldersInfo(response);
     await setElders(response); // 상태 업데이트
   };
   return (

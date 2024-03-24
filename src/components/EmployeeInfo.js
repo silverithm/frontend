@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
 
-function EmployeeInfo({ onSelectEmployee, setJwt, jwt }) {
+function EmployeeInfo({ onSelectEmployee, setJwt, jwt, setEmployeesInfo }) {
   const [employees, setEmployees] = useState([]);
 
   const fetchEmployees = async () => {
@@ -24,6 +24,7 @@ function EmployeeInfo({ onSelectEmployee, setJwt, jwt }) {
       })
       .catch((error) => console.error(error));
 
+    await setEmployeesInfo(response);
     await setEmployees(response); // 상태 업데이트
   };
 

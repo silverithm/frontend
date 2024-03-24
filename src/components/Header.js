@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
 
-function Header({ setJwt, jwt }) {
+function Header({ setJwt, jwt, setCompany, companyName }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +32,8 @@ function Header({ setJwt, jwt }) {
       })
       .catch((error) => console.error(error));
 
-    await setJwt(loginResult["accessToken"]);
+    await setJwt(loginResult["tokenInfo"]["accessToken"]);
+    await setCompany(loginResult["companyName"], loginResult["companyAddress"]);
   };
 
   const handleSignup = () => {
@@ -107,6 +108,14 @@ function Header({ setJwt, jwt }) {
           placeholder="Jwt"
           value={jwt}
           onChange={(e) => setJwt(e.target.value)}
+          style={{ width: "1400px" }}
+        />
+      </div>
+      <div>
+        <input
+          type="companyName"
+          placeholder="companyName"
+          value={companyName}
           style={{ width: "1400px" }}
         />
       </div>

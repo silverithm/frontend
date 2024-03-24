@@ -1,10 +1,10 @@
 import VehicleAssignmentButton from "./VehicleAssignmentButton";
 import { styled } from "styled-components";
 
-function Footer() {
+function Footer({ dispatch }) {
   return (
     <FooterDiv>
-      <VehicleAssignmentButton />
+      <VehicleAssignmentButton dispatch={dispatch} />
     </FooterDiv>
   );
 }

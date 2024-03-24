@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
 
-function AssignmentComponent({ onSelectElde, jwtSet, jwt }) {
+function AssignmentComponent({ jwtSet, jwt, onSelectAssignment }) {
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
+
+  const handleSelect = (e, elderId) => {
+    const selectedAssignment = {
+      employee_idx: Number(e.target.value),
+      elderly_idx: elderId,
+    };
+
+    onSelectAssignment(selectedAssignment);
+  };
 
   const fetchEmployeesAndElders = async () => {
     await fetchEmployees();
@@ -62,8 +71,11 @@ function AssignmentComponent({ onSelectElde, jwtSet, jwt }) {
           <div key={elder.id}>
             {elder.name}
             <div style={{ display: "flex" }}>
-              <select style={{ marginLeft: "10px" }}>
-                <option value="">없음</option>
+              <select
+                onChange={(e) => handleSelect(e, elder.id)}
+                style={{ marginLeft: "10px" }}
+              >
+                <option value="없음">없음</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
                     {employee.name}
