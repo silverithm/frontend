@@ -32,14 +32,44 @@ function App() {
       selectedElderIds.includes(elderlyInfo.id)
     );
 
-    const requestJson = {
+    const requestJson1 = {
+      elderlys: selectedElderlysInfos,
+      employees: selectedEmployeesInfos,
+      company: { companyAddress: companyAddress },
+      dispatchType: "IN",
+    };
+    const requestJson2 = {
       elderlys: selectedElderlysInfos,
       employees: selectedEmployeesInfos,
       company: { companyAddress: companyAddress },
       fixedAssignments: fixedAssignments,
+      dispatchType: "IN",
     };
 
-    console.log(requestJson);
+    if (fixedAssignments.length === 0) {
+      console.log(JSON.stringify(requestJson1));
+    } else {
+      console.log(JSON.stringify(requestJson2));
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body:
+        fixedAssignments.length === 0
+          ? JSON.stringify(requestJson1)
+          : JSON.stringify(requestJson2),
+      redirect: "follow",
+    };
+
+    fetch("http://localhost:8080/api/v1/dispatch", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
   }
 
   function onSelectEmployee(employeeId) {
