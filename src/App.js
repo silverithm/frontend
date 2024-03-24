@@ -20,8 +20,6 @@ function App() {
   function setCompany(companyName, companyAddress) {
     setCompanyName(companyName);
     setCompanyAddress(companyAddress);
-    console.log(companyName);
-    console.log(companyAddress);
   }
 
   function dispatch() {
@@ -37,6 +35,7 @@ function App() {
     const requestJson = {
       elderlys: selectedElderlysInfos,
       employees: selectedEmployeesInfos,
+      company: { companyAddress: companyAddress },
       fixedAssignments: fixedAssignments,
     };
 

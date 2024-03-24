@@ -108,7 +108,7 @@ function Header({ setJwt, jwt, setCompany, companyName }) {
           placeholder="Jwt"
           value={jwt}
           onChange={(e) => setJwt(e.target.value)}
-          style={{ width: "1400px" }}
+          style={{ width: "1400px", textAlign: "center" }}
         />
       </div>
       <div>
@@ -116,7 +116,7 @@ function Header({ setJwt, jwt, setCompany, companyName }) {
           type="companyName"
           placeholder="companyName"
           value={companyName}
-          style={{ width: "1400px" }}
+          style={{ width: "1400px", textAlign: "center" }}
         />
       </div>
     </HeaderDiv>
