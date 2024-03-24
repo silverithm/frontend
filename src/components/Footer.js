@@ -1,10 +1,12 @@
-import VehicleAssignmentButton from "./VehicleAssignmentButton";
+import InVehicleAssignmentButton from "./InVehicleAssignmentButton";
+import OutVehicleAssignmentButton from "./OutVehicleAssignmentButton";
 import { styled } from "styled-components";
 
-function Footer({ dispatch }) {
+function Footer({ dispatchIn, dispatchOut }) {
   return (
     <FooterDiv>
-      <VehicleAssignmentButton dispatch={dispatch} />
+      <InVehicleAssignmentButton dispatchIn={dispatchIn} />
+      <OutVehicleAssignmentButton dispatchOut={dispatchOut} />
     </FooterDiv>
   );
 }

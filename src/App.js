@@ -4,7 +4,6 @@ import Body from "./components/Body";
 import Footer from "./components/Footer";
 import { styled } from "styled-components";
 import { useState } from "react";
-import ElderInfo from "./components/ElderInfo";
 
 function App() {
   const [jwt, setJwt] = useState("");
@@ -17,13 +16,20 @@ function App() {
   const [employeesInfo, setEmployeesInfo] = useState([]);
   const [eldersInfo, setEldersInfo] = useState([]);
 
+  const [dispatchType, setType] = useState("");
+
   function setCompany(companyName, companyAddress) {
     setCompanyName(companyName);
     setCompanyAddress(companyAddress);
   }
 
-  function dispatch() {
-    alert("차량배치가 시작되었습니다.");
+  function setTypeFunction(type) {
+    console.log(type);
+    setType(type);
+  }
+
+  function dispatchIn() {
+    alert("출근 차량배치가 시작되었습니다.");
 
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
       selectedEmployeeIds.includes(employeeInfo.id)
@@ -44,6 +50,56 @@ function App() {
       company: { companyAddress: companyAddress },
       fixedAssignments: fixedAssignments,
       dispatchType: "IN",
+    };
+
+    if (fixedAssignments.length === 0) {
+      console.log(JSON.stringify(requestJson1));
+    } else {
+      console.log(JSON.stringify(requestJson2));
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body:
+        fixedAssignments.length === 0
+          ? JSON.stringify(requestJson1)
+          : JSON.stringify(requestJson2),
+      redirect: "follow",
+    };
+
+    fetch("http://localhost:8080/api/v1/dispatch", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  }
+
+  function dispatchOut() {
+    alert("퇴근 차량배치가 시작되었습니다.");
+
+    const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
+      selectedEmployeeIds.includes(employeeInfo.id)
+    );
+    const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
+      selectedElderIds.includes(elderlyInfo.id)
+    );
+
+    const requestJson1 = {
+      elderlys: selectedElderlysInfos,
+      employees: selectedEmployeesInfos,
+      company: { companyAddress: companyAddress },
+      dispatchType: "OUT",
+    };
+    const requestJson2 = {
+      elderlys: selectedElderlysInfos,
+      employees: selectedEmployeesInfos,
+      company: { companyAddress: companyAddress },
+      fixedAssignments: fixedAssignments,
+      dispatchType: "OUT",
     };
 
     if (fixedAssignments.length === 0) {
@@ -135,7 +191,7 @@ function App() {
         setJwt={setJwt}
         jwt={jwt}
       />
-      <Footer dispatch={dispatch} />
+      <Footer dispatchIn={dispatchIn} dispatchOut={dispatchOut} />
     </Container>
   );
 }
