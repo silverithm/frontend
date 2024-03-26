@@ -32,6 +32,7 @@ function EmployeeInfo({
 
     await setEmployeesInfo(response);
     await setEmployees(response); // 상태 업데이트
+    await console.log(employees);
   };
 
   return (
@@ -45,7 +46,10 @@ function EmployeeInfo({
             type="checkbox"
             onChange={() => onSelectEmployee(employee.id)}
           />
-          {employee.name}
+          <input value={employee["name"]}></input>
+          <input value={employee["maximumCapacity"]}></input>
+          <button>수정</button>
+          <button>삭제</button>
         </div>
       ))}
     </ScrollableDiv>
@@ -54,6 +58,6 @@ function EmployeeInfo({
 const ScrollableDiv = styled.div`
   overflow-y: auto; // 세로 스크롤 활성화
   height: 400px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 200px; // 너비 설정, 필요에 따라 조정 가능
+  width: 400px; // 너비 설정, 필요에 따라 조정 가능
 `;
 export default EmployeeInfo;

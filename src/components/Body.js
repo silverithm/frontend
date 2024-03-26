@@ -41,7 +41,7 @@ const BodyDiv = styled.div`
   align-items: center;
   display: flex;
   flex-direction: row;
-  background: papayawhip;
+
   justify-content: space-around;
 `;
 

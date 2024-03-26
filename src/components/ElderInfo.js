@@ -7,6 +7,31 @@ function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt, userId }) {
 
   const [elders, setElders] = useState([]);
 
+  function updateElder(name, requiredFrontSeat, elderId) {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const raw = JSON.stringify({
+      name: name,
+      requiredFrontSeat: requiredFrontSeat,
+    });
+
+    const requestOptions = {
+      method: "PUT",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch("localhost:8080/api/v1/elder/" + elderId, requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+
+    alert(name + " 수정 완료");
+  }
+
   const fetchElders = async () => {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
@@ -37,7 +62,16 @@ function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt, userId }) {
       {elders.map((elder) => (
         <div key={elder.id}>
           <input type="checkbox" onChange={() => onSelectElder(elder.id)} />
-          {elder.name}
+          <input value={elder["name"]}></input>
+          <input value={elder["requiredFrontSeat"]}></input>
+          <button
+            onClick={() =>
+              updateElder(elder["name"], elder["requiredFrontSeat"], elder.id)
+            }
+          >
+            수정
+          </button>
+          <button>삭제</button>
         </div>
       ))}
     </ScrollableDiv>
@@ -49,5 +83,5 @@ export default ElderInfo;
 const ScrollableDiv = styled.div`
   overflow-y: auto; // 세로 스크롤 활성화
   height: 400px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 200px; // 너비 설정, 필요에 따라 조정 가능
+  width: 400px; // 너비 설정, 필요에 따라 조정 가능
 `;
