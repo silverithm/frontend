@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
 
-function AssignmentComponent({ jwtSet, jwt, onSelectAssignment }) {
+function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
 
@@ -29,7 +29,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/employees",
+      "http://localhost:8080/api/v1/employees/" + userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -50,7 +50,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/elders",
+      "http://localhost:8080/api/v1/elders/" + userId,
       requestOptions
     )
       .then((response) => response.json())

@@ -10,6 +10,7 @@ function Body({
   onSelectAssignment,
   setEmployeesInfo,
   setEldersInfo,
+  userId,
 }) {
   return (
     <BodyDiv>
@@ -20,11 +21,13 @@ function Body({
         setEldersInfo={setEldersInfo}
         setJwt={setJwt}
         jwt={jwt}
+        userId={userId}
       />
       <AssignmentComponent
         setJwt={setJwt}
         jwt={jwt}
         onSelectAssignment={onSelectAssignment}
+        userId={userId}
       />
     </BodyDiv>
   );

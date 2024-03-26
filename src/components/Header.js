@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
 
-function Header({ setJwt, jwt, setCompany, companyName }) {
+function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +34,7 @@ function Header({ setJwt, jwt, setCompany, companyName }) {
 
     await setJwt(loginResult["tokenInfo"]["accessToken"]);
     await setCompany(loginResult["companyName"], loginResult["companyAddress"]);
+    await setUserId(loginResult["userId"]);
   };
 
   const handleSignup = () => {

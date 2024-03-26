@@ -17,6 +17,7 @@ function App() {
   const [eldersInfo, setEldersInfo] = useState([]);
 
   const [dispatchType, setType] = useState("");
+  const [userId, setUserId] = useState();
 
   function setCompany(companyName, companyAddress) {
     setCompanyName(companyName);
@@ -178,6 +179,7 @@ function App() {
     <Container>
       <Header
         setJwt={setJwt}
+        setUserId={setUserId}
         jwt={jwt}
         setCompany={setCompany}
         companyName={companyName}
@@ -185,6 +187,7 @@ function App() {
       <Body
         onSelectEmployee={onSelectEmployee}
         onSelectElder={onSelectElder}
+        userId={userId}
         onSelectAssignment={onSelectAssignment}
         setEmployeesInfo={setEmployeesInfo}
         setEldersInfo={setEldersInfo}

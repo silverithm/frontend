@@ -10,6 +10,7 @@ function InformationDisplay({
   jwt,
   setEldersInfo,
   setEmployeesInfo,
+  userId,
 }) {
   return (
     <InformationDisplaySection>
@@ -19,6 +20,7 @@ function InformationDisplay({
           setJwt={setJwt}
           setEmployeesInfo={setEmployeesInfo}
           jwt={jwt}
+          userId={userId}
         />
       </div>
       <div className="elder-info">
@@ -27,6 +29,7 @@ function InformationDisplay({
           setJwt={setJwt}
           setEldersInfo={setEldersInfo}
           jwt={jwt}
+          userId={userId}
         />
       </div>
     </InformationDisplaySection>

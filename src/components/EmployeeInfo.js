@@ -2,7 +2,13 @@ import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
 
-function EmployeeInfo({ onSelectEmployee, setJwt, jwt, setEmployeesInfo }) {
+function EmployeeInfo({
+  onSelectEmployee,
+  setJwt,
+  jwt,
+  setEmployeesInfo,
+  userId,
+}) {
   const [employees, setEmployees] = useState([]);
 
   const fetchEmployees = async () => {
@@ -15,7 +21,7 @@ function EmployeeInfo({ onSelectEmployee, setJwt, jwt, setEmployeesInfo }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/employees",
+      "http://localhost:8080/api/v1/employees/" + userId,
       requestOptions
     )
       .then((response) => response.json())

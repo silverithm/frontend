@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
 
-function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt }) {
+function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt, userId }) {
   // 어르신 정보는 props 또는 API 호출을 통해 가져오는 것으로 가정
 
   const [elders, setElders] = useState([]);
@@ -17,7 +17,7 @@ function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/elders",
+      "http://localhost:8080/api/v1/elders/" + userId,
       requestOptions
     )
       .then((response) => response.json())
