@@ -11,6 +11,10 @@ function EmployeeInfo({
 }) {
   const [employees, setEmployees] = useState([]);
 
+  function checkValue() {
+    console.log(employees);
+  }
+
   const fetchEmployees = async () => {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
@@ -35,6 +39,14 @@ function EmployeeInfo({
     await console.log(employees);
   };
 
+  const handleMaximumCapacityChange = async (id, value) => {
+    await setEmployees((prevEmployees) =>
+      prevEmployees.map((employee) =>
+        employee.id === id ? { ...employee, maximumCapacity: value } : employee
+      )
+    );
+  };
+
   return (
     <ScrollableDiv>
       <h2>
@@ -47,8 +59,10 @@ function EmployeeInfo({
             onChange={() => onSelectEmployee(employee.id)}
           />
           <input value={employee["name"]}></input>
-          <input value={employee["maximumCapacity"]}></input>
-          <button>수정</button>
+          <input
+            onChange={(e) => (employee.maximumCapacity = e.target.value)}
+            defaultValue={employee["maximumCapacity"]}
+          ></input>
           <button>삭제</button>
         </div>
       ))}

@@ -6,31 +6,17 @@ function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt, userId }) {
   // 어르신 정보는 props 또는 API 호출을 통해 가져오는 것으로 가정
 
   const [elders, setElders] = useState([]);
+  const [selectedRequiredFrontSeat, setSelectedRequiredFrontSeat] = useState();
 
-  function updateElder(name, requiredFrontSeat, elderId) {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", "Bearer " + jwt);
-
-    const raw = JSON.stringify({
-      name: name,
-      requiredFrontSeat: requiredFrontSeat,
-    });
-
-    const requestOptions = {
-      method: "PUT",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    fetch("localhost:8080/api/v1/elder/" + elderId, requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-
-    alert(name + " 수정 완료");
-  }
+  const handleSelectChange = (elderId, requiredFrontSeat) => {
+    setElders((prevElders) =>
+      prevElders.map((elder) =>
+        elder.id === elderId
+          ? { ...elder, requiredFrontSeat: requiredFrontSeat }
+          : elder
+      )
+    );
+  };
 
   const fetchElders = async () => {
     const myHeaders = new Headers();
@@ -63,14 +49,15 @@ function ElderInfo({ onSelectElder, setJwt, setEldersInfo, jwt, userId }) {
         <div key={elder.id}>
           <input type="checkbox" onChange={() => onSelectElder(elder.id)} />
           <input value={elder["name"]}></input>
-          <input value={elder["requiredFrontSeat"]}></input>
-          <button
-            onClick={() =>
-              updateElder(elder["name"], elder["requiredFrontSeat"], elder.id)
+          <select
+            onChange={(e) =>
+              handleSelectChange(elder.id, e.target.value === "true")
             }
+            value={elder.requiredFrontSeat ? "true" : "false"}
           >
-            수정
-          </button>
+            <option value="true">앞자리 필요</option>
+            <option value="false">앞자리 필요없음</option>
+          </select>
           <button>삭제</button>
         </div>
       ))}
