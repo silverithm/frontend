@@ -9,6 +9,7 @@ function EmployeeInfo({
   userId,
   employees,
   setEmployees,
+  setEmployeesInfo,
 }) {
   async function deleteEmployee(employeeId) {
     const myHeaders = new Headers();

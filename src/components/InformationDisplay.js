@@ -105,6 +105,7 @@ function InformationDisplay({
       .catch((error) => console.error(error));
 
     await setEmployees(response); // 상태 업데이트
+    await setEmployeesInfo(response);
     await console.log(employees);
   };
 
@@ -146,6 +147,7 @@ function InformationDisplay({
           employees={employees}
           userId={userId}
           setEmployees={setEmployees}
+          setEmployeesInfo={setEmployeesInfo}
         />
 
         <InformationDiv2>
