@@ -63,18 +63,15 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   };
   return (
     <AssignmentComponentSection>
-      <ScrollableDiv>
+      <AssignmentDiv>
         <h2>
           고정 <button onClick={fetchEmployeesAndElders}>불러오기</button>
         </h2>
-        {elders.map((elder) => (
-          <div key={elder.id}>
-            {elder.name}
-            <div style={{ display: "flex" }}>
-              <select
-                onChange={(e) => handleSelect(e, elder.id)}
-                style={{ marginLeft: "10px" }}
-              >
+        <ScrollableDiv>
+          {elders.map((elder) => (
+            <ElderRow key={elder.id}>
+              <input value={elder.name}></input>
+              <select onChange={(e) => handleSelect(e, elder.id)}>
                 <option value="없음">없음</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
@@ -82,31 +79,44 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
-        ))}
-      </ScrollableDiv>
+            </ElderRow>
+          ))}
+        </ScrollableDiv>
+      </AssignmentDiv>
     </AssignmentComponentSection>
   );
 }
 
-const ScrollableDiv = styled.div`
-  align-items: center;
+const AssignmentDiv = styled.div`
   display: flex;
-  flex-direction: column;
-  overflow-y: auto; // 세로 스크롤 활성화
-  height: 100%; // 높이 설정, 원하는 값으로 조정 가능
-  width: 100%; // 너비 설정, 필요에 따라 조정 가능
-`;
-const AssignmentComponentSection = styled.section`
-  width: 45%;
-  height: 400px;
-  align-content: center;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
+
+const ElderRow = styled.div`
+  display: flex;
+  flex-direction: row; // 수평 정렬
+  align-items: center; // 세로 중앙 정렬
+  justify-content: center; // 시작 부분부터 요소를 배열
+`;
+
+const ScrollableDiv = styled.div`
+  overflow-y: scroll; // 세로 스크롤 활성화
+  height: 450px; // 높이 설정, 원하는 값으로 조정 가능
+  width: 600px; // 너비 설정, 필요에 따라 조정 가능
+  flex-direction: row;
+`;
+
+const AssignmentComponentSection = styled.section`
+  width: 600px;
+  height: 500px;
+  align-content: center;
   align-items: center;
   display: flex;
   flex-direction: row;
   background: white;
+  text-align: center;
 `;
 
 export default AssignmentComponent;
