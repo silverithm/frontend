@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-
+import { toast, ToastContainer } from "react-toastify";
 function EmployeeInfo({
   onSelectEmployee,
   setJwt,
@@ -33,6 +33,7 @@ function EmployeeInfo({
     setEmployees((prevEmployees) =>
       prevEmployees.filter((employee) => employee.id !== employeeId)
     );
+    await toast("삭제에 성공하였습니다.");
   }
   return (
     <ScrollableDiv>

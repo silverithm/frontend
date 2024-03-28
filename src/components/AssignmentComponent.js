@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { styled } from "styled-components";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import { toast, ToastContainer } from "react-toastify";
 
 function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   const [elders, setElders] = useState([]);
@@ -17,6 +18,12 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   };
 
   const fetchEmployeesAndElders = async () => {
+    if (jwt === "") {
+      toast(
+        "불러오기를 하려면 로그인이 필요합니다. 먼저 로그인을 시도해 주세요."
+      );
+      return;
+    }
     await fetchEmployees();
     await fetchElders();
   };

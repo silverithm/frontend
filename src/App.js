@@ -8,6 +8,7 @@ import RiseLoader from "react-spinners/RiseLoader";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { toast, ToastContainer } from "react-toastify";
 
 function App() {
   const [jwt, setJwt] = useState("");
@@ -77,7 +78,13 @@ function App() {
   }
 
   async function dispatchIn() {
-    alert("출근 차량배치가 시작되었습니다.");
+    if (jwt === "") {
+      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
+      return;
+    }
+
+    toast("출근 차량배치가 시작되었습니다.");
+
     await setLoading(true);
 
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
@@ -121,15 +128,26 @@ function App() {
       redirect: "follow",
     };
 
+    let flag = false;
     const result = await fetch(
       "http://localhost:8080/api/v1/dispatch",
       requestOptions
     )
       .then((response) => {
+        if (!response.ok) {
+          flag = true;
+        }
         console.log(response.text);
         return response.json();
       })
       .catch((error) => console.error(error));
+
+    if (flag) {
+      toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
+      setLoading(false);
+      return;
+    }
+    toast("출근 차량배치가 완료되었습니다.");
 
     await setLoading(false);
     await setDispatchResult(result);
@@ -138,7 +156,12 @@ function App() {
   }
 
   async function dispatchOut() {
-    alert("퇴근 차량배치가 시작되었습니다.");
+    if (jwt === "") {
+      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
+      return;
+    }
+
+    toast("퇴근 차량배치가 시작되었습니다.");
     await setLoading(true);
 
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
@@ -182,15 +205,26 @@ function App() {
       redirect: "follow",
     };
 
+    let flag = false;
     const result = await fetch(
       "http://localhost:8080/api/v1/dispatch",
       requestOptions
     )
       .then((response) => {
+        if (!response.ok) {
+          flag = true;
+        }
         console.log(response.text);
         return response.json();
       })
       .catch((error) => console.error(error));
+
+    if (flag) {
+      toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
+      setLoading(false);
+      return;
+    }
+    toast("퇴근 차량배치가 완료되었습니다.");
 
     await setLoading(false);
     await setDispatchResult(result);
@@ -246,6 +280,8 @@ function App() {
 
   return (
     <div>
+      <ToastContainer></ToastContainer>
+
       <Container>
         <Header
           setJwt={setJwt}
@@ -253,6 +289,10 @@ function App() {
           jwt={jwt}
           setCompany={setCompany}
           companyName={companyName}
+          setEldersInfo={setEldersInfo}
+          setEmployeesInfo={setEmployeesInfo}
+          setSelectedElderIds={setSelectedElderIds}
+          setSelectedEmployeeIds={setSelectedEmployeeIds}
         />
         <div style={{ height: "1px" }}></div>
         <Body

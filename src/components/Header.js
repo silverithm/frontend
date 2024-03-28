@@ -2,9 +2,19 @@ import React, { useState } from "react";
 import { styled } from "styled-components";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-
-function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+function Header({
+  setJwt,
+  jwt,
+  setCompany,
+  companyName,
+  setUserId,
+  setEldersInfo,
+  setEmployeesInfo,
+  setSelectedElderIds,
+  setSelectedEmployeeIds,
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,14 +43,28 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
       .then((result) => {
         return result;
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+      });
 
-    await setJwt(loginResult["tokenInfo"]["accessToken"]);
-    await setCompany(loginResult["companyName"], loginResult["companyAddress"]);
-    await setUserId(loginResult["userId"]);
+    try {
+      await setJwt(loginResult["tokenInfo"]["accessToken"]);
+      await setCompany(
+        loginResult["companyName"],
+        loginResult["companyAddress"]
+      );
+      await setUserId(loginResult["userId"]);
+      await toast("로그인에 성공하였습니다.");
+    } catch (error) {
+      toast("로그인에 실패하였습니다. 다시 시도해 주세요.");
+    }
   };
 
   const handleSignup = () => {
+    toast(
+      "해당 기능은 준비 중입니다. 회원가입을 원하시면 관리자에게 문의해 주세요."
+    );
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -61,10 +85,15 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
     fetch("http://localhost:8080/api/v1/signup", requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
-      .catch((error) => console.error(error));
+      .catch((error) => alert("회원가입에 실패하였습니다."));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (jwt === "") {
+      toast("로그인 상태가 아닙니다. 로그인 후 이용해 주세요.");
+      return;
+    }
+
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
@@ -74,10 +103,13 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
       redirect: "follow",
     };
 
-    fetch("http://localhost:8080/api/v1/logout", requestOptions)
+    await fetch("http://localhost:8080/api/v1/logout", requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
-      .catch((error) => console.error(error));
+      .catch((error) => alert("로그아웃에 실패하였습니다."));
+    await window.location.reload();
+
+    await toast("로그아웃에 성공하였습니다. 다시 로그인해 주세요");
   };
 
   return (
@@ -85,7 +117,7 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
       <InputDiv>
         <Form.Control
           type="text"
-          placeholder="ID"
+          placeholder="Id"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -108,6 +140,7 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
 
       <div>
         <Form.Control
+          readOnly
           type="jwt"
           placeholder="Jwt"
           value={jwt}
@@ -117,6 +150,7 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
       </div>
       <div>
         <Form.Control
+          readOnly
           type="companyName"
           placeholder="companyName"
           value={companyName}

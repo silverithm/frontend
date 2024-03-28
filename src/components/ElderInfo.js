@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-
+import { toast, ToastContainer } from "react-toastify";
 function ElderInfo({
   onSelectElder,
   setJwt,
@@ -30,6 +30,8 @@ function ElderInfo({
     setElders((prevElders) =>
       prevElders.filter((elder) => elder.id !== elderId)
     );
+
+    await toast("삭제에 성공하였습니다.");
   }
 
   const handleSelectChange = (elderId, requiredFrontSeat) => {

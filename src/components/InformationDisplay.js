@@ -5,7 +5,7 @@ import { styled } from "styled-components";
 import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-
+import { toast, ToastContainer } from "react-toastify";
 function InformationDisplay({
   onSelectEmployee,
   onSelectElder,
@@ -43,6 +43,19 @@ function InformationDisplay({
   };
 
   function addEmployee() {
+    if (jwt === "") {
+      toast("추가를 하려면 로그인이 필요합니다. 먼저 로그인을 시도해 주세요.");
+      return;
+    }
+
+    if (
+      employeeName === "" ||
+      employeeWorkPlace === "" ||
+      employeeHomeAddress === ""
+    ) {
+      toast("직원 정보를 모두 입력해 주세요.");
+      return;
+    }
     console.log("clicked!!!");
     console.log(employeeName);
     console.log(employeeWorkPlace);
@@ -68,11 +81,30 @@ function InformationDisplay({
     };
 
     fetch("http://localhost:8080/api/v1/employee/" + userId, requestOptions)
-      .then((response) => response.text())
+      .then((result) => {
+        if (!result.ok) {
+          toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
+        } else {
+          toast("직원 추가에 성공하였습니다.");
+        }
+      })
       .then((result) => console.log(result))
-      .catch((error) => console.error(error));
+      .catch((error) => console.log(error));
   }
+
   function addElderly() {
+    if (jwt === "") {
+      toast("추가를 하려면 로그인이 필요합니다. 먼저 로그인을 시도해 주세요.");
+      return;
+    }
+    if (
+      elderlyName === "" ||
+      elderlyHomeAddress === "" ||
+      elderlyIsRequiredFrontSeat === ""
+    ) {
+      toast("어르신 정보를 모두 입력해 주세요.");
+      return;
+    }
     console.log("clicked!!!");
     console.log(elderlyName);
     console.log(elderlyHomeAddress);
@@ -96,12 +128,24 @@ function InformationDisplay({
     };
 
     fetch("http://localhost:8080/api/v1/elder/" + userId, requestOptions)
-      .then((response) => response.text())
+      .then((response) => {
+        if (!response.ok) {
+          toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
+        } else {
+          toast("직원 추가에 성공하였습니다.");
+        }
+      })
       .then((result) => console.log(result))
       .catch((error) => console.error(error));
   }
 
   const fetchEmployees = async () => {
+    if (jwt === "") {
+      toast(
+        "불러오기를 하려면 로그인이 필요합니다. 먼저 로그인을 시도해 주세요."
+      );
+      return;
+    }
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
@@ -126,6 +170,12 @@ function InformationDisplay({
   };
 
   const fetchElders = async () => {
+    if (jwt === "") {
+      toast(
+        "불러오기를 하려면 로그인이 필요합니다. 먼저 로그인을 시도해 주세요."
+      );
+      return;
+    }
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
