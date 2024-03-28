@@ -46,7 +46,25 @@ function App() {
             차량 배치 결과
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>{props.message}</Modal.Body>
+        <Modal.Body>
+          <div>
+            {props.data.map((item, index) => (
+              <div
+                key={index}
+                style={{ display: "flex", marginBottom: "10px" }}
+              >
+                <div style={{ marginRight: "20px", fontWeight: "bold" }}>
+                  {item.employeeName}
+                </div>
+                <div style={{ flexDirection: "row", display: "flex" }}>
+                  {item.assignmentElderNames.map((name, idx) => (
+                    <div key={idx}>{name}</div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Modal.Body>
         <Modal.Footer>
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
@@ -103,9 +121,9 @@ function App() {
       "http://localhost:8080/api/v1/dispatch",
       requestOptions
     )
-      .then((response) => response.text())
-      .then((result) => {
-        return result;
+      .then((response) => {
+        console.log(response.text);
+        return response.json();
       })
       .catch((error) => console.error(error));
 
@@ -164,9 +182,9 @@ function App() {
       "http://localhost:8080/api/v1/dispatch",
       requestOptions
     )
-      .then((response) => response.text())
-      .then((result) => {
-        return result;
+      .then((response) => {
+        console.log(response.text);
+        return response.json();
       })
       .catch((error) => console.error(error));
 
@@ -252,7 +270,7 @@ function App() {
       <MyVerticallyCenteredModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        message={dispatchResult}
+        data={dispatchResult}
       />
     </div>
   );
