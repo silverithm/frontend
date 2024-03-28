@@ -270,7 +270,7 @@ function App() {
       </Container>
       {loading && (
         <LoadingOverlay>
-          <RiseLoader color="#f88c6b" loading={loading} size={50} />
+          <RiseLoader color="#00BFFF" loading={loading} size={50} />
         </LoadingOverlay>
       )}
       <MyVerticallyCenteredModal
