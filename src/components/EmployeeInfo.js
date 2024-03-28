@@ -54,7 +54,7 @@ function EmployeeInfo({
 const ScrollableDiv = styled.div`
   overflow-y: scroll; // 세로 스크롤 활성화
   height: 400px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 600px; // 너비 설정, 필요에 따라 조정 가능
+  width: 500px; // 너비 설정, 필요에 따라 조정 가능
 `;
 
 const EmployeeItem = styled.div`

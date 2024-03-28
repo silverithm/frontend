@@ -4,6 +4,10 @@ import Body from "./components/Body";
 import Footer from "./components/Footer";
 import { styled } from "styled-components";
 import { useState } from "react";
+import RiseLoader from "react-spinners/RiseLoader";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [jwt, setJwt] = useState("");
@@ -16,21 +20,43 @@ function App() {
   const [employeesInfo, setEmployeesInfo] = useState([]);
   const [eldersInfo, setEldersInfo] = useState([]);
 
-  const [dispatchType, setType] = useState("");
   const [userId, setUserId] = useState();
+
+  let [loading, setLoading] = useState(false);
+
+  const [modalShow, setModalShow] = React.useState(false);
+
+  const [dispatchResult, setDispatchResult] = useState([]);
 
   function setCompany(companyName, companyAddress) {
     setCompanyName(companyName);
     setCompanyAddress(companyAddress);
   }
 
-  function setTypeFunction(type) {
-    console.log(type);
-    setType(type);
+  function MyVerticallyCenteredModal(props) {
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            차량 배치 결과
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{props.message}</Modal.Body>
+        <Modal.Footer>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
   }
 
-  function dispatchIn() {
+  async function dispatchIn() {
     alert("출근 차량배치가 시작되었습니다.");
+    await setLoading(true);
 
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
       selectedEmployeeIds.includes(employeeInfo.id)
@@ -73,14 +99,25 @@ function App() {
       redirect: "follow",
     };
 
-    fetch("http://localhost:8080/api/v1/dispatch", requestOptions)
+    const result = await fetch(
+      "http://localhost:8080/api/v1/dispatch",
+      requestOptions
+    )
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) => {
+        return result;
+      })
       .catch((error) => console.error(error));
+
+    await setLoading(false);
+    await setDispatchResult(result);
+    await console.log(dispatchResult);
+    await setModalShow(true);
   }
 
-  function dispatchOut() {
+  async function dispatchOut() {
     alert("퇴근 차량배치가 시작되었습니다.");
+    await setLoading(true);
 
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
       selectedEmployeeIds.includes(employeeInfo.id)
@@ -123,10 +160,20 @@ function App() {
       redirect: "follow",
     };
 
-    fetch("http://localhost:8080/api/v1/dispatch", requestOptions)
+    const result = await fetch(
+      "http://localhost:8080/api/v1/dispatch",
+      requestOptions
+    )
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) => {
+        return result;
+      })
       .catch((error) => console.error(error));
+
+    await setLoading(false);
+    await setDispatchResult(result);
+    await console.log(dispatchResult);
+    await setModalShow(true);
   }
 
   function onSelectEmployee(employeeId) {
@@ -176,28 +223,53 @@ function App() {
   }
 
   return (
-    <Container>
-      <Header
-        setJwt={setJwt}
-        setUserId={setUserId}
-        jwt={jwt}
-        setCompany={setCompany}
-        companyName={companyName}
+    <div>
+      <Container>
+        <Header
+          setJwt={setJwt}
+          setUserId={setUserId}
+          jwt={jwt}
+          setCompany={setCompany}
+          companyName={companyName}
+        />
+        <Body
+          onSelectEmployee={onSelectEmployee}
+          onSelectElder={onSelectElder}
+          userId={userId}
+          onSelectAssignment={onSelectAssignment}
+          setEmployeesInfo={setEmployeesInfo}
+          setEldersInfo={setEldersInfo}
+          setJwt={setJwt}
+          jwt={jwt}
+        />
+        <Footer dispatchIn={dispatchIn} dispatchOut={dispatchOut} />
+      </Container>
+      {loading && (
+        <LoadingOverlay>
+          <RiseLoader color="#f88c6b" loading={loading} size={50} />
+        </LoadingOverlay>
+      )}
+      <MyVerticallyCenteredModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        message={dispatchResult}
       />
-      <Body
-        onSelectEmployee={onSelectEmployee}
-        onSelectElder={onSelectElder}
-        userId={userId}
-        onSelectAssignment={onSelectAssignment}
-        setEmployeesInfo={setEmployeesInfo}
-        setEldersInfo={setEldersInfo}
-        setJwt={setJwt}
-        jwt={jwt}
-      />
-      <Footer dispatchIn={dispatchIn} dispatchOut={dispatchOut} />
-    </Container>
+    </div>
   );
 }
+
+const LoadingOverlay = styled.div`
+  position: fixed; /* 화면에 고정 */
+  top: 0;
+  left: 0;
+  width: 100%; /* 전체 화면 너비 */
+  height: 100%; /* 전체 화면 높이 */
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  align-items: center; /* 세로 방향으로 가운데 정렬 */
+  z-index: 1000; /* 다른 요소들 위에 오도록 z-index 설정 */
+  flex-direction: column;
+`;
 
 const Container = styled.div`
   display: flex;

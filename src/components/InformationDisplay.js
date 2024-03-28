@@ -239,7 +239,7 @@ const InformationDiv2 = styled.div`
   flex-direction: row;
 `;
 const InformationDisplaySection = styled.section`
-  width: 1200px;
+  width: 1000px;
   height: 500px;
   align-content: center;
   justify-content: space-around;

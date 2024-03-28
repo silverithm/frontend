@@ -103,14 +103,15 @@ const ElderRow = styled.div`
 
 const ScrollableDiv = styled.div`
   overflow-y: scroll; // 세로 스크롤 활성화
-  height: 450px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 600px; // 너비 설정, 필요에 따라 조정 가능
+  height: 470px; // 높이 설정, 원하는 값으로 조정 가능
+  width: 450px; // 너비 설정, 필요에 따라 조정 가능
   flex-direction: row;
 `;
 
 const AssignmentComponentSection = styled.section`
-  width: 600px;
-  height: 500px;
+  height: 470px;
+  width: 500px;
+
   align-content: center;
   align-items: center;
   display: flex;
