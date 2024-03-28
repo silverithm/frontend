@@ -1,6 +1,8 @@
 import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 function EmployeeInfo({
   onSelectEmployee,
@@ -36,16 +38,24 @@ function EmployeeInfo({
     <ScrollableDiv>
       {employees.map((employee, index) => (
         <EmployeeItem key={index}>
-          <input
+          <Form.Check
             type="checkbox"
             onChange={() => onSelectEmployee(employee.id)}
           />
-          <input value={employee["name"]} readOnly />
-          <input
+          &nbsp;&nbsp;&nbsp;
+          <Form.Control
+            style={{ width: "180px", textAlign: "center" }}
+            value={employee["name"]}
+            readOnly
+          />
+          &nbsp;&nbsp;&nbsp;
+          <Form.Control
+            style={{ width: "50px", textAlign: "center" }}
             onChange={(e) => (employee.maximumCapacity = e.target.value)}
             defaultValue={employee["maximumCapacity"]}
-          ></input>
-          <button onClick={() => deleteEmployee(employee.id)}>삭제</button>
+          ></Form.Control>
+          &nbsp;&nbsp;&nbsp;
+          <Button onClick={() => deleteEmployee(employee.id)}>삭제</Button>
         </EmployeeItem>
       ))}
     </ScrollableDiv>

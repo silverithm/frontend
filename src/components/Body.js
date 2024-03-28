@@ -22,6 +22,7 @@ function Body({
         setJwt={setJwt}
         jwt={jwt}
         userId={userId}
+        onSelectAssignment={onSelectAssignment}
       />
       <AssignmentComponent
         setJwt={setJwt}
@@ -35,14 +36,15 @@ function Body({
 
 const BodyDiv = styled.div`
   width: 100%;
-  height: 600px;
+  height: 700px;
   align-content: center;
   justify-content: center;
   align-items: center;
   display: flex;
   flex-direction: row;
-
+  border: 2px solid #ccc;
   justify-content: space-around;
+  margin: 1px;
 `;
 
 export default Body;

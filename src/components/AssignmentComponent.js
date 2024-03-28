@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   const [elders, setElders] = useState([]);
@@ -62,62 +64,73 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
     await setElders(response); // 상태 업데이트
   };
   return (
-    <AssignmentComponentSection>
-      <AssignmentDiv>
+    <AssignmentDisplaySection>
+      <AssignmentInfoSection>
         <h2>
-          고정 <button onClick={fetchEmployeesAndElders}>불러오기</button>
+          고정 &nbsp; &nbsp; &nbsp;
+          <Button onClick={fetchEmployeesAndElders}>불러오기</Button>
         </h2>
         <ScrollableDiv>
           {elders.map((elder) => (
             <ElderRow key={elder.id}>
-              <input value={elder.name}></input>
-              <select onChange={(e) => handleSelect(e, elder.id)}>
+              <Form.Control
+                style={{ textAlign: "center" }}
+                value={elder.name}
+              ></Form.Control>
+              &nbsp;&nbsp;&nbsp;
+              <Form.Select
+                style={{ textAlign: "center" }}
+                onChange={(e) => handleSelect(e, elder.id)}
+              >
                 <option value="없음">없음</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
                     {employee.name}
                   </option>
                 ))}
-              </select>
+              </Form.Select>
             </ElderRow>
           ))}
         </ScrollableDiv>
-      </AssignmentDiv>
-    </AssignmentComponentSection>
+        <div style={{ height: "300px" }}></div>
+      </AssignmentInfoSection>
+    </AssignmentDisplaySection>
   );
 }
 
-const AssignmentDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-
 const ElderRow = styled.div`
-  display: flex;
-  flex-direction: row; // 수평 정렬
-  align-items: center; // 세로 중앙 정렬
-  justify-content: center; // 시작 부분부터 요소를 배열
+  display: flex; /* flex 컨테이너로 만듭니다. */
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  width: 100%; /* 너비를 부모 컨테이너의 100%로 설정 */
+  margin-bottom: 10px; /* 아이템 간 간격 */
 `;
 
 const ScrollableDiv = styled.div`
   overflow-y: scroll; // 세로 스크롤 활성화
-  height: 470px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 450px; // 너비 설정, 필요에 따라 조정 가능
+  height: 400px; // 높이 설정, 원하는 값으로 조정 가능
+  width: 400px; // 너비 설정, 필요에 따라 조정 가능
   flex-direction: row;
 `;
 
-const AssignmentComponentSection = styled.section`
-  height: 470px;
+const AssignmentDisplaySection = styled.section`
   width: 500px;
-
+  height: 500px;
   align-content: center;
   align-items: center;
   display: flex;
   flex-direction: row;
   background: white;
   text-align: center;
+`;
+
+const AssignmentInfoSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 400px;
+  height: 100%;
 `;
 
 export default AssignmentComponent;

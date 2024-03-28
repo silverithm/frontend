@@ -254,6 +254,7 @@ function App() {
           setCompany={setCompany}
           companyName={companyName}
         />
+        <div style={{ height: "1px" }}></div>
         <Body
           onSelectEmployee={onSelectEmployee}
           onSelectElder={onSelectElder}
@@ -264,6 +265,7 @@ function App() {
           setJwt={setJwt}
           jwt={jwt}
         />
+        <div style={{ height: "1px" }}></div>
         <Footer dispatchIn={dispatchIn} dispatchOut={dispatchOut} />
       </Container>
       {loading && (

@@ -5,7 +5,8 @@ import { styled } from "styled-components";
 function Footer({ dispatchIn, dispatchOut }) {
   return (
     <FooterDiv>
-      <InVehicleAssignmentButton dispatchIn={dispatchIn} />
+      <InVehicleAssignmentButton dispatchIn={dispatchIn} /> &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;
       <OutVehicleAssignmentButton dispatchOut={dispatchOut} />
     </FooterDiv>
   );
@@ -18,6 +19,7 @@ const FooterDiv = styled.section`
   align-items: center;
   display: flex;
   flex-direction: row;
-  background: skyblue;
+  border: 2px solid #ccc;
+  margin: 1px;
 `;
 export default Footer;

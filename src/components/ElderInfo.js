@@ -1,6 +1,8 @@
 import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 function ElderInfo({
   onSelectElder,
@@ -44,9 +46,15 @@ function ElderInfo({
     <ScrollableDiv>
       {elders.map((elder) => (
         <ElderItem key={elder.id}>
-          <input type="checkbox" onChange={() => onSelectElder(elder.id)} />
-          <input value={elder["name"]}></input>
-          <select
+          <Form.Check onChange={() => onSelectElder(elder.id)} />
+          &nbsp;&nbsp;&nbsp;
+          <Form.Control
+            style={{ width: "160px", textAlign: "center" }}
+            value={elder["name"]}
+          ></Form.Control>
+          &nbsp;&nbsp;&nbsp;
+          <Form.Select
+            style={{ width: "150px", textAlign: "center" }}
             onChange={(e) =>
               handleSelectChange(elder.id, e.target.value === "true")
             }
@@ -54,8 +62,9 @@ function ElderInfo({
           >
             <option value="true">앞자리 필요</option>
             <option value="false">앞자리 필요없음</option>
-          </select>
-          <button onClick={() => deleteElder(elder.id)}>삭제</button>
+          </Form.Select>
+          &nbsp;&nbsp;&nbsp;
+          <Button onClick={() => deleteElder(elder.id)}>삭제</Button>
         </ElderItem>
       ))}
     </ScrollableDiv>

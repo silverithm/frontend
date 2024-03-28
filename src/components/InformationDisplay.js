@@ -3,6 +3,8 @@ import EmployeeInfo from "./EmployeeInfo";
 import ElderInfo from "./ElderInfo.js";
 import { styled } from "styled-components";
 import { useState } from "react";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 function InformationDisplay({
   onSelectEmployee,
@@ -12,6 +14,7 @@ function InformationDisplay({
   setEldersInfo,
   setEmployeesInfo,
   userId,
+  onSelectAssignment,
 }) {
   const [employeeName, setEmployeeName] = useState("");
   const [employeeWorkPlace, setEmployeeWorkPlace] = useState("");
@@ -25,6 +28,19 @@ function InformationDisplay({
     useState(true);
   const [selectedRequiredFrontSeat, setSelectedRequiredFrontSeat] = useState();
   const [elders, setElders] = useState([]);
+
+  const handleSelect = (e, elderId) => {
+    const selectedAssignment = {
+      employee_idx: Number(e.target.value),
+      elderly_idx: elderId,
+    };
+
+    onSelectAssignment(selectedAssignment);
+  };
+  const fetchEmployeesAndElders = async () => {
+    await fetchEmployees();
+    await fetchElders();
+  };
 
   function addEmployee() {
     console.log("clicked!!!");
@@ -133,10 +149,11 @@ function InformationDisplay({
   };
   return (
     <InformationDisplaySection>
-      <div className="employee-info">
+      <EmployeeInfoSection>
         <InformationDiv>
           <h2>
-            직원 정보 <button onClick={fetchEmployees}> 불러오기 </button>
+            직원 정보 &nbsp; &nbsp; &nbsp;
+            <Button onClick={fetchEmployees}> 불러오기 </Button>
           </h2>
         </InformationDiv>
 
@@ -150,43 +167,46 @@ function InformationDisplay({
           setEmployeesInfo={setEmployeesInfo}
         />
 
-        <InformationDiv2>
-          <input
-            onChange={(e) => setEmployeeName(e.target.value)}
-            placeholder="이름"
-          ></input>
-          <input
-            onChange={(e) => setEmployeeWorkPlace(e.target.value)}
-            placeholder="직장 주소"
-          ></input>
-          <input
-            onChange={(e) => setEmployeeHomeAddress(e.target.value)}
-            placeholder="집 주소"
-          ></input>
-          <select
-            onChange={(e) => setEmployeeMaxCapacity(e.target.value)}
-            placeholder="최대 배치 인원"
-          >
-            <option value={2}>최대 인원 2</option>
-            <option value={3}>최대 인원 3</option>
-            <option value={4}>최대 인원 4</option>
-            <option value={5}>최대 인원 5</option>
-            <option value={6}>최대 인원 6</option>
-            <option value={7}>최대 인원 7</option>
-            <option value={8}>최대 인원 8</option>
-            <option value={9}>최대 인원 9</option>
-            <option value={10}>최대 인원 10</option>
-          </select>
-        </InformationDiv2>
+        <Form.Control
+          style={{ width: "400px", textAlign: "center" }}
+          onChange={(e) => setEmployeeName(e.target.value)}
+          placeholder="이름"
+        ></Form.Control>
+        <Form.Control
+          style={{ width: "400px", textAlign: "center" }}
+          onChange={(e) => setEmployeeWorkPlace(e.target.value)}
+          placeholder="직장 주소"
+        ></Form.Control>
+        <Form.Control
+          style={{ width: "400px", textAlign: "center" }}
+          onChange={(e) => setEmployeeHomeAddress(e.target.value)}
+          placeholder="집 주소"
+        ></Form.Control>
+        <Form.Select
+          style={{ textAlign: "center" }}
+          onChange={(e) => setEmployeeMaxCapacity(e.target.value)}
+          placeholder="최대 배치 인원"
+        >
+          <option value={2}>최대 인원 2</option>
+          <option value={3}>최대 인원 3</option>
+          <option value={4}>최대 인원 4</option>
+          <option value={5}>최대 인원 5</option>
+          <option value={6}>최대 인원 6</option>
+          <option value={7}>최대 인원 7</option>
+          <option value={8}>최대 인원 8</option>
+          <option value={9}>최대 인원 9</option>
+          <option value={10}>최대 인원 10</option>
+        </Form.Select>
 
-        <button onClick={addEmployee} style={{ width: "100%" }}>
+        <Button onClick={addEmployee} style={{ width: "100%" }}>
           추가
-        </button>
-      </div>
-      <div className="elder-info">
+        </Button>
+      </EmployeeInfoSection>
+      <ElderInfoSection>
         <InformationDiv>
           <h2>
-            어르신 정보 <button onClick={fetchElders}>불러오기</button>
+            어르신 정보 &nbsp; &nbsp; &nbsp;{" "}
+            <Button onClick={fetchElders}>불러오기</Button>
           </h2>
         </InformationDiv>
 
@@ -200,31 +220,50 @@ function InformationDisplay({
           elders={elders}
         />
 
-        <InformationDiv2>
-          <input
-            onChange={(e) => setElderlyName(e.target.value)}
-            placeholder="이름"
-          ></input>
-          <input
-            onChange={(e) => setElderlyHomeAddress(e.target.value)}
-            placeholder="집 주소"
-          ></input>
-          <select
-            onChange={(e) => setIsElderlyRequiredFrontSeat(e.target.value)}
-            placeholder="앞자리 여부"
-          >
-            <option value={true}>앞자리 필요</option>
-            <option value={false}>앞자리 필요없음</option>
-          </select>
-        </InformationDiv2>
+        <Form.Control
+          style={{ width: "400px", textAlign: "center" }}
+          onChange={(e) => setElderlyName(e.target.value)}
+          placeholder="이름"
+        ></Form.Control>
+        <Form.Control
+          style={{ width: "400px", textAlign: "center" }}
+          onChange={(e) => setElderlyHomeAddress(e.target.value)}
+          placeholder="집 주소"
+        ></Form.Control>
+        <Form.Select
+          style={{ textAlign: "center" }}
+          onChange={(e) => setIsElderlyRequiredFrontSeat(e.target.value)}
+          placeholder="앞자리 여부"
+        >
+          <option value={true}>앞자리 필요</option>
+          <option value={false}>앞자리 필요없음</option>
+        </Form.Select>
 
-        <button onClick={addElderly} style={{ width: "100%" }}>
+        <Button onClick={addElderly} style={{ width: "100%" }}>
           추가
-        </button>
-      </div>
+        </Button>
+      </ElderInfoSection>
     </InformationDisplaySection>
   );
 }
+
+const ElderInfoSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 400px;
+  height: 100%;
+`;
+
+const EmployeeInfoSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 400px;
+  height: 100%;
+`;
 
 const InformationDiv = styled.div`
   display: flex;
@@ -232,12 +271,7 @@ const InformationDiv = styled.div`
   align-items: center;
   flex-direction: column;
 `;
-const InformationDiv2 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-`;
+
 const InformationDisplaySection = styled.section`
   width: 1000px;
   height: 500px;

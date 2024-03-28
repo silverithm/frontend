@@ -1,7 +1,8 @@
 import React from "react";
+import Button from "react-bootstrap/Button";
 
 function OutVehicleAssignmentButton({ dispatchOut }) {
-  return <button onClick={dispatchOut}>차량 배치 실행 OUT</button>;
+  return <Button onClick={dispatchOut}>차량 배치 실행 OUT</Button>;
 }
 
 export default OutVehicleAssignmentButton;

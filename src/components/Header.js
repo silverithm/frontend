@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 
 function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
   const [name, setName] = useState("");
@@ -79,32 +82,32 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
 
   return (
     <HeaderDiv>
-      <div>
-        <input
-          type="text"
-          placeholder="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
+      <InputDiv>
+        <Form.Control
           type="text"
           placeholder="ID"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <input
+        <Form.Control
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button onClick={handleSignin}>로그인</button>
-        <button onClick={handleLogout}>로그아웃</button>
-        <button onClick={handleSignup}>회원가입</button>
-      </div>
+        <Button style={{ width: "300px" }} onClick={handleSignin}>
+          로그인
+        </Button>
+        <Button style={{ width: "300px" }} onClick={handleLogout}>
+          로그아웃
+        </Button>
+        <Button style={{ width: "300px" }} onClick={handleSignup}>
+          회원가입
+        </Button>
+      </InputDiv>
 
       <div>
-        <input
+        <Form.Control
           type="jwt"
           placeholder="Jwt"
           value={jwt}
@@ -113,7 +116,7 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
         />
       </div>
       <div>
-        <input
+        <Form.Control
           type="companyName"
           placeholder="companyName"
           value={companyName}
@@ -126,14 +129,20 @@ function Header({ setJwt, jwt, setCompany, companyName, setUserId }) {
 
 const HeaderDiv = styled.div`
   width: 100%;
-  height: 100px;
+  height: 150px;
   align-content: center;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   display: flex;
+  border: 2px solid #ccc;
+  margin: 1px;
+`;
 
-  background: papayawhip;
+const InputDiv = styled.div`
+  width: 700px;
+  display: flex;
+  flex-direction: row;
 `;
 
 export default Header;
