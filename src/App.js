@@ -47,6 +47,9 @@ function App() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <h4>
+            실제 운행 시간은 도로 혼잡도에 따라 10분 정도 차이날 수 있습니다.
+          </h4>
           <div>
             {props.data.map((item, index) => (
               <div
@@ -58,8 +61,9 @@ function App() {
                 </div>
                 <div style={{ flexDirection: "row", display: "flex" }}>
                   {item.assignmentElderNames.map((name, idx) => (
-                    <div key={idx}>{name}</div>
+                    <div key={idx}> {name} &nbsp;&nbsp;&nbsp;&nbsp; </div>
                   ))}
+                  <div>|&nbsp;&nbsp;&nbsp;약 {item.time}분 소요</div>
                 </div>
               </div>
             ))}
