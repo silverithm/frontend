@@ -130,7 +130,7 @@ function App() {
 
     let flag = false;
     const result = await fetch(
-      "http://https://silverithm.site/api/v1/dispatch",
+      "https://silverithm.site/api/v1/dispatch",
       requestOptions
     )
       .then((response) => {
@@ -207,7 +207,7 @@ function App() {
 
     let flag = false;
     const result = await fetch(
-      "http://https://silverithm.site/api/v1/dispatch",
+      "https://silverithm.site/api/v1/dispatch",
       requestOptions
     )
       .then((response) => {
