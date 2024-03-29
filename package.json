@@ -1,5 +1,5 @@
 {
-  "proxy": "https://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080",
+  "proxy": "https://silverithm.site",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,

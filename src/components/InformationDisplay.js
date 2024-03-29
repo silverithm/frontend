@@ -80,11 +80,7 @@ function InformationDisplay({
       redirect: "follow",
     };
 
-    fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employee/" +
-        userId,
-      requestOptions
-    )
+    fetch("https://silverithm.site/api/v1/employee/" + userId, requestOptions)
       .then((result) => {
         if (!result.ok) {
           toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
@@ -131,11 +127,7 @@ function InformationDisplay({
       redirect: "follow",
     };
 
-    fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elder/" +
-        userId,
-      requestOptions
-    )
+    fetch("https://silverithm.site/api/v1/elder/" + userId, requestOptions)
       .then((response) => {
         if (!response.ok) {
           toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
@@ -163,8 +155,7 @@ function InformationDisplay({
       redirect: "follow",
     };
     const response = await fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employees/" +
-        userId,
+      "https://silverithm.site/api/v1/employees/" + userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -194,8 +185,7 @@ function InformationDisplay({
       redirect: "follow",
     };
     const response = await fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elders/" +
-        userId,
+      "https://silverithm.site/api/v1/elders/" + userId,
       requestOptions
     )
       .then((response) => response.json())

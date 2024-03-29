@@ -41,8 +41,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employees/" +
-        userId,
+      "https://silverithm.site/api/v1/employees/" + userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -63,8 +62,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elders/" +
-        userId,
+      "https://silverithm.site/api/v1/elders/" + userId,
       requestOptions
     )
       .then((response) => response.json())

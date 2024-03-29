@@ -24,8 +24,7 @@ function ElderInfo({
     };
 
     await fetch(
-      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elder/" +
-        elderId,
+      "https://silverithm.site/api/v1/elder/" + elderId,
       requestOptions
     )
       .then((response) => response.text())
