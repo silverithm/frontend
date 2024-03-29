@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:8080",
+  "proxy": "http://http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,

@@ -24,7 +24,8 @@ function EmployeeInfo({
     };
 
     await fetch(
-      "http://localhost:8080/api/v1/employee/" + employeeId,
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employee/" +
+        employeeId,
       requestOptions
     )
       .then((response) => response.text())

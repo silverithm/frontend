@@ -41,7 +41,8 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/employees/" + userId,
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employees/" +
+        userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -62,7 +63,8 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/elders/" + userId,
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elders/" +
+        userId,
       requestOptions
     )
       .then((response) => response.json())

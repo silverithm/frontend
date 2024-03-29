@@ -36,7 +36,7 @@ function Header({
     };
 
     const loginResult = await fetch(
-      "http://localhost:8080/api/v1/signin",
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/signin",
       requestOptions
     )
       .then((response) => response.json())
@@ -82,7 +82,10 @@ function Header({
       redirect: "follow",
     };
 
-    fetch("http://localhost:8080/api/v1/signup", requestOptions)
+    fetch(
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/signup",
+      requestOptions
+    )
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => alert("회원가입에 실패하였습니다."));
@@ -103,7 +106,10 @@ function Header({
       redirect: "follow",
     };
 
-    await fetch("http://localhost:8080/api/v1/logout", requestOptions)
+    await fetch(
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/logout",
+      requestOptions
+    )
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => alert("로그아웃에 실패하였습니다."));

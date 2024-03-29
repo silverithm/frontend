@@ -23,7 +23,11 @@ function ElderInfo({
       redirect: "follow",
     };
 
-    await fetch("http://localhost:8080/api/v1/elder/" + elderId, requestOptions)
+    await fetch(
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elder/" +
+        elderId,
+      requestOptions
+    )
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => console.error(error));

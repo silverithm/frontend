@@ -80,7 +80,11 @@ function InformationDisplay({
       redirect: "follow",
     };
 
-    fetch("http://localhost:8080/api/v1/employee/" + userId, requestOptions)
+    fetch(
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employee/" +
+        userId,
+      requestOptions
+    )
       .then((result) => {
         if (!result.ok) {
           toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
@@ -127,7 +131,11 @@ function InformationDisplay({
       redirect: "follow",
     };
 
-    fetch("http://localhost:8080/api/v1/elder/" + userId, requestOptions)
+    fetch(
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elder/" +
+        userId,
+      requestOptions
+    )
       .then((response) => {
         if (!response.ok) {
           toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
@@ -155,7 +163,8 @@ function InformationDisplay({
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/employees/" + userId,
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/employees/" +
+        userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -185,7 +194,8 @@ function InformationDisplay({
       redirect: "follow",
     };
     const response = await fetch(
-      "http://localhost:8080/api/v1/elders/" + userId,
+      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elders/" +
+        userId,
       requestOptions
     )
       .then((response) => response.json())
