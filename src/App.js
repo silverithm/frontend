@@ -256,25 +256,19 @@ function App() {
     }
   }
 
-  function onSelectAssignment(fixedAssignment) {
-    // 체크박스 선택 여부에 따라 추가 또는 제거
-    if (
-      fixedAssignments.includes({
-        employee_id: fixedAssignment.employee_idx,
-        elder_Id: fixedAssignment.elderly_idx,
-      })
-    ) {
-      setSelectedElderIds(
-        fixedAssignments.filter(
-          (id) =>
-            id.employee_id !== fixedAssignment.employee_idx &&
-            id.elder_id !== fixedAssignment.elderly_idx
-        )
+  async function onSelectAssignment(fixedAssignment) {
+    if (fixedAssignment.employee_idx === "없음") {
+      // '없음'을 선택했을 때는 해당 엘더의 모든 할당을 제거
+
+      const filteredAssignments = await fixedAssignments.filter(
+        (assignment) => assignment.elderly_idx !== fixedAssignment.elderly_idx
       );
+
+      await setFixedAssignments(filteredAssignments);
     } else {
+      // 새로운 할당을 추가할 때는 기존 상태를 직접 변경하지 않고 새 배열을 생성
       fixedAssignments.push(fixedAssignment);
       setFixedAssignments(fixedAssignments);
-      console.log(fixedAssignments);
     }
   }
 
