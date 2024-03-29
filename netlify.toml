@@ -1,5 +1,5 @@
 [[redirects]]
-  from = "/proxy/*"
+  from = "http://localhost:8080/*"
   to = "https://silverithm.netlify.app/"
   status = 200
   force = true
