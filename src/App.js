@@ -130,7 +130,7 @@ function App() {
 
     let flag = false;
     const result = await fetch(
-      "http://http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/dispatch",
+      "http://http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/dispatch",
       requestOptions
     )
       .then((response) => {
@@ -207,7 +207,7 @@ function App() {
 
     let flag = false;
     const result = await fetch(
-      "http://http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/dispatch",
+      "http://http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/dispatch",
       requestOptions
     )
       .then((response) => {

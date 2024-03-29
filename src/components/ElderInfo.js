@@ -24,7 +24,7 @@ function ElderInfo({
     };
 
     await fetch(
-      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elder/" +
+      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/elder/" +
         elderId,
       requestOptions
     )

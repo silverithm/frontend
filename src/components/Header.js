@@ -36,7 +36,7 @@ function Header({
     };
 
     const loginResult = await fetch(
-      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/signin",
+      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/signin",
       requestOptions
     )
       .then((response) => response.json())
@@ -83,7 +83,7 @@ function Header({
     };
 
     fetch(
-      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/signup",
+      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/signup",
       requestOptions
     )
       .then((response) => response.text())
@@ -107,7 +107,7 @@ function Header({
     };
 
     await fetch(
-      "http://ec2-3-35-4-92.ap-northeast-2.compute.amazonaws.com:8080/api/v1/logout",
+      "http://ec2-3-34-98-229.ap-northeast-2.compute.amazonaws.com:8080/api/v1/logout",
       requestOptions
     )
       .then((response) => response.text())
