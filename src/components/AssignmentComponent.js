@@ -14,7 +14,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
         employeeIdx.target.value === "없음"
           ? "없음"
           : Number(employeeIdx.target.value),
-      elderly_idx: elderIdx,
+      elderly_idx: elderId,
     };
 
     onSelectAssignment(selectedAssignment);
@@ -94,7 +94,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
               >
                 <option value="없음">없음</option>
                 {employees.map((employee, idx) => (
-                  <option key={idx} value={idx}>
+                  <option key={idx} value={employee.id}>
                     {employee.name}
                   </option>
                 ))}
