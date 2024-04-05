@@ -81,7 +81,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
           <Button onClick={fetchEmployeesAndElders}>불러오기</Button>
         </h2>
         <ScrollableDiv>
-          {elders.map((elder, elderIdx) => (
+          {elders.map((elder, index) => (
             <ElderRow key={elder.id}>
               <Form.Control
                 style={{ textAlign: "center" }}
@@ -90,7 +90,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
               &nbsp;&nbsp;&nbsp;
               <Form.Select
                 style={{ textAlign: "center" }}
-                onChange={(e) => handleSelect(e, elder.id, elderIdx)}
+                onChange={(e) => handleSelect(e, elder.id, index)}
               >
                 <option value="없음">없음</option>
                 {employees.map((employee, idx) => (

@@ -214,7 +214,7 @@ function App() {
         if (!response.ok) {
           flag = true;
         }
-        console.log(response.text);
+        console.log(response);
         return response.json();
       })
       .catch((error) => console.error(error));
