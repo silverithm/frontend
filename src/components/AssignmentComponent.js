@@ -10,11 +10,11 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
 
   const handleSelect = (employeeIdx, elderId, elderIdx) => {
     const selectedAssignment = {
-      employee_idx:
+      employee_id:
         employeeIdx.target.value === "없음"
           ? "없음"
           : Number(employeeIdx.target.value),
-      elderly_idx: elderId,
+      elderly_id: elderId,
     };
 
     onSelectAssignment(selectedAssignment);
