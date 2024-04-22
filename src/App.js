@@ -257,25 +257,28 @@ function App() {
   }
 
   async function onSelectAssignment(fixedAssignment) {
-    if (fixedAssignment.employee_idx === "없음") {
+    if (fixedAssignment.elderly_id === "없음") {
       // '없음'을 선택했을 때는 해당 엘더의 모든 할당을 제거
 
       const filteredAssignments = await fixedAssignments.filter(
-        (assignment) => assignment.elderly_idx !== fixedAssignment.elderly_idx
+        (assignment) =>
+          assignment.sequence !== fixedAssignment.sequence ||
+          assignment.employee_id !== fixedAssignment.employee_id
       );
-
       await setFixedAssignments(filteredAssignments);
     } else {
-      // 새로운 할당을 추가할 때는 기존 상태를 직접 변경하지 않고 새 배열을 생성
-      fixedAssignments.push(fixedAssignment);
-      setFixedAssignments(fixedAssignments);
+      const filteredAssignments = await fixedAssignments.filter(
+        (assignment) =>
+          assignment.sequence !== fixedAssignment.sequence ||
+          assignment.employee_id !== fixedAssignment.employee_id
+      );
+      await setFixedAssignments([...filteredAssignments, fixedAssignment]);
     }
   }
 
   return (
     <div>
       <ToastContainer></ToastContainer>
-
       <Container>
         <Header
           setJwt={setJwt}

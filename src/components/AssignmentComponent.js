@@ -8,13 +8,11 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
 
-  const handleSelect = (employeeIdx, elderId, elderIdx) => {
+  const handleSelect = (employeeId, elderId, sequence) => {
     const selectedAssignment = {
-      employee_id:
-        employeeIdx.target.value === "없음"
-          ? "없음"
-          : Number(employeeIdx.target.value),
+      employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
       elderly_id: elderId,
+      sequence: sequence,
     };
 
     onSelectAssignment(selectedAssignment);
@@ -81,24 +79,29 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
           <Button onClick={fetchEmployeesAndElders}>불러오기</Button>
         </h2>
         <ScrollableDiv>
-          {elders.map((elder, index) => (
-            <ElderRow key={elder.id}>
+          {employees.map((employee, index) => (
+            <ElderRow key={employee.id}>
               <Form.Control
-                style={{ textAlign: "center" }}
-                value={elder.name}
+                style={{ textAlign: "center", width: "100px" }}
+                value={employee.name}
               ></Form.Control>
               &nbsp;&nbsp;&nbsp;
-              <Form.Select
-                style={{ textAlign: "center" }}
-                onChange={(e) => handleSelect(e, elder.id, index)}
-              >
-                <option value="없음">없음</option>
-                {employees.map((employee, idx) => (
-                  <option key={idx} value={employee.id}>
-                    {employee.name}
-                  </option>
-                ))}
-              </Form.Select>
+              {Array.from({ length: employee.maximumCapacity }, (_, index) => (
+                <Form.Select
+                  key={index}
+                  style={{ textAlign: "center", width: "100px" }}
+                  onChange={(e) =>
+                    handleSelect(employee.id, e.target.value, index + 1)
+                  }
+                >
+                  <option value="없음">없음</option>
+                  {elders.map((elder, idx) => (
+                    <option key={idx} value={elder.id}>
+                      {elder.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              ))}
             </ElderRow>
           ))}
         </ScrollableDiv>
@@ -110,21 +113,20 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
 
 const ElderRow = styled.div`
   display: flex; /* flex 컨테이너로 만듭니다. */
-  justify-content: center; /* 가로 중앙 정렬 */
-  align-items: center; /* 세로 중앙 정렬 */
   width: 100%; /* 너비를 부모 컨테이너의 100%로 설정 */
   margin-bottom: 10px; /* 아이템 간 간격 */
 `;
 
 const ScrollableDiv = styled.div`
   overflow-y: scroll; // 세로 스크롤 활성화
+  overflow-x: scroll;
   height: 400px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 400px; // 너비 설정, 필요에 따라 조정 가능
+  width: 500px; // 너비 설정, 필요에 따라 조정 가능
   flex-direction: row;
 `;
 
 const AssignmentDisplaySection = styled.section`
-  width: 500px;
+  width: 700px;
   height: 500px;
   align-content: center;
   align-items: center;
@@ -139,7 +141,7 @@ const AssignmentInfoSection = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 400px;
+  width: 100%;
   height: 100%;
 `;
 
