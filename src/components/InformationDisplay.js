@@ -25,6 +25,8 @@ function InformationDisplay({
   ]);
   const [employeeMaxCapacity, setEmployeeMaxCapacity] = useState(2);
 
+  const [employeeIsDriver, setEmployeeIsDriver] = useState(false);
+
   const [elderlyName, setElderlyName] = useState("");
   const [elderlyHomeAddress, setElderlyHomeAddress] = useState("");
   const [elderlyIsRequiredFrontSeat, setIsElderlyRequiredFrontSeat] =
@@ -74,6 +76,7 @@ function InformationDisplay({
       workPlace: employeeWorkPlace,
       homeAddress: employeeHomeAddress,
       maxCapacity: employeeMaxCapacity,
+      isDriver: employeeIsDriver,
     });
 
     const requestOptions = {
@@ -249,6 +252,15 @@ function InformationDisplay({
           <option value={8}>최대 인원 8</option>
           <option value={9}>최대 인원 9</option>
           <option value={10}>최대 인원 10</option>
+        </Form.Select>
+
+        <Form.Select
+          style={{ textAlign: "center" }}
+          onChange={(e) => setEmployeeIsDriver(e.target.value)}
+          placeholder="최대 배치 인원"
+        >
+          <option value={false}>직원</option>
+          <option value={true}>운전원</option>
         </Form.Select>
 
         <Button onClick={addEmployee} style={{ width: "100%" }}>
