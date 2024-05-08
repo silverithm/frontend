@@ -90,6 +90,7 @@ function App() {
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
       selectedEmployeeIds.includes(employeeInfo.id)
     );
+
     const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
       selectedElderIds.includes(elderlyInfo.id)
     );

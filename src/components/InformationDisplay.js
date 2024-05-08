@@ -15,11 +15,14 @@ function InformationDisplay({
   setEmployeesInfo,
   userId,
   onSelectAssignment,
+  onSelectDriver,
 }) {
   const [employeeName, setEmployeeName] = useState("");
   const [employeeWorkPlace, setEmployeeWorkPlace] = useState("");
   const [employeeHomeAddress, setEmployeeHomeAddress] = useState("");
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState([
+    { id: 1, name: "최숙자", maximumCapacity: 5 },
+  ]);
   const [employeeMaxCapacity, setEmployeeMaxCapacity] = useState(2);
 
   const [elderlyName, setElderlyName] = useState("");

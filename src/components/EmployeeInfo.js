@@ -12,6 +12,7 @@ function EmployeeInfo({
   employees,
   setEmployees,
   setEmployeesInfo,
+  onSelectDriver,
 }) {
   async function deleteEmployee(employeeId) {
     const myHeaders = new Headers();
@@ -35,6 +36,16 @@ function EmployeeInfo({
     );
     await toast("삭제에 성공하였습니다.");
   }
+
+  const handleSelectChange = (employeeId, isDriver) => {
+    setEmployees((prevEmployees) =>
+      prevEmployees.map((employee) =>
+        employee.id === employeeId
+          ? { ...employee, isDriver: isDriver }
+          : employee
+      )
+    );
+  };
   return (
     <ScrollableDiv>
       {employees.map((employee, index) => (
@@ -45,7 +56,7 @@ function EmployeeInfo({
           />
           &nbsp;&nbsp;&nbsp;
           <Form.Control
-            style={{ width: "180px", textAlign: "center" }}
+            style={{ width: "100px", textAlign: "center" }}
             value={employee["name"]}
             readOnly
           />
@@ -56,6 +67,25 @@ function EmployeeInfo({
             defaultValue={employee["maximumCapacity"]}
           ></Form.Control>
           &nbsp;&nbsp;&nbsp;
+          <Form.Select
+            key={index}
+            style={{ textAlign: "center", width: "90px" }}
+            value={employee.isDriver ? "true" : "false"}
+            onChange={(e) => {
+              e.target.value === "false"
+                ? (employee.isDriver = false)
+                : (employee.isDriver = true);
+              handleSelectChange(
+                employee.id,
+                e.target.value === "false"
+                  ? (employee.isDriver = false)
+                  : (employee.isDriver = true)
+              );
+            }}
+          >
+            <option value="false">직원</option>
+            <option value="true">운전원</option>
+          </Form.Select>
           <Button onClick={() => deleteEmployee(employee.id)}>삭제</Button>
         </EmployeeItem>
       ))}
