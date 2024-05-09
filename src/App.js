@@ -87,9 +87,19 @@ function App() {
 
     await setLoading(true);
 
-    const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
-      selectedEmployeeIds.includes(employeeInfo.id)
-    );
+    // const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
+    //   selectedEmployeeIds.includes(employeeInfo.id)
+    // );
+
+    const selectedEmployeesInfos = [];
+
+    employeesInfo.array.forEach((employeeInfo) => {
+      if (selectedEmployeeIds.includes(employeeInfo.id)) {
+        for (let i = 0; i < employeeInfo.repeat; i++) {
+          selectedEmployeesInfos.push(employeeInfo);
+        }
+      }
+    });
 
     const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
       selectedElderIds.includes(elderlyInfo.id)
