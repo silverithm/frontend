@@ -338,7 +338,7 @@ const InformationDiv = styled.div`
 `;
 
 const InformationDisplaySection = styled.section`
-  width: 1000px;
+  width: 1100px;
   height: 500px;
   align-content: center;
   justify-content: space-around;

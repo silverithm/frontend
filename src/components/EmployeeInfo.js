@@ -60,13 +60,11 @@ function EmployeeInfo({
             value={employee["name"]}
             readOnly
           />
-          &nbsp;&nbsp;&nbsp;
           <Form.Control
             style={{ width: "50px", textAlign: "center" }}
             onChange={(e) => (employee.maximumCapacity = e.target.value)}
             defaultValue={employee["maximumCapacity"]}
           ></Form.Control>
-          &nbsp;&nbsp;&nbsp;
           <Form.Select
             key={index}
             style={{ textAlign: "center", width: "60px" }}
@@ -78,6 +76,25 @@ function EmployeeInfo({
             <option value={2}>2</option>
             <option value={3}>3</option>
           </Form.Select>
+          <Form.Select
+            key={index}
+            style={{ textAlign: "center", width: "90px" }}
+            value={employee.isDriver ? "true" : "false"}
+            onChange={(e) => {
+              e.target.value === "false"
+                ? (employee.isDriver = false)
+                : (employee.isDriver = true);
+              handleSelectChange(
+                employee.id,
+                e.target.value === "false"
+                  ? (employee.isDriver = false)
+                  : (employee.isDriver = true)
+              );
+            }}
+          >
+            <option value="false">직원</option>
+            <option value="true">운전원</option>
+          </Form.Select>
           <Button onClick={() => deleteEmployee(employee.id)}>삭제</Button>
         </EmployeeItem>
       ))}
@@ -87,7 +104,7 @@ function EmployeeInfo({
 const ScrollableDiv = styled.div`
   overflow-y: scroll; // 세로 스크롤 활성화
   height: 400px; // 높이 설정, 원하는 값으로 조정 가능
-  width: 500px; // 너비 설정, 필요에 따라 조정 가능
+  width: 600px; // 너비 설정, 필요에 따라 조정 가능
 `;
 
 const EmployeeItem = styled.div`
