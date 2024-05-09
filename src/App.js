@@ -99,7 +99,7 @@ function App() {
 
       // 해당 부분부터 repeat만큼 employeeInfo 삽입
       for (let i = 0; i < repeat; i++) {
-        selectedEmployeesInfos.splice(index + i, 0, employeeInfo);
+        selectedEmployeesInfos.splice(index - 1, 0, employeeInfo);
       }
     });
 
