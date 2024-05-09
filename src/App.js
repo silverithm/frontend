@@ -95,11 +95,14 @@ function App() {
 
     selectedEmployeesInfos.forEach((employeeInfo, index) => {
       let repeat = employeeInfo.repeat;
-      employeeInfo.repeat = 1;
-      for (let i = 1; i < repeat; i++) {
-        selectedEmployeesInfos.splice(index, 0, employeeInfo);
+      employeeInfo.repeat = 1; // repeat 속성 초기화 (필요에 따라 생략 가능)
+
+      // 해당 부분부터 repeat만큼 employeeInfo 삽입
+      for (let i = 0; i < repeat; i++) {
+        selectedEmployeesInfos.splice(index + i, 0, employeeInfo);
       }
     });
+
     console.log(selectedEmployeesInfos);
 
     const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
