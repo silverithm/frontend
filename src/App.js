@@ -96,10 +96,12 @@ function App() {
     // 새로운 배열 생성
     let updatedEmployeesInfos = [];
 
-    // 각 employeeInfo를 확인하고 반복 횟수만큼 새 배열에 추가
     selectedEmployeesInfos.forEach((employeeInfo) => {
+      // repeat 속성이 없거나 1 이하인 경우, 기본적으로 한 번만 추가
+      let repeatCount = employeeInfo.repeat || 1;
+
       // repeat 횟수 만큼 반복하여 삽입
-      for (let i = 0; i < employeeInfo.repeat; i++) {
+      for (let i = 0; i < repeatCount; i++) {
         updatedEmployeesInfos.push({ ...employeeInfo, repeat: 1 }); // 스프레드 연산자를 사용해 객체 복사 후, repeat 속성 초기화
       }
     });
