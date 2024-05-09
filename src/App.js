@@ -93,15 +93,19 @@ function App() {
       selectedEmployeeIds.includes(employeeInfo.id)
     );
 
-    selectedEmployeesInfos.forEach((employeeInfo, index) => {
-      let repeat = employeeInfo.repeat;
-      employeeInfo.repeat = 1; // repeat 속성 초기화 (필요에 따라 생략 가능)
+    // 새로운 배열 생성
+    let updatedEmployeesInfos = [];
 
-      // 해당 부분부터 repeat만큼 employeeInfo 삽입
-      for (let i = 0; i < repeat; i++) {
-        selectedEmployeesInfos.splice(index, 0, employeeInfo);
+    // 각 employeeInfo를 확인하고 반복 횟수만큼 새 배열에 추가
+    selectedEmployeesInfos.forEach((employeeInfo) => {
+      // repeat 횟수 만큼 반복하여 삽입
+      for (let i = 0; i < employeeInfo.repeat; i++) {
+        updatedEmployeesInfos.push({ ...employeeInfo, repeat: 1 }); // 스프레드 연산자를 사용해 객체 복사 후, repeat 속성 초기화
       }
     });
+
+    // 원래 배열에 새 배열을 할당
+    selectedEmployeesInfos = updatedEmployeesInfos;
 
     console.log(selectedEmployeesInfos);
 
