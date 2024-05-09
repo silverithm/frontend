@@ -78,8 +78,6 @@ function App() {
   }
 
   async function dispatchIn() {
-    const selectedEmployeesInfos = [];
-
     console.log(employeesInfo);
 
     if (jwt === "") {
@@ -91,18 +89,18 @@ function App() {
 
     await setLoading(true);
 
-    // const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
-    //   selectedEmployeeIds.includes(employeeInfo.id)
-    // );
+    const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
+      selectedEmployeeIds.includes(employeeInfo.id)
+    );
 
-    employeesInfo.array.forEach((employeeInfo) => {
-      console.log(employeeInfo);
-      if (selectedEmployeeIds.includes(employeeInfo.id)) {
-        for (let i = 0; i < employeeInfo.repeat; i++) {
-          selectedEmployeesInfos.push(employeeInfo);
-        }
+    selectedEmployeesInfos.forEach((employeeInfo, index) => {
+      let repeat = employeeInfo.repeat;
+      employeeInfo.repeat = 1;
+      for (let i = 1; i < repeat; i++) {
+        selectedEmployeesInfos.splice(index, 0, employeeInfo);
       }
     });
+    console.log(selectedEmployeesInfos);
 
     const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
       selectedElderIds.includes(elderlyInfo.id)
