@@ -69,22 +69,14 @@ function EmployeeInfo({
           &nbsp;&nbsp;&nbsp;
           <Form.Select
             key={index}
-            style={{ textAlign: "center", width: "90px" }}
-            value={employee.isDriver ? "true" : "false"}
+            style={{ textAlign: "center", width: "60px" }}
             onChange={(e) => {
-              e.target.value === "false"
-                ? (employee.isDriver = false)
-                : (employee.isDriver = true);
-              handleSelectChange(
-                employee.id,
-                e.target.value === "false"
-                  ? (employee.isDriver = false)
-                  : (employee.isDriver = true)
-              );
+              employee.repeat = e.target.value;
             }}
           >
-            <option value="false">직원</option>
-            <option value="true">운전원</option>
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
           </Form.Select>
           <Button onClick={() => deleteEmployee(employee.id)}>삭제</Button>
         </EmployeeItem>

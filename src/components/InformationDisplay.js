@@ -20,9 +20,7 @@ function InformationDisplay({
   const [employeeName, setEmployeeName] = useState("");
   const [employeeWorkPlace, setEmployeeWorkPlace] = useState("");
   const [employeeHomeAddress, setEmployeeHomeAddress] = useState("");
-  const [employees, setEmployees] = useState([
-    { id: 1, name: "최숙자", maximumCapacity: 5 },
-  ]);
+  const [employees, setEmployees] = useState([]);
   const [employeeMaxCapacity, setEmployeeMaxCapacity] = useState(2);
 
   const [employeeIsDriver, setEmployeeIsDriver] = useState(false);
