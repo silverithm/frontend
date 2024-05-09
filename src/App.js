@@ -89,7 +89,7 @@ function App() {
 
     await setLoading(true);
 
-    const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
+    let selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
       selectedEmployeeIds.includes(employeeInfo.id)
     );
 
