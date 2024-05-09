@@ -78,6 +78,10 @@ function App() {
   }
 
   async function dispatchIn() {
+    const selectedEmployeesInfos = [];
+
+    console.log(employeesInfo);
+
     if (jwt === "") {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
@@ -91,9 +95,8 @@ function App() {
     //   selectedEmployeeIds.includes(employeeInfo.id)
     // );
 
-    const selectedEmployeesInfos = [];
-
     employeesInfo.array.forEach((employeeInfo) => {
+      console.log(employeeInfo);
       if (selectedEmployeeIds.includes(employeeInfo.id)) {
         for (let i = 0; i < employeeInfo.repeat; i++) {
           selectedEmployeesInfos.push(employeeInfo);
