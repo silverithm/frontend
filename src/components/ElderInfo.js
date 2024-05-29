@@ -4,6 +4,7 @@ import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
+import config from "../config";
 function ElderInfo({
   onSelectElder,
   setJwt,
@@ -23,10 +24,7 @@ function ElderInfo({
       redirect: "follow",
     };
 
-    await fetch(
-      "https://silverithm.site/api/v1/elder/" + elderId,
-      requestOptions
-    )
+    await fetch(`${config.apiUrl}/elder/` + elderId, requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => console.error(error));

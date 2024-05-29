@@ -3,6 +3,7 @@ import { styled } from "styled-components";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
+import config from "../config";
 
 function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
   const [elders, setElders] = useState([]);
@@ -39,7 +40,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "https://silverithm.site/api/v1/employees/" + userId,
+      `${config.apiUrl}/employees/` + userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -60,7 +61,7 @@ function AssignmentComponent({ jwtSet, jwt, onSelectAssignment, userId }) {
       redirect: "follow",
     };
     const response = await fetch(
-      "https://silverithm.site/api/v1/elders/" + userId,
+      `${config.apiUrl}/elders/` + userId,
       requestOptions
     )
       .then((response) => response.json())

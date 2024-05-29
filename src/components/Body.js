@@ -1,7 +1,6 @@
 import InformationDisplay from "./InformationDisplay";
 import AssignmentComponent from "./AssignmentComponent";
 import styled from "styled-components";
-
 function Body({
   onSelectEmployee,
   onSelectElder,

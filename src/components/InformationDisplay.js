@@ -6,6 +6,7 @@ import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
+import config from "../config";
 function InformationDisplay({
   onSelectEmployee,
   onSelectElder,
@@ -84,7 +85,7 @@ function InformationDisplay({
       redirect: "follow",
     };
 
-    fetch("https://silverithm.site/api/v1/employee/" + userId, requestOptions)
+    fetch(`${config.apiUrl}/employee/` + userId, requestOptions)
       .then((result) => {
         if (!result.ok) {
           toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
@@ -131,7 +132,7 @@ function InformationDisplay({
       redirect: "follow",
     };
 
-    fetch("https://silverithm.site/api/v1/elder/" + userId, requestOptions)
+    fetch(`${config.apiUrl}/elder/` + userId, requestOptions)
       .then((response) => {
         if (!response.ok) {
           toast("직원 추가에 실패하였습니다. 주소를 다시 확인해 주세요.");
@@ -159,7 +160,7 @@ function InformationDisplay({
       redirect: "follow",
     };
     const response = await fetch(
-      "https://silverithm.site/api/v1/employees/" + userId,
+      `${config.apiUrl}/employees/` + userId,
       requestOptions
     )
       .then((response) => response.json())
@@ -189,7 +190,7 @@ function InformationDisplay({
       redirect: "follow",
     };
     const response = await fetch(
-      "https://silverithm.site/api/v1/elders/" + userId,
+      `${config.apiUrl}/elders/` + userId,
       requestOptions
     )
       .then((response) => response.json())

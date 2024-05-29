@@ -10,6 +10,8 @@ import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { toast, ToastContainer } from "react-toastify";
 
+import config from "./config";
+
 function App() {
   const [jwt, setJwt] = useState("");
   const [selectedElderIds, setSelectedElderIds] = useState([]);
@@ -150,10 +152,7 @@ function App() {
     };
 
     let flag = false;
-    const result = await fetch(
-      "https://silverithm.site/api/v1/dispatch",
-      requestOptions
-    )
+    const result = await fetch(`${config.apiUrl}/dispatch`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           flag = true;
@@ -227,10 +226,7 @@ function App() {
     };
 
     let flag = false;
-    const result = await fetch(
-      "https://silverithm.site/api/v1/dispatch",
-      requestOptions
-    )
+    const result = await fetch(`${config.apiUrl}/dispatch`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           flag = true;

@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import config from "../config";
 function Header({
   setJwt,
   jwt,
@@ -35,10 +36,7 @@ function Header({
       redirect: "follow",
     };
 
-    const loginResult = await fetch(
-      "https://silverithm.site/api/v1/signin",
-      requestOptions
-    )
+    const loginResult = await fetch(`${config.apiUrl}/signin`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         return result;
@@ -82,7 +80,7 @@ function Header({
       redirect: "follow",
     };
 
-    fetch("https://silverithm.site/api/v1/signup", requestOptions)
+    fetch(`${config.apiUrl}/signup`, requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => toast("회원가입에 실패하였습니다."));
@@ -103,7 +101,7 @@ function Header({
       redirect: "follow",
     };
 
-    await fetch("https://silverithm.site/api/v1/logout", requestOptions)
+    await fetch(`${config.apiUrl}/logout`, requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => alert("로그아웃에 실패하였습니다."));

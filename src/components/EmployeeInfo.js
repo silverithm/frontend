@@ -4,6 +4,7 @@ import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
+import config from "../config";
 function EmployeeInfo({
   onSelectEmployee,
   setJwt,
@@ -24,10 +25,7 @@ function EmployeeInfo({
       redirect: "follow",
     };
 
-    await fetch(
-      "https://silverithm.site/api/v1/employee/" + employeeId,
-      requestOptions
-    )
+    await fetch(`${config.apiUrl}/employee/` + employeeId, requestOptions)
       .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => console.error(error));
@@ -62,7 +60,9 @@ function EmployeeInfo({
           />
           <Form.Control
             style={{ width: "50px", textAlign: "center" }}
-            onChange={(e) => (employee.maximumCapacity = e.target.value)}
+            onChange={(e) => {
+              employee.maximumCapacity = e.target.value;
+            }}
             defaultValue={employee["maximumCapacity"]}
           ></Form.Control>
           <Form.Select
