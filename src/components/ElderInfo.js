@@ -49,7 +49,27 @@ function ElderInfo({
     await toast("삭제에 성공하였습니다.");
   }
 
-  const handleSelectChange = (elderId, requiredFrontSeat) => {
+  const handleSelectChange = (elderId, elderName, requiredFrontSeat) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const raw = JSON.stringify({
+      requiredFrontSeat: requiredFrontSeat,
+    });
+
+    const requestOptions = {
+      method: "PUT",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(`${config.apiUrl}/elder/frontseat/` + elderId, requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+
     setElders((prevElders) =>
       prevElders.map((elder) =>
         elder.id === elderId
@@ -76,7 +96,11 @@ function ElderInfo({
           <Form.Select
             style={{ width: "150px", textAlign: "center" }}
             onChange={(e) =>
-              handleSelectChange(elder.id, e.target.value === "true")
+              handleSelectChange(
+                elder.id,
+                elder.name,
+                e.target.value === "true"
+              )
             }
             value={elder.requiredFrontSeat ? "true" : "false"}
           >
