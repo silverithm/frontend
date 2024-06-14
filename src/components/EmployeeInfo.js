@@ -49,6 +49,7 @@ function EmployeeInfo({
       {employees.map((employee, index) => (
         <EmployeeItem key={index}>
           <Form.Check
+            defaultChecked={true}
             type="checkbox"
             onChange={() => onSelectEmployee(employee.id)}
           />

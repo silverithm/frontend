@@ -49,7 +49,10 @@ function ElderInfo({
     <ScrollableDiv>
       {elders.map((elder) => (
         <ElderItem key={elder.id}>
-          <Form.Check onChange={() => onSelectElder(elder.id)} />
+          <Form.Check
+            defaultChecked={true}
+            onChange={() => onSelectElder(elder.id)}
+          />
           &nbsp;&nbsp;&nbsp;
           <Form.Control
             style={{ width: "160px", textAlign: "center" }}
