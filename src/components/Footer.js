@@ -2,12 +2,12 @@ import InVehicleAssignmentButton from "./InVehicleAssignmentButton";
 import OutVehicleAssignmentButton from "./OutVehicleAssignmentButton";
 import { styled } from "styled-components";
 
-function Footer({ dispatchIn, dispatchOut }) {
+function Footer({ checkDispatchInData, checkDispatchOutData }) {
   return (
     <FooterDiv>
-      <InVehicleAssignmentButton dispatchIn={dispatchIn} /> &nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;
-      <OutVehicleAssignmentButton dispatchOut={dispatchOut} />
+      <InVehicleAssignmentButton checkDispatchInData={checkDispatchInData} />{" "}
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      <OutVehicleAssignmentButton checkDispatchOutData={checkDispatchOutData} />
     </FooterDiv>
   );
 }

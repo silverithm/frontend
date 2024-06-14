@@ -18,6 +18,8 @@ function App() {
   const {
     staticSelectedElderIds,
     staticSelectedEmployeeIds,
+    staticElders,
+    staticEmployees,
     setStaticSelectedElderIds,
     setStaticSelectedEmployeeIds,
   } = useStore();
@@ -37,7 +39,10 @@ function App() {
   let [loading, setLoading] = useState(false);
 
   const [modalShow, setModalShow] = React.useState(false);
+  const [beforeInModalShow, setBeforeInModalShow] = React.useState(false);
+  const [beforeOutModalShow, setBeforeOutModalShow] = React.useState(false);
 
+  const [dispatchData, setDispatchData] = useState([]);
   const [dispatchResult, setDispatchResult] = useState([]);
 
   function setCompany(companyName, companyAddress) {
@@ -86,6 +91,117 @@ function App() {
         </Modal.Footer>
       </Modal>
     );
+  }
+
+  function MyVerticallyCenteredModalDispatchInData(props) {
+    function dispatchInStart() {
+      props.onHide();
+      dispatchIn();
+    }
+
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            차량 배치 데이터 확인 (출근)
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h4>선택하신 데이터가 맞습니까?</h4>
+          <div style={{ marginBottom: "20px" }}></div>
+          <div style={{ marginBottom: "20px" }}>
+            <h5>직원 목록:</h5>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {staticEmployees
+                .filter((employee) =>
+                  staticSelectedEmployeeIds.includes(employee.id)
+                )
+                .map((employee) => (
+                  <div key={employee.id}>{employee.name}</div>
+                ))}
+            </div>
+          </div>
+          <div>
+            <h5>어르신 목록:</h5>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {staticElders
+                .filter((elder) => staticSelectedElderIds.includes(elder.id))
+                .map((elder) => (
+                  <div key={elder.id}>{elder.name}</div>
+                ))}
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={dispatchInStart}>차량 배치 시작하기</Button>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  function MyVerticallyCenteredModalDispatchOutData(props) {
+    function dispatchOutStart() {
+      props.onHide();
+      dispatchOut();
+    }
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            차량 배치 데이터 확인 (퇴근)
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h4>선택하신 데이터가 맞습니까?</h4>
+          <div style={{ marginBottom: "20px" }}></div>
+          <div style={{ marginBottom: "20px" }}>
+            <h5>직원 목록:</h5>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {staticEmployees
+                .filter((employee) =>
+                  staticSelectedEmployeeIds.includes(employee.id)
+                )
+                .map((employee) => (
+                  <div key={employee.id}>{employee.name}</div>
+                ))}
+            </div>
+          </div>
+          <div>
+            <h5>어르신 목록:</h5>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {staticElders
+                .filter((elder) => staticSelectedElderIds.includes(elder.id))
+                .map((elder) => (
+                  <div key={elder.id}>{elder.name}</div>
+                ))}
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={dispatchOutStart}>차량 배치 시작하기</Button>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  async function checkDispatchInData() {
+    setBeforeInModalShow(true);
+  }
+
+  async function checkDispatchOutData() {
+    setBeforeOutModalShow(true);
   }
 
   async function dispatchIn() {
@@ -305,7 +421,10 @@ function App() {
           jwt={jwt}
         />
         <div style={{ height: "1px" }}></div>
-        <Footer dispatchIn={dispatchIn} dispatchOut={dispatchOut} />
+        <Footer
+          checkDispatchInData={checkDispatchInData}
+          checkDispatchOutData={checkDispatchOutData}
+        />
       </Container>
       {loading && (
         <LoadingOverlay>
@@ -316,6 +435,14 @@ function App() {
         show={modalShow}
         onHide={() => setModalShow(false)}
         data={dispatchResult}
+      />
+      <MyVerticallyCenteredModalDispatchInData
+        show={beforeInModalShow}
+        onHide={() => setBeforeInModalShow(false)}
+      />
+      <MyVerticallyCenteredModalDispatchOutData
+        show={beforeOutModalShow}
+        onHide={() => setBeforeOutModalShow(false)}
       />
     </div>
   );

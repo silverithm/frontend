@@ -27,6 +27,10 @@ function InformationDisplay({
     setStaticSelectedEmployeeIds,
     staticSelectedElderIds,
     setStaticSelectedElderIds,
+    staticElders,
+    staticEmployees,
+    setStaticElders,
+    setStaticEmployees,
   } = useStore();
   const [employeeName, setEmployeeName] = useState("");
   const [employeeWorkPlace, setEmployeeWorkPlace] = useState("");
@@ -167,6 +171,7 @@ function InformationDisplay({
 
     await setEmployees(response); // 상태 업데이트
     await setEmployeesInfo(response);
+    await setStaticEmployees(response);
     await setStaticSelectedEmployeeIds(response.map((employee) => employee.id));
     await console.log(response);
   };
@@ -197,7 +202,8 @@ function InformationDisplay({
       .catch((error) => console.error(error));
 
     await setEldersInfo(response);
-    await setElders(response); // 상태 업데이트
+    await setElders(response);
+    await setStaticElders(response);
     await setStaticSelectedElderIds(response.map((elder) => elder.id));
     await console.log(response);
   };
