@@ -5,6 +5,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
 import config from "../config";
+import useStore from "../store/useStore";
+
 function EmployeeInfo({
   onSelectEmployee,
   setJwt,
@@ -14,7 +16,12 @@ function EmployeeInfo({
   setEmployees,
   setEmployeesInfo,
   onSelectDriver,
+  selectedElderIds,
+  selectedEmployeeIds,
 }) {
+  const { staticSelectedEmployeeIds, setStaticSelectedEmployeeIds } =
+    useStore();
+
   async function deleteEmployee(employeeId) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
@@ -44,6 +51,17 @@ function EmployeeInfo({
       )
     );
   };
+
+  const handleSelectEmployee = (id) => {
+    if (staticSelectedEmployeeIds.includes(id)) {
+      setStaticSelectedEmployeeIds(
+        staticSelectedEmployeeIds.filter((employeeId) => employeeId !== id)
+      );
+    } else {
+      setStaticSelectedEmployeeIds([...staticSelectedEmployeeIds, id]);
+    }
+    console.log(staticSelectedEmployeeIds);
+  };
   return (
     <ScrollableDiv>
       {employees.map((employee, index) => (
@@ -51,7 +69,7 @@ function EmployeeInfo({
           <Form.Check
             defaultChecked={true}
             type="checkbox"
-            onChange={() => onSelectEmployee(employee.id)}
+            onChange={() => handleSelectEmployee(employee.id)}
           />
           &nbsp;&nbsp;&nbsp;
           <Form.Control

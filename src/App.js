@@ -10,9 +10,18 @@ import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { toast, ToastContainer } from "react-toastify";
 
+import useStore from "./store/useStore";
+
 import config from "./config";
 
 function App() {
+  const {
+    staticSelectedElderIds,
+    staticSelectedEmployeeIds,
+    setStaticSelectedElderIds,
+    setStaticSelectedEmployeeIds,
+  } = useStore();
+
   const [jwt, setJwt] = useState("");
   const [selectedElderIds, setSelectedElderIds] = useState([]);
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
@@ -92,7 +101,7 @@ function App() {
     await setLoading(true);
 
     let selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
-      selectedEmployeeIds.includes(employeeInfo.id)
+      staticSelectedEmployeeIds.includes(employeeInfo.id)
     );
 
     // 새로운 배열 생성
@@ -114,7 +123,7 @@ function App() {
     console.log(selectedEmployeesInfos);
 
     const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
-      selectedElderIds.includes(elderlyInfo.id)
+      staticSelectedElderIds.includes(elderlyInfo.id)
     );
 
     const requestJson1 = {
@@ -185,10 +194,10 @@ function App() {
     await setLoading(true);
 
     const selectedEmployeesInfos = employeesInfo.filter((employeeInfo) =>
-      selectedEmployeeIds.includes(employeeInfo.id)
+      staticSelectedEmployeeIds.includes(employeeInfo.id)
     );
     const selectedElderlysInfos = eldersInfo.filter((elderlyInfo) =>
-      selectedElderIds.includes(elderlyInfo.id)
+      staticSelectedElderIds.includes(elderlyInfo.id)
     );
 
     const requestJson1 = {
@@ -249,30 +258,6 @@ function App() {
     await setModalShow(true);
   }
 
-  function onSelectEmployee(employeeId) {
-    // 체크박스 선택 여부에 따라 추가 또는 제거
-    if (selectedEmployeeIds.includes(employeeId)) {
-      setSelectedEmployeeIds(
-        selectedEmployeeIds.filter((id) => id !== employeeId)
-      );
-    } else {
-      selectedEmployeeIds.push(employeeId);
-      setSelectedEmployeeIds(selectedEmployeeIds);
-      console.log(selectedEmployeeIds);
-    }
-  }
-
-  function onSelectElder(elderId) {
-    // 체크박스 선택 여부에 따라 추가 또는 제거
-    if (selectedElderIds.includes(elderId)) {
-      setSelectedElderIds(selectedElderIds.filter((id) => id !== elderId));
-    } else {
-      selectedElderIds.push(elderId);
-      setSelectedElderIds(selectedElderIds);
-      console.log(selectedElderIds);
-    }
-  }
-
   async function onSelectAssignment(fixedAssignment) {
     if (fixedAssignment.elderly_id === "없음") {
       // '없음'을 선택했을 때는 해당 엘더의 모든 할당을 제거
@@ -310,8 +295,8 @@ function App() {
         />
         <div style={{ height: "1px" }}></div>
         <Body
-          onSelectEmployee={onSelectEmployee}
-          onSelectElder={onSelectElder}
+          selectedElderIds={selectedElderIds}
+          selectedEmployeeIds={selectedEmployeeIds}
           userId={userId}
           onSelectAssignment={onSelectAssignment}
           setEmployeesInfo={setEmployeesInfo}

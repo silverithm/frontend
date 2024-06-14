@@ -7,6 +7,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
 import config from "../config";
+import useStore from "../store/useStore";
+
 function InformationDisplay({
   onSelectEmployee,
   onSelectElder,
@@ -17,7 +19,15 @@ function InformationDisplay({
   userId,
   onSelectAssignment,
   onSelectDriver,
+  selectedEmployeeIds,
+  selectedElderIds,
 }) {
+  const {
+    staticSelectedEmployeeIds,
+    setStaticSelectedEmployeeIds,
+    staticSelectedElderIds,
+    setStaticSelectedElderIds,
+  } = useStore();
   const [employeeName, setEmployeeName] = useState("");
   const [employeeWorkPlace, setEmployeeWorkPlace] = useState("");
   const [employeeHomeAddress, setEmployeeHomeAddress] = useState("");
@@ -30,21 +40,7 @@ function InformationDisplay({
   const [elderlyHomeAddress, setElderlyHomeAddress] = useState("");
   const [elderlyIsRequiredFrontSeat, setIsElderlyRequiredFrontSeat] =
     useState(true);
-  const [selectedRequiredFrontSeat, setSelectedRequiredFrontSeat] = useState();
   const [elders, setElders] = useState([]);
-
-  const handleSelect = (e, elderId) => {
-    const selectedAssignment = {
-      employee_idx: Number(e.target.value),
-      elderly_idx: elderId,
-    };
-
-    onSelectAssignment(selectedAssignment);
-  };
-  const fetchEmployeesAndElders = async () => {
-    await fetchEmployees();
-    await fetchElders();
-  };
 
   function addEmployee() {
     if (jwt === "") {
@@ -171,7 +167,8 @@ function InformationDisplay({
 
     await setEmployees(response); // 상태 업데이트
     await setEmployeesInfo(response);
-    await console.log(employees);
+    await setStaticSelectedEmployeeIds(response.map((employee) => employee.id));
+    await console.log(response);
   };
 
   const fetchElders = async () => {
@@ -201,6 +198,8 @@ function InformationDisplay({
 
     await setEldersInfo(response);
     await setElders(response); // 상태 업데이트
+    await setStaticSelectedElderIds(response.map((elder) => elder.id));
+    await console.log(response);
   };
   return (
     <InformationDisplaySection>
@@ -210,6 +209,15 @@ function InformationDisplay({
             직원 정보 &nbsp; &nbsp; &nbsp;
             <Button onClick={fetchEmployees}> 불러오기 </Button>
           </h2>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "5px",
+            }}
+          >
+            <span>{staticSelectedEmployeeIds.length}명 선택</span>
+          </div>
         </InformationDiv>
 
         <EmployeeInfo
@@ -220,6 +228,8 @@ function InformationDisplay({
           userId={userId}
           setEmployees={setEmployees}
           setEmployeesInfo={setEmployeesInfo}
+          selectedElderIds={selectedElderIds}
+          selectedEmployeeIds={selectedEmployeeIds}
         />
 
         <Form.Control
@@ -272,6 +282,15 @@ function InformationDisplay({
             어르신 정보 &nbsp; &nbsp; &nbsp;{" "}
             <Button onClick={fetchElders}>불러오기</Button>
           </h2>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "5px",
+            }}
+          >
+            <span>{staticSelectedElderIds.length}명 선택</span>
+          </div>
         </InformationDiv>
 
         <ElderInfo
@@ -282,6 +301,8 @@ function InformationDisplay({
           userId={userId}
           setElders={setElders}
           elders={elders}
+          selectedElderIds={selectedElderIds}
+          selectedEmployeeIds={selectedEmployeeIds}
         />
 
         <Form.Control

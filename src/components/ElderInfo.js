@@ -5,6 +5,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
 import config from "../config";
+import useStore from "../store/useStore";
+
 function ElderInfo({
   onSelectElder,
   setJwt,
@@ -14,6 +16,18 @@ function ElderInfo({
   setElders,
   elders,
 }) {
+  const { staticSelectedElderIds, setStaticSelectedElderIds } = useStore();
+  const handleSelectElder = (id) => {
+    if (staticSelectedElderIds.includes(id)) {
+      setStaticSelectedElderIds(
+        staticSelectedElderIds.filter((elderId) => elderId !== id)
+      );
+    } else {
+      setStaticSelectedElderIds([...staticSelectedElderIds, id]);
+    }
+    console.log(staticSelectedElderIds);
+  };
+
   async function deleteElder(elderId) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
@@ -51,7 +65,7 @@ function ElderInfo({
         <ElderItem key={elder.id}>
           <Form.Check
             defaultChecked={true}
-            onChange={() => onSelectElder(elder.id)}
+            onChange={() => handleSelectElder(elder.id)}
           />
           &nbsp;&nbsp;&nbsp;
           <Form.Control

@@ -10,11 +10,14 @@ function Body({
   setEmployeesInfo,
   setEldersInfo,
   userId,
-  onSelectDriver,
+  selectedElderIds,
+  selectedEmployeeIds,
 }) {
   return (
     <BodyDiv>
       <InformationDisplay
+        selectedElderIds={selectedElderIds}
+        selectedEmployeeIds={selectedEmployeeIds}
         onSelectEmployee={onSelectEmployee}
         onSelectElder={onSelectElder}
         setEmployeesInfo={setEmployeesInfo}
