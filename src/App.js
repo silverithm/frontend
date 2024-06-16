@@ -214,6 +214,7 @@ function App() {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
+    getProgressSSE();
 
     toast("출근 차량배치가 시작되었습니다.");
 
@@ -305,12 +306,7 @@ function App() {
     await setModalShow(true);
   }
 
-  async function dispatchOut() {
-    if (jwt === "") {
-      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
-      return;
-    }
-
+  function getProgressSSE() {
     const url = `http://localhost:8080/SSE/subscribe/${userId}`;
 
     const eventSource = new EventSourcePolyfill(url, {
@@ -326,6 +322,15 @@ function App() {
         setProgress(Number(event.data));
       }
     });
+  }
+
+  async function dispatchOut() {
+    if (jwt === "") {
+      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
+      return;
+    }
+
+    getProgressSSE();
 
     toast("퇴근 차량배치가 시작되었습니다.");
     await setLoading(true);
