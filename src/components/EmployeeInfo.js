@@ -69,6 +69,7 @@ function EmployeeInfo({
           <Form.Check
             defaultChecked={true}
             type="checkbox"
+            checked={staticSelectedEmployeeIds.includes(employee.id)}
             onChange={() => handleSelectEmployee(employee.id)}
           />
           &nbsp;&nbsp;&nbsp;

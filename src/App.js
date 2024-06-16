@@ -9,6 +9,8 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { toast, ToastContainer } from "react-toastify";
+import { EventSourcePolyfill } from "event-source-polyfill";
+import ProgressBar from "react-bootstrap/ProgressBar";
 
 import useStore from "./store/useStore";
 
@@ -35,6 +37,7 @@ function App() {
   const [eldersInfo, setEldersInfo] = useState([]);
 
   const [userId, setUserId] = useState();
+  const [progress, setProgress] = useState();
 
   let [loading, setLoading] = useState(false);
 
@@ -247,6 +250,7 @@ function App() {
       employees: selectedEmployeesInfos,
       company: { companyAddress: companyAddress },
       dispatchType: "IN",
+      userName: userId,
     };
     const requestJson2 = {
       elderlys: selectedElderlysInfos,
@@ -254,6 +258,7 @@ function App() {
       company: { companyAddress: companyAddress },
       fixedAssignments: fixedAssignments,
       dispatchType: "IN",
+      userName: userId,
     };
 
     if (fixedAssignments.length === 0) {
@@ -306,6 +311,22 @@ function App() {
       return;
     }
 
+    const url = `http://localhost:8080/SSE/subscribe/${userId}`;
+
+    const eventSource = new EventSourcePolyfill(url, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    eventSource.addEventListener("sse", (event) => {
+      console.log(event);
+
+      if (!event.data.includes("EventStream Created")) {
+        setProgress(Number(event.data));
+      }
+    });
+
     toast("퇴근 차량배치가 시작되었습니다.");
     await setLoading(true);
 
@@ -321,6 +342,7 @@ function App() {
       employees: selectedEmployeesInfos,
       company: { companyAddress: companyAddress },
       dispatchType: "OUT",
+      userName: userId,
     };
     const requestJson2 = {
       elderlys: selectedElderlysInfos,
@@ -328,6 +350,7 @@ function App() {
       company: { companyAddress: companyAddress },
       fixedAssignments: fixedAssignments,
       dispatchType: "OUT",
+      userName: userId,
     };
 
     if (fixedAssignments.length === 0) {
@@ -429,6 +452,14 @@ function App() {
       {loading && (
         <LoadingOverlay>
           <RiseLoader color="#00BFFF" loading={loading} size={50} />
+          <div style={{ height: 50 }}></div>
+          <ProgressBar
+            style={{ width: 1000, height: 50 }}
+            animated
+            now={progress}
+            label={`${progress}%`}
+          />
+          ;
         </LoadingOverlay>
       )}
       <MyVerticallyCenteredModal

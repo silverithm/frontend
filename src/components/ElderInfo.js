@@ -17,7 +17,10 @@ function ElderInfo({
   elders,
 }) {
   const { staticSelectedElderIds, setStaticSelectedElderIds } = useStore();
+  const [allSelected, setAllSelected] = useState(true);
   const handleSelectElder = (id) => {
+    setAllSelected(false);
+
     if (staticSelectedElderIds.includes(id)) {
       setStaticSelectedElderIds(
         staticSelectedElderIds.filter((elderId) => elderId !== id)
@@ -85,6 +88,7 @@ function ElderInfo({
         <ElderItem key={elder.id}>
           <Form.Check
             defaultChecked={true}
+            checked={staticSelectedElderIds.includes(elder.id)}
             onChange={() => handleSelectElder(elder.id)}
           />
           &nbsp;&nbsp;&nbsp;

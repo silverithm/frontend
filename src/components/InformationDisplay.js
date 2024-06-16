@@ -25,13 +25,15 @@ function InformationDisplay({
   const {
     staticSelectedEmployeeIds,
     setStaticSelectedEmployeeIds,
-    staticSelectedElderIds,
-    setStaticSelectedElderIds,
     staticElders,
     staticEmployees,
     setStaticElders,
     setStaticEmployees,
   } = useStore();
+
+  const { staticSelectedElderIds, setStaticSelectedElderIds } = useStore();
+  const [allSelected, setAllSelected] = useState(true);
+
   const [employeeName, setEmployeeName] = useState("");
   const [employeeWorkPlace, setEmployeeWorkPlace] = useState("");
   const [employeeHomeAddress, setEmployeeHomeAddress] = useState("");
@@ -45,6 +47,24 @@ function InformationDisplay({
   const [elderlyIsRequiredFrontSeat, setIsElderlyRequiredFrontSeat] =
     useState(true);
   const [elders, setElders] = useState([]);
+
+  const handleSelectAll = () => {
+    if (allSelected) {
+      setStaticSelectedElderIds([]);
+    } else {
+      setStaticSelectedElderIds(elders.map((elder) => elder.id));
+    }
+    setAllSelected(!allSelected);
+  };
+
+  const handleSelectAllEmployee = () => {
+    if (allSelected) {
+      setStaticSelectedEmployeeIds([]);
+    } else {
+      setStaticSelectedEmployeeIds(employees.map((employee) => employee.id));
+    }
+    setAllSelected(!allSelected);
+  };
 
   function addEmployee() {
     if (jwt === "") {
@@ -222,6 +242,17 @@ function InformationDisplay({
               padding: "5px",
             }}
           >
+            <Button
+              style={{
+                height: 25, // 높이를 절반으로 줄임
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={handleSelectAllEmployee}
+            >
+              {"전체 선택"}
+            </Button>
             <span>{staticSelectedEmployeeIds.length}명 선택</span>
           </div>
         </InformationDiv>
@@ -295,6 +326,17 @@ function InformationDisplay({
               padding: "5px",
             }}
           >
+            <Button
+              style={{
+                height: 25, // 높이를 절반으로 줄임
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={handleSelectAll}
+            >
+              {"전체 선택"}
+            </Button>
             <span>{staticSelectedElderIds.length}명 선택</span>
           </div>
         </InformationDiv>
