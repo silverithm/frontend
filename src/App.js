@@ -52,7 +52,7 @@ function App() {
   const Map = () => {
     const [map, setMap] = useState(null);
 
-    const REST_API_KEY = process.env.REST_API_KEY;
+    const REST_API_KEY = config.restApiKey;
 
     // 호출방식의 URL을 입력합니다.
     const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
