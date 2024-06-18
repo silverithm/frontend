@@ -1,4 +1,8 @@
 import React from "react";
+import { Map } from "./components/KakaoMap";
+import useStore from "./store/useStore";
+import config from "./config";
+
 import Header from "./components/Header";
 import Body from "./components/Body";
 import Footer from "./components/Footer";
@@ -11,10 +15,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { toast, ToastContainer } from "react-toastify";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import ProgressBar from "react-bootstrap/ProgressBar";
-
-import useStore from "./store/useStore";
-
-import config from "./config";
+import { useEffect } from "react";
+const { kakao } = window;
 
 function App() {
   const {
@@ -45,8 +47,232 @@ function App() {
   const [beforeInModalShow, setBeforeInModalShow] = React.useState(false);
   const [beforeOutModalShow, setBeforeOutModalShow] = React.useState(false);
 
-  const [dispatchData, setDispatchData] = useState([]);
   const [dispatchResult, setDispatchResult] = useState([]);
+
+  const Map = () => {
+    const [map, setMap] = useState(null);
+
+    const REST_API_KEY = config.restApiKey;
+
+    // 호출방식의 URL을 입력합니다.
+    const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
+
+    function getRandomColor() {
+      const letters = "0123456789ABCDEF";
+      let color = "#";
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    async function getCarDirection() {
+      console.log(dispatchResult);
+
+      dispatchResult.forEach(async (result) => {
+        let origin;
+        let destination;
+        let waypoints = [];
+        let randomColor = await getRandomColor();
+        console.log(randomColor);
+        if (result.dispatchType === "IN") {
+          origin = {
+            x: result.homeAddress.longitude,
+            y: result.homeAddress.latitude,
+            name: result.employeeName,
+          };
+
+          for (let i = 0; i < result.assignmentElders.length; i++) {
+            let currentElder = result.assignmentElders[i];
+            waypoints.push({
+              x: currentElder.homeAddress.longitude,
+              y: currentElder.homeAddress.latitude,
+              name: currentElder.name,
+            });
+          }
+
+          destination = {
+            x: result.workPlace.longitude,
+            y: result.workPlace.latitude,
+            name: "학교",
+          };
+          console.log(origin);
+          console.log(waypoints);
+          console.log(destination);
+        }
+
+        if (result.dispatchType === "OUT") {
+          origin = {
+            x: result.workPlace.longitude,
+            y: result.workPlace.latitude,
+            name: "학교",
+          };
+
+          for (let i = 0; i < result.assignmentElders.length; i++) {
+            let currentElder = result.assignmentElders[i];
+            waypoints.push({
+              x: currentElder.homeAddress.longitude,
+              y: currentElder.homeAddress.latitude,
+              name: currentElder.name,
+            });
+          }
+
+          destination = {
+            x: result.homeAddress.longitude,
+            y: result.homeAddress.latitude,
+            name: result.employeeName,
+          };
+          console.log(origin);
+          console.log(waypoints);
+          console.log(destination);
+        }
+
+        // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
+
+        const headers = {
+          Authorization: `KakaoAK ${REST_API_KEY}`,
+          "Content-Type": "application/json",
+        };
+
+        const body = JSON.stringify({
+          origin: origin,
+          destination: destination,
+          waypoints: waypoints,
+          priority: "RECOMMEND",
+          car_fuel: "GASOLINE",
+          car_hipass: false,
+          alternatives: true,
+          road_details: false,
+        });
+
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: headers,
+            body: body,
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          console.log(data);
+
+          data.routes[0].sections.forEach((section) => {
+            const linePath = [];
+
+            section.roads.forEach((road) => {
+              for (let i = 0; i < road.vertexes.length; i += 2) {
+                const latLng = new kakao.maps.LatLng(
+                  road.vertexes[i + 1],
+                  road.vertexes[i]
+                );
+                linePath.push(latLng);
+              }
+            });
+
+            console.log(linePath);
+            var content = `<div style="
+            justify-content: center;
+            align-items: center;
+            color: ${randomColor};
+            font-size: 20px;
+            font-weight: bold;
+        ">
+        ${origin.name}
+        </div>`;
+
+            var position = new kakao.maps.LatLng(origin.y, origin.x);
+            var customOverlay = new kakao.maps.CustomOverlay({
+              position: position,
+              content: content,
+            });
+            customOverlay.setMap(map);
+
+            waypoints.forEach((point) => {
+              var content = `<div style="
+              justify-content: center;
+              align-items: center;
+              color: ${randomColor};
+              font-size: 20px;
+              font-weight: bold;
+          ">
+          ${point.name}
+          </div>`;
+
+              var position = new kakao.maps.LatLng(point.y, point.x);
+              var customOverlay = new kakao.maps.CustomOverlay({
+                position: position,
+                content: content,
+              });
+              customOverlay.setMap(map);
+            });
+
+            var content2 = `<div style="
+            justify-content: center;
+            align-items: center;
+            color: ${randomColor};
+            font-size: 20px;
+            font-weight: bold;
+        ">
+        ${destination.name}
+        </div>`;
+
+            var position2 = new kakao.maps.LatLng(destination.y, destination.x);
+            var customOverlay2 = new kakao.maps.CustomOverlay({
+              position: position2,
+              content: content2,
+            });
+            customOverlay2.setMap(map);
+
+            var polyline = new kakao.maps.Polyline({
+              path: linePath,
+              strokeWeight: 7,
+              strokeColor: randomColor,
+              strokeOpacity: 0.7,
+              strokeStyle: "solid",
+            });
+            polyline.setMap(map);
+            console.log(polyline);
+            console.log(map);
+          });
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+    }
+    getCarDirection();
+
+    useEffect(() => {
+      const mapContainer = document.getElementById("map");
+      const mapOptions = {
+        center: new kakao.maps.LatLng(35.1709043, 128.0820769), //지도의 중심좌표.
+        level: 3, //지도의 레벨(확대, 축소 정도)
+      };
+
+      const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
+      setMap(kakaoMap);
+    }, []);
+
+    function setCenter({ lat, lng }) {
+      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      map.setCenter(moveLatLon);
+    }
+
+    function panTo({ lat, lng }) {
+      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      map.panTo(moveLatLon);
+    }
+
+    return (
+      <>
+        <div id="map" style={{ width: "100%", height: "450px" }} />
+        <div style={{ display: "flex", gap: "10px" }}></div>
+      </>
+    );
+  };
 
   function setCompany(companyName, companyAddress) {
     setCompanyName(companyName);
@@ -80,14 +306,15 @@ function App() {
                   {item.employeeName}
                 </div>
                 <div style={{ flexDirection: "row", display: "flex" }}>
-                  {item.assignmentElderNames.map((name, idx) => (
-                    <div key={idx}> {name} &nbsp;&nbsp;&nbsp;&nbsp; </div>
+                  {item.assignmentElders.map((elder, idx) => (
+                    <div key={idx}> {elder.name} &nbsp;&nbsp;&nbsp;&nbsp; </div>
                   ))}
                   <div>|&nbsp;&nbsp;&nbsp;약 {item.time}분 소요</div>
                 </div>
               </div>
             ))}
           </div>
+          <Map></Map>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={props.onHide}>Close</Button>
@@ -294,7 +521,9 @@ function App() {
       .catch((error) => console.error(error));
 
     if (flag) {
-      toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
+      toast(
+        "차량 배치에 실패하였습니다. 로그인이나 데이터를 다시 확인해 주세요."
+      );
       setLoading(false);
       return;
     }
@@ -398,7 +627,7 @@ function App() {
 
     await setLoading(false);
     await setDispatchResult(result);
-    await console.log(dispatchResult);
+    await console.log(result);
     await setModalShow(true);
   }
 
@@ -464,9 +693,9 @@ function App() {
             now={progress}
             label={`${progress}%`}
           />
-          ;
         </LoadingOverlay>
       )}
+
       <MyVerticallyCenteredModal
         show={modalShow}
         onHide={() => setModalShow(false)}

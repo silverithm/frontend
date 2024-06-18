@@ -84,7 +84,7 @@ function ElderInfo({
 
   return (
     <ScrollableDiv>
-      {elders.map((elder) => (
+      {elders.map((elder, index) => (
         <ElderItem key={elder.id}>
           <Form.Check
             defaultChecked={true}
