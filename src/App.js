@@ -49,8 +49,6 @@ function App() {
 
   const [dispatchResult, setDispatchResult] = useState([]);
 
-  var kakaoDurationResult = [];
-
   const Map = () => {
     const [map, setMap] = useState(null);
 
@@ -70,8 +68,9 @@ function App() {
 
     async function getCarDirection() {
       console.log(dispatchResult);
+      var kakaoDurationResult = [];
 
-      dispatchResult.forEach(async (result) => {
+      await dispatchResult.forEach(async (result) => {
         let origin;
         let destination;
         let waypoints = [];
@@ -250,7 +249,7 @@ function App() {
         }
       });
 
-      console.log(kakaoDurationResult);
+      await console.log(kakaoDurationResult);
     }
     getCarDirection();
 
