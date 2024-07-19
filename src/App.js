@@ -158,7 +158,10 @@ function App() {
 
           const data = await response.json();
 
-          console.log(data);
+          console.log("kakaomap api response :" + data);
+
+          const duration = data.routes[0].summary.duration;
+          console.log("kakaomap api duration :" + duration);
 
           data.routes[0].sections.forEach((section) => {
             const linePath = [];
