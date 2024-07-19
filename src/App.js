@@ -49,6 +49,8 @@ function App() {
 
   const [dispatchResult, setDispatchResult] = useState([]);
 
+  const [kakaoDurationResult, setKakaoDurationResult] = useState([]);
+
   const Map = () => {
     const [map, setMap] = useState(null);
 
@@ -163,6 +165,8 @@ function App() {
           const duration = data.routes[0].summary.duration;
           console.log("kakaomap api duration :" + duration);
 
+          kakaoDurationResult.push(duration);
+
           data.routes[0].sections.forEach((section) => {
             const linePath = [];
 
@@ -240,6 +244,7 @@ function App() {
             polyline.setMap(map);
             console.log(polyline);
             console.log(map);
+            setKakaoDurationResult(kakaoDurationResult);
           });
         } catch (error) {
           console.error("Error:", error);
@@ -312,7 +317,10 @@ function App() {
                   {item.assignmentElders.map((elder, idx) => (
                     <div key={idx}> {elder.name} &nbsp;&nbsp;&nbsp;&nbsp; </div>
                   ))}
-                  <div>|&nbsp;&nbsp;&nbsp;약 {item.time}분 소요</div>
+                  <div>
+                    |&nbsp;&nbsp;&nbsp;약 {item.time}분 소요,{" "}
+                    {kakaoDurationResult[index]}초 소요
+                  </div>
                 </div>
               </div>
             ))}
