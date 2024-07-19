@@ -49,7 +49,7 @@ function App() {
 
   const [dispatchResult, setDispatchResult] = useState([]);
 
-  const [kakaoDurationResult, setKakaoDurationResult] = useState([]);
+  var kakaoDurationResult = [];
 
   const Map = () => {
     const [map, setMap] = useState(null);
@@ -246,12 +246,12 @@ function App() {
             polyline.setMap(map);
             console.log(polyline);
             console.log(map);
-            setKakaoDurationResult(durations);
           });
         } catch (error) {
           console.error("Error:", error);
         }
       });
+      kakaoDurationResult = durations;
       console.log(kakaoDurationResult);
     }
     getCarDirection();
