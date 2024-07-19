@@ -163,10 +163,10 @@ function App() {
 
           console.log("kakaomap api response :" + data);
 
-          const duration = data.routes[0].summary.duration;
+          const duration = await data.routes[0].summary.duration;
           console.log("kakaomap api duration :" + duration);
 
-          kakaoDurationResult.push(duration);
+          await kakaoDurationResult.push(duration);
 
           data.routes[0].sections.forEach((section) => {
             const linePath = [];
