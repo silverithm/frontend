@@ -71,6 +71,8 @@ function App() {
     async function getCarDirection() {
       console.log(dispatchResult);
 
+      var durations = [];
+
       dispatchResult.forEach(async (result) => {
         let origin;
         let destination;
@@ -165,7 +167,7 @@ function App() {
           const duration = data.routes[0].summary.duration;
           console.log("kakaomap api duration :" + duration);
 
-          kakaoDurationResult.push(duration);
+          durations.push(duration);
 
           data.routes[0].sections.forEach((section) => {
             const linePath = [];
@@ -244,7 +246,7 @@ function App() {
             polyline.setMap(map);
             console.log(polyline);
             console.log(map);
-            setKakaoDurationResult(kakaoDurationResult);
+            setKakaoDurationResult(durations);
           });
         } catch (error) {
           console.error("Error:", error);
