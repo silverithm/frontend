@@ -49,6 +49,8 @@ function App() {
 
   const [dispatchResult, setDispatchResult] = useState([]);
 
+  var durationResults = [];
+
   const Map = () => {
     const [map, setMap] = useState(null);
 
@@ -250,6 +252,7 @@ function App() {
       });
 
       await console.log(kakaoDurationResult);
+      durationResults = await kakaoDurationResult;
     }
     getCarDirection();
 
@@ -319,7 +322,7 @@ function App() {
                   ))}
                   <div>
                     |&nbsp;&nbsp;&nbsp;약 {item.time}분 소요,{" "}
-                    {kakaoDurationResult[index]}초 소요
+                    {durationResults[index]}초 소요
                   </div>
                 </div>
               </div>
