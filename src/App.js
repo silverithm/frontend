@@ -434,7 +434,8 @@ function App() {
             justify-content: center;
             align-items: center;
             color: ${randomColor};
-            background-color: 'white';
+            background-color: white;
+            border-radius: 30px;
             font-size: 20px;
             font-weight: bold;
         ">
@@ -453,7 +454,8 @@ function App() {
               justify-content: center;
               align-items: center;
               color: ${randomColor};
-              background-color: 'white';
+              background-color: white;
+              border-radius: 30px;
               font-size: 20px;
               font-weight: bold;
           ">
@@ -472,7 +474,8 @@ function App() {
             justify-content: center;
             align-items: center;
             color: ${randomColor};
-            background-color: 'white';
+            background-color: white;
+            border-radius: 30px;
             font-size: 20px;
             font-weight: bold;
         ">
