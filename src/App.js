@@ -26,6 +26,8 @@ function App() {
     staticEmployees,
     setStaticSelectedElderIds,
     setStaticSelectedEmployeeIds,
+    staticDurationTimes,
+    setStaticDurationTimes,
   } = useStore();
 
   const [jwt, setJwt] = useState("");
@@ -49,12 +51,259 @@ function App() {
 
   const [dispatchResult, setDispatchResult] = useState([]);
 
-  var durationResults = [];
+  const Map = ({ setMap, map }) => {
+    // const REST_API_KEY = config.restApiKey;
+    // const [map, setMap] = useState(null);
 
-  const Map = () => {
+    // // 호출방식의 URL을 입력합니다.
+    // const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
+
+    // function getRandomColor() {
+    //   const letters = "0123456789ABCDEF";
+    //   let color = "#";
+    //   for (let i = 0; i < 6; i++) {
+    //     color += letters[Math.floor(Math.random() * 16)];
+    //   }
+    //   return color;
+    // }
+
+    // async function getCarDirection() {
+    //   await dispatchResult.forEach(async (result) => {
+    //     let origin;
+    //     let destination;
+    //     let waypoints = [];
+    //     let randomColor = await getRandomColor();
+    //     console.log(randomColor);
+    //     if (result.dispatchType === "IN") {
+    //       origin = {
+    //         x: result.homeAddress.longitude,
+    //         y: result.homeAddress.latitude,
+    //         name: result.employeeName,
+    //       };
+
+    //       for (let i = 0; i < result.assignmentElders.length; i++) {
+    //         let currentElder = result.assignmentElders[i];
+    //         waypoints.push({
+    //           x: currentElder.homeAddress.longitude,
+    //           y: currentElder.homeAddress.latitude,
+    //           name: currentElder.name,
+    //         });
+    //       }
+
+    //       destination = {
+    //         x: result.workPlace.longitude,
+    //         y: result.workPlace.latitude,
+    //         name: "학교",
+    //       };
+    //       console.log(origin);
+    //       console.log(waypoints);
+    //       console.log(destination);
+    //     }
+
+    //     if (result.dispatchType === "OUT") {
+    //       origin = {
+    //         x: result.workPlace.longitude,
+    //         y: result.workPlace.latitude,
+    //         name: "학교",
+    //       };
+
+    //       for (let i = 0; i < result.assignmentElders.length; i++) {
+    //         let currentElder = result.assignmentElders[i];
+    //         waypoints.push({
+    //           x: currentElder.homeAddress.longitude,
+    //           y: currentElder.homeAddress.latitude,
+    //           name: currentElder.name,
+    //         });
+    //       }
+
+    //       destination = {
+    //         x: result.homeAddress.longitude,
+    //         y: result.homeAddress.latitude,
+    //         name: result.employeeName,
+    //       };
+    //       console.log(origin);
+    //       console.log(waypoints);
+    //       console.log(destination);
+    //     }
+
+    //     // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
+
+    //     const headers = {
+    //       Authorization: `KakaoAK ${REST_API_KEY}`,
+    //       "Content-Type": "application/json",
+    //     };
+
+    //     const body = JSON.stringify({
+    //       origin: origin,
+    //       destination: destination,
+    //       waypoints: waypoints,
+    //       priority: "RECOMMEND",
+    //       car_fuel: "GASOLINE",
+    //       car_hipass: false,
+    //       alternatives: true,
+    //       road_details: false,
+    //     });
+
+    //     try {
+    //       const response = await fetch(url, {
+    //         method: "POST",
+    //         headers: headers,
+    //         body: body,
+    //       });
+
+    //       if (!response.ok) {
+    //         throw new Error(`HTTP error! Status: ${response.status}`);
+    //       }
+
+    //       const data = await response.json();
+
+    //       console.log("kakaomap api response :" + data);
+
+    //       const duration = await data.routes[0].summary.duration;
+    //       console.log("kakaomap api duration :" + duration);
+
+    //       data.routes[0].sections.forEach((section) => {
+    //         const linePath = [];
+
+    //         section.roads.forEach((road) => {
+    //           for (let i = 0; i < road.vertexes.length; i += 2) {
+    //             const latLng = new kakao.maps.LatLng(
+    //               road.vertexes[i + 1],
+    //               road.vertexes[i]
+    //             );
+    //             linePath.push(latLng);
+    //           }
+    //         });
+
+    //         console.log(linePath);
+    //         var content = `<div style="
+    //         justify-content: center;
+    //         align-items: center;
+    //         color: ${randomColor};
+    //         font-size: 20px;
+    //         font-weight: bold;
+    //     ">
+    //     ${origin.name}
+    //     </div>`;
+
+    //         var position = new kakao.maps.LatLng(origin.y, origin.x);
+    //         var customOverlay = new kakao.maps.CustomOverlay({
+    //           position: position,
+    //           content: content,
+    //         });
+    //         customOverlay.setMap(map);
+
+    //         waypoints.forEach((point) => {
+    //           var content = `<div style="
+    //           justify-content: center;
+    //           align-items: center;
+    //           color: ${randomColor};
+    //           font-size: 20px;
+    //           font-weight: bold;
+    //       ">
+    //       ${point.name}
+    //       </div>`;
+
+    //           var position = new kakao.maps.LatLng(point.y, point.x);
+    //           var customOverlay = new kakao.maps.CustomOverlay({
+    //             position: position,
+    //             content: content,
+    //           });
+    //           customOverlay.setMap(map);
+    //         });
+
+    //         var content2 = `<div style="
+    //         justify-content: center;
+    //         align-items: center;
+    //         color: ${randomColor};
+    //         font-size: 20px;
+    //         font-weight: bold;
+    //     ">
+    //     ${destination.name}
+    //     </div>`;
+
+    //         var position2 = new kakao.maps.LatLng(destination.y, destination.x);
+    //         var customOverlay2 = new kakao.maps.CustomOverlay({
+    //           position: position2,
+    //           content: content2,
+    //         });
+    //         customOverlay2.setMap(map);
+
+    //         var polyline = new kakao.maps.Polyline({
+    //           path: linePath,
+    //           strokeWeight: 7,
+    //           strokeColor: randomColor,
+    //           strokeOpacity: 0.7,
+    //           strokeStyle: "solid",
+    //         });
+    //         polyline.setMap(map);
+    //         console.log(polyline);
+    //         console.log(map);
+    //       });
+    //     } catch (error) {
+    //       console.error("Error:", error);
+    //     }
+    //   });
+    // }
+
+    // getCarDirection();
+
+    useEffect(() => {
+      const mapContainer = document.getElementById("map");
+      const mapOptions = {
+        center: new kakao.maps.LatLng(35.1709043, 128.0820769), //지도의 중심좌표.
+        level: 3, //지도의 레벨(확대, 축소 정도)
+      };
+
+      const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
+      setMap(kakaoMap);
+    }, []);
+
+    function setCenter({ lat, lng }) {
+      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      map.setCenter(moveLatLon);
+    }
+
+    function panTo({ lat, lng }) {
+      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      map.panTo(moveLatLon);
+    }
+
+    return (
+      <>
+        <div id="map" style={{ width: "100%", height: "450px" }} />
+        <div style={{ display: "flex", gap: "10px" }}></div>
+      </>
+    );
+  };
+
+  function setCompany(companyName, companyAddress) {
+    setCompanyName(companyName);
+    setCompanyAddress(companyAddress);
+  }
+
+  function MyVerticallyCenteredModal(props) {
+    const REST_API_KEY = config.restApiKey;
     const [map, setMap] = useState(null);
 
-    const REST_API_KEY = config.restApiKey;
+    const [durations, setDurations] = useState([]);
+
+    useEffect(() => {
+      async function fetchData() {
+        try {
+          const data = await getCarDirection();
+          await setDurations(data);
+        } catch (error) {
+          console.error("Error getCarDirection :", error);
+        } finally {
+          console.log(durations);
+        }
+      }
+
+      if (map != null && durations !== []) {
+        fetchData();
+      }
+    }, [map]);
 
     // 호출방식의 URL을 입력합니다.
     const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
@@ -69,10 +318,9 @@ function App() {
     }
 
     async function getCarDirection() {
-      console.log(dispatchResult);
-      var kakaoDurationResult = [];
+      var dur = [];
 
-      await dispatchResult.forEach(async (result) => {
+      for (const result of dispatchResult) {
         let origin;
         let destination;
         let waypoints = [];
@@ -165,8 +413,8 @@ function App() {
 
           const duration = await data.routes[0].summary.duration;
           console.log("kakaomap api duration :" + duration);
-
-          await kakaoDurationResult.push(duration);
+          dur.push(duration);
+          console.log(dur);
 
           data.routes[0].sections.forEach((section) => {
             const linePath = [];
@@ -249,48 +497,19 @@ function App() {
         } catch (error) {
           console.error("Error:", error);
         }
-      });
-
-      await console.log(kakaoDurationResult);
-      durationResults = await kakaoDurationResult;
-    }
-    getCarDirection();
-
-    useEffect(() => {
-      const mapContainer = document.getElementById("map");
-      const mapOptions = {
-        center: new kakao.maps.LatLng(35.1709043, 128.0820769), //지도의 중심좌표.
-        level: 3, //지도의 레벨(확대, 축소 정도)
-      };
-
-      const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
-      setMap(kakaoMap);
-    }, []);
-
-    function setCenter({ lat, lng }) {
-      const moveLatLon = new kakao.maps.LatLng(lat, lng);
-      map.setCenter(moveLatLon);
+      }
+      return await dur;
     }
 
-    function panTo({ lat, lng }) {
-      const moveLatLon = new kakao.maps.LatLng(lat, lng);
-      map.panTo(moveLatLon);
-    }
+    const getCurrentTime = () => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
+    };
 
-    return (
-      <>
-        <div id="map" style={{ width: "100%", height: "450px" }} />
-        <div style={{ display: "flex", gap: "10px" }}></div>
-      </>
-    );
-  };
+    const currentTime = getCurrentTime();
 
-  function setCompany(companyName, companyAddress) {
-    setCompanyName(companyName);
-    setCompanyAddress(companyAddress);
-  }
-
-  function MyVerticallyCenteredModal(props) {
     return (
       <Modal
         {...props}
@@ -305,8 +524,15 @@ function App() {
         </Modal.Header>
         <Modal.Body>
           <h4>
-            실제 운행 시간은 도로 혼잡도에 따라 10분 정도 차이날 수 있습니다.
+            이 운행 시간은 {currentTime} 기준 카카오맵 API로 계산된
+            운행시간입니다.
           </h4>
+          <h5>
+            운행 당시 도로 혼잡도에 따라 운행시간은 10분 정도 차이 날 수
+            있습니다.
+          </h5>
+          <br></br>
+
           <div>
             {props.data.map((item, index) => (
               <div
@@ -321,14 +547,17 @@ function App() {
                     <div key={idx}> {elder.name} &nbsp;&nbsp;&nbsp;&nbsp; </div>
                   ))}
                   <div>
-                    |&nbsp;&nbsp;&nbsp;약 {item.time}분 소요,{" "}
-                    {durationResults[index]}초 소요
+                    |&nbsp;&nbsp;&nbsp;약{" "}
+                    {isNaN(durations[index])
+                      ? "계산중..."
+                      : (durations[index] / 60).toFixed(2)}
+                    분 소요,{" "}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <Map></Map>
+          <Map setMap={setMap} map={map}></Map>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={props.onHide}>Close</Button>
