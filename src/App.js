@@ -434,7 +434,7 @@ function App() {
             justify-content: center;
             align-items: center;
             color: ${randomColor};
-            background-color: hsl(240, 100%, 50%, 0.5);
+            background-color: 'white';
             font-size: 20px;
             font-weight: bold;
         ">
@@ -453,7 +453,7 @@ function App() {
               justify-content: center;
               align-items: center;
               color: ${randomColor};
-              background-color: hsl(240, 100%, 50%, 0.5);
+              background-color: 'white';
               font-size: 20px;
               font-weight: bold;
           ">
@@ -472,7 +472,7 @@ function App() {
             justify-content: center;
             align-items: center;
             color: ${randomColor};
-            background-color: hsl(240, 100%, 50%, 0.5);
+            background-color: 'white';
             font-size: 20px;
             font-weight: bold;
         ">
