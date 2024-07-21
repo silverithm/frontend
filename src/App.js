@@ -551,7 +551,7 @@ function App() {
                     {isNaN(durations[index])
                       ? "계산중..."
                       : (durations[index] / 60).toFixed(2)}
-                    분 소요,{" "}
+                    분 소요
                   </div>
                 </div>
               </div>
