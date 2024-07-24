@@ -225,6 +225,7 @@ function InformationDisplay({
     await setElders(response);
     await setStaticElders(response);
     await setStaticSelectedElderIds(response.map((elder) => elder.id));
+
     await console.log(response);
   };
   return (
