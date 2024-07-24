@@ -319,7 +319,7 @@ function App() {
     }
 
     function OffsetPolyline(path) {
-      const offsetX = lineIndex * 5;
+      const offsetX = lineIndex * 2;
       // const offsetY = lineIndex * 50;
 
       console.log(path);
