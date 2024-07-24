@@ -51,203 +51,11 @@ function App() {
 
   const [dispatchResult, setDispatchResult] = useState([]);
 
+  const [colors, setColors] = useState([]);
+
+  var randomColors = [];
+
   const Map = ({ setMap, map }) => {
-    // const REST_API_KEY = config.restApiKey;
-    // const [map, setMap] = useState(null);
-
-    // // 호출방식의 URL을 입력합니다.
-    // const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
-
-    // function getRandomColor() {
-    //   const letters = "0123456789ABCDEF";
-    //   let color = "#";
-    //   for (let i = 0; i < 6; i++) {
-    //     color += letters[Math.floor(Math.random() * 16)];
-    //   }
-    //   return color;
-    // }
-
-    // async function getCarDirection() {
-    //   await dispatchResult.forEach(async (result) => {
-    //     let origin;
-    //     let destination;
-    //     let waypoints = [];
-    //     let randomColor = await getRandomColor();
-    //     console.log(randomColor);
-    //     if (result.dispatchType === "IN") {
-    //       origin = {
-    //         x: result.homeAddress.longitude,
-    //         y: result.homeAddress.latitude,
-    //         name: result.employeeName,
-    //       };
-
-    //       for (let i = 0; i < result.assignmentElders.length; i++) {
-    //         let currentElder = result.assignmentElders[i];
-    //         waypoints.push({
-    //           x: currentElder.homeAddress.longitude,
-    //           y: currentElder.homeAddress.latitude,
-    //           name: currentElder.name,
-    //         });
-    //       }
-
-    //       destination = {
-    //         x: result.workPlace.longitude,
-    //         y: result.workPlace.latitude,
-    //         name: "학교",
-    //       };
-    //       console.log(origin);
-    //       console.log(waypoints);
-    //       console.log(destination);
-    //     }
-
-    //     if (result.dispatchType === "OUT") {
-    //       origin = {
-    //         x: result.workPlace.longitude,
-    //         y: result.workPlace.latitude,
-    //         name: "학교",
-    //       };
-
-    //       for (let i = 0; i < result.assignmentElders.length; i++) {
-    //         let currentElder = result.assignmentElders[i];
-    //         waypoints.push({
-    //           x: currentElder.homeAddress.longitude,
-    //           y: currentElder.homeAddress.latitude,
-    //           name: currentElder.name,
-    //         });
-    //       }
-
-    //       destination = {
-    //         x: result.homeAddress.longitude,
-    //         y: result.homeAddress.latitude,
-    //         name: result.employeeName,
-    //       };
-    //       console.log(origin);
-    //       console.log(waypoints);
-    //       console.log(destination);
-    //     }
-
-    //     // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
-
-    //     const headers = {
-    //       Authorization: `KakaoAK ${REST_API_KEY}`,
-    //       "Content-Type": "application/json",
-    //     };
-
-    //     const body = JSON.stringify({
-    //       origin: origin,
-    //       destination: destination,
-    //       waypoints: waypoints,
-    //       priority: "RECOMMEND",
-    //       car_fuel: "GASOLINE",
-    //       car_hipass: false,
-    //       alternatives: true,
-    //       road_details: false,
-    //     });
-
-    //     try {
-    //       const response = await fetch(url, {
-    //         method: "POST",
-    //         headers: headers,
-    //         body: body,
-    //       });
-
-    //       if (!response.ok) {
-    //         throw new Error(`HTTP error! Status: ${response.status}`);
-    //       }
-
-    //       const data = await response.json();
-
-    //       console.log("kakaomap api response :" + data);
-
-    //       const duration = await data.routes[0].summary.duration;
-    //       console.log("kakaomap api duration :" + duration);
-
-    //       data.routes[0].sections.forEach((section) => {
-    //         const linePath = [];
-
-    //         section.roads.forEach((road) => {
-    //           for (let i = 0; i < road.vertexes.length; i += 2) {
-    //             const latLng = new kakao.maps.LatLng(
-    //               road.vertexes[i + 1],
-    //               road.vertexes[i]
-    //             );
-    //             linePath.push(latLng);
-    //           }
-    //         });
-
-    //         console.log(linePath);
-    //         var content = `<div style="
-    //         justify-content: center;
-    //         align-items: center;
-    //         color: ${randomColor};
-    //         font-size: 20px;
-    //         font-weight: bold;
-    //     ">
-    //     ${origin.name}
-    //     </div>`;
-
-    //         var position = new kakao.maps.LatLng(origin.y, origin.x);
-    //         var customOverlay = new kakao.maps.CustomOverlay({
-    //           position: position,
-    //           content: content,
-    //         });
-    //         customOverlay.setMap(map);
-
-    //         waypoints.forEach((point) => {
-    //           var content = `<div style="
-    //           justify-content: center;
-    //           align-items: center;
-    //           color: ${randomColor};
-    //           font-size: 20px;
-    //           font-weight: bold;
-    //       ">
-    //       ${point.name}
-    //       </div>`;
-
-    //           var position = new kakao.maps.LatLng(point.y, point.x);
-    //           var customOverlay = new kakao.maps.CustomOverlay({
-    //             position: position,
-    //             content: content,
-    //           });
-    //           customOverlay.setMap(map);
-    //         });
-
-    //         var content2 = `<div style="
-    //         justify-content: center;
-    //         align-items: center;
-    //         color: ${randomColor};
-    //         font-size: 20px;
-    //         font-weight: bold;
-    //     ">
-    //     ${destination.name}
-    //     </div>`;
-
-    //         var position2 = new kakao.maps.LatLng(destination.y, destination.x);
-    //         var customOverlay2 = new kakao.maps.CustomOverlay({
-    //           position: position2,
-    //           content: content2,
-    //         });
-    //         customOverlay2.setMap(map);
-
-    //         var polyline = new kakao.maps.Polyline({
-    //           path: linePath,
-    //           strokeWeight: 7,
-    //           strokeColor: randomColor,
-    //           strokeOpacity: 0.7,
-    //           strokeStyle: "solid",
-    //         });
-    //         polyline.setMap(map);
-    //         console.log(polyline);
-    //         console.log(map);
-    //       });
-    //     } catch (error) {
-    //       console.error("Error:", error);
-    //     }
-    //   });
-    // }
-
-    // getCarDirection();
-
     useEffect(() => {
       const mapContainer = document.getElementById("map");
       const mapOptions = {
@@ -293,15 +101,15 @@ function App() {
       async function fetchData() {
         try {
           const data = await getCarDirection();
+
           await setDurations(data);
         } catch (error) {
           console.error("Error getCarDirection :", error);
         } finally {
-          console.log(durations);
         }
       }
 
-      if (map != null && durations !== []) {
+      if (map != null && durations !== [] && colors !== []) {
         fetchData();
       }
     }, [map]);
@@ -322,8 +130,6 @@ function App() {
       const offsetX = lineIndex * 2;
       // const offsetY = lineIndex * 50;
 
-      console.log(path);
-
       const offsetPath = path.map((point) => {
         const earthRadius = 6378137;
         // const offsetLatitude = (offsetY / earthRadius) * (180 / Math.PI);
@@ -338,21 +144,20 @@ function App() {
 
       lineIndex++;
 
-      console.log(offsetPath);
-
       return offsetPath;
     }
 
     async function getCarDirection() {
       var dur = [];
+      randomColors = [];
 
       for (const result of dispatchResult) {
         let origin;
         let destination;
         let waypoints = [];
         let randomColor = await getRandomColor();
+        randomColors.push(randomColor);
 
-        console.log(randomColor);
         if (result.dispatchType === "IN") {
           origin = {
             x: result.homeAddress.longitude,
@@ -374,9 +179,6 @@ function App() {
             y: result.workPlace.latitude,
             name: "학교",
           };
-          console.log(origin);
-          console.log(waypoints);
-          console.log(destination);
         }
 
         if (result.dispatchType === "OUT") {
@@ -400,9 +202,6 @@ function App() {
             y: result.homeAddress.latitude,
             name: result.employeeName,
           };
-          console.log(origin);
-          console.log(waypoints);
-          console.log(destination);
         }
 
         // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
@@ -436,12 +235,9 @@ function App() {
 
           const data = await response.json();
 
-          console.log("kakaomap api response :" + data);
-
           const duration = await data.routes[0].summary.duration;
-          console.log("kakaomap api duration :" + duration);
+
           dur.push(duration);
-          console.log(dur);
 
           data.routes[0].sections.forEach(async (section) => {
             const linePath = [];
@@ -456,7 +252,6 @@ function App() {
               }
             });
 
-            console.log(linePath);
             var content = `<div style="
             justify-content: center;
             align-items: center;
@@ -516,8 +311,6 @@ function App() {
             });
             customOverlay2.setMap(map);
 
-            console.log(linePath);
-
             var newPolyline = await OffsetPolyline(linePath);
 
             var polyline = new kakao.maps.Polyline({
@@ -529,8 +322,6 @@ function App() {
             });
 
             polyline.setMap(map);
-            console.log(polyline);
-            console.log(map);
           });
         } catch (error) {
           console.error("Error:", error);
@@ -577,7 +368,13 @@ function App() {
                 key={index}
                 style={{ display: "flex", marginBottom: "10px" }}
               >
-                <div style={{ marginRight: "20px", fontWeight: "bold" }}>
+                <div
+                  style={{
+                    color: randomColors[index],
+                    marginRight: "20px",
+                    fontWeight: "bold",
+                  }}
+                >
                   {item.employeeName}
                 </div>
                 <div style={{ flexDirection: "row", display: "flex" }}>
