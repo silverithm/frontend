@@ -285,6 +285,7 @@ function App() {
   function MyVerticallyCenteredModal(props) {
     const REST_API_KEY = config.restApiKey;
     const [map, setMap] = useState(null);
+    var lineIndex = 0;
 
     const [durations, setDurations] = useState([]);
 
@@ -317,6 +318,31 @@ function App() {
       return color;
     }
 
+    function OffsetPolyline(path) {
+      const offsetX = lineIndex * 20;
+      const offsetY = lineIndex * 20;
+
+      console.log(path);
+
+      const offsetPath = path.map((point) => {
+        const earthRadius = 6378137;
+        // const offsetLatitude = (offsetY / earthRadius) * (180 / Math.PI);
+        const offsetLongitude =
+          (offsetX / (earthRadius * Math.cos((Math.PI * point.La) / 180))) *
+          (180 / Math.PI);
+
+        point.Ma = point.Ma + offsetLongitude;
+
+        return point;
+      });
+
+      lineIndex++;
+
+      console.log(offsetPath);
+
+      return offsetPath;
+    }
+
     async function getCarDirection() {
       var dur = [];
 
@@ -325,6 +351,7 @@ function App() {
         let destination;
         let waypoints = [];
         let randomColor = await getRandomColor();
+
         console.log(randomColor);
         if (result.dispatchType === "IN") {
           origin = {
@@ -416,10 +443,10 @@ function App() {
           dur.push(duration);
           console.log(dur);
 
-          data.routes[0].sections.forEach((section) => {
+          data.routes[0].sections.forEach(async (section) => {
             const linePath = [];
 
-            section.roads.forEach((road) => {
+            await section.roads.forEach((road) => {
               for (let i = 0; i < road.vertexes.length; i += 2) {
                 const latLng = new kakao.maps.LatLng(
                   road.vertexes[i + 1],
@@ -489,13 +516,18 @@ function App() {
             });
             customOverlay2.setMap(map);
 
+            console.log(linePath);
+
+            var newPolyline = await OffsetPolyline(linePath);
+
             var polyline = new kakao.maps.Polyline({
-              path: linePath,
+              path: newPolyline,
               strokeWeight: 7,
               strokeColor: randomColor,
               strokeOpacity: 0.7,
               strokeStyle: "solid",
             });
+
             polyline.setMap(map);
             console.log(polyline);
             console.log(map);
