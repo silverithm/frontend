@@ -194,6 +194,17 @@ function App() {
     });
   };
 
+  const handleFixCheckboxAll = () => {
+    const checkboxes = document.querySelectorAll('input[id^="fixCheckbox"]');
+    const isChecked = checkboxes[0].checked;
+
+    checkboxes.forEach((checkbox) => {
+      if (checkbox.checked !== isChecked) {
+        checkbox.checked = isChecked;
+      }
+    });
+  };
+
   const handleSignin = () => {
     navigate("/signin");
   };
@@ -225,13 +236,13 @@ function App() {
                   : "로그인이 필요합니다."}
               </text>
               <button
-                className="text-xs"
+                className="text-xs hover:underline"
                 onClick={isSignin === false ? handleSignin : handleSignout}
               >
                 {isSignin === true ? "로그아웃" : "로그인"}
               </button>
 
-              <button className="text-xs">회원가입</button>
+              <button className="text-xs hover:underline">회원가입</button>
               <div className="flex-grow"></div>
             </div>
           </div>
@@ -240,10 +251,16 @@ function App() {
       <main>
         <div className="flex justify-end space-x-4 mt-2">
           <div className="flex flex-row space-x-4">
-            <button onClick={() => setView("current")} className="text-base">
+            <button
+              onClick={() => setView("current")}
+              className="text-base hover:underline"
+            >
               차량 배치 진행하기
             </button>
-            <button onClick={() => setView("previous")} className="text-base">
+            <button
+              onClick={() => setView("previous")}
+              className="text-base hover:underline"
+            >
               이전 배치 보기
             </button>
             <div className="flex-grow"></div>
@@ -259,7 +276,9 @@ function App() {
                 <div className="flex flex-row items-center">
                   <text className="text-lg font-bold">직원 목록</text>
                   <div className="w-6"></div>
-                  <button className="text-sm">현재 선택 인원 16명 +</button>
+                  <button className="text-sm hover:underline">
+                    현재 선택 인원 16명 +
+                  </button>
                   <div className="w-6"></div>
                   <text className="text-sm">최대 배차 인원 45명</text>
                 </div>
@@ -271,13 +290,13 @@ function App() {
                         ? setIsEmployeeCollapsed(!isEmployeeCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded "
+                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
                   >
                     {isEmployeeCollapsed ? "늘리기" : "접기"}
                   </button>
                   <div className="w-4"></div>
 
-                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded ">
+                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500">
                     직원 추가
                   </button>
                 </div>
@@ -343,8 +362,8 @@ function App() {
                           </div>
                         </td>
                         <td className="px-6 py-4">{row.name}</td>
-                        <td className="px-6 py-4">{row.address}</td>
-                        <td className="px-6 py-4">{row.maxPeople}</td>
+                        <td className="px-6 py-4">{row.homeAddressName}</td>
+                        <td className="px-6 py-4">{row.maximumCapacity}</td>
 
                         <td className="px-6 py-4">
                           {selectedRows.has(row.id) ? (
@@ -382,7 +401,9 @@ function App() {
                 <div className="flex flex-row items-center">
                   <text className="text-lg font-bold">어르신 목록</text>
                   <div className="w-6"></div>
-                  <button className="text-sm">현재 선택 인원 55명 +</button>
+                  <button className="text-sm hover:underline">
+                    현재 선택 인원 55명 +
+                  </button>
                   <div className="w-6"></div>
                   <text className="text-sm">최대 배차 인원 45명</text>
                   <div className="w-4"></div>
@@ -405,13 +426,13 @@ function App() {
                         ? setIsElderCollapsed(!isElderCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded "
+                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
                   >
                     {isElderCollapsed ? "늘리기" : "접기"}
                   </button>
                   <div className="w-4"></div>
 
-                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded ">
+                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 ">
                     어르신 추가
                   </button>
                 </div>
@@ -445,7 +466,7 @@ function App() {
                         주소
                       </th>
                       <th scope="col" className="px-6 py-3">
-                        최대 인원
+                        앞자리 탑승 여부
                       </th>
 
                       <th scope="col" className="px-6 py-3">
@@ -477,8 +498,12 @@ function App() {
                           </div>
                         </td>
                         <td className="px-6 py-4">{row.name}</td>
-                        <td className="px-6 py-4">{row.address}</td>
-                        <td className="px-6 py-4">{row.maxPeople}</td>
+                        <td className="px-6 py-4">{row.homeAddressName}</td>
+                        <td className="px-6 py-4">
+                          {row.requiredFrontSeat === false
+                            ? "필요 없음"
+                            : "필요"}
+                        </td>
 
                         <td className="px-6 py-4">
                           {selectedRows.has(row.id) ? (
@@ -518,18 +543,20 @@ function App() {
                   <text className="text-lg font-bold">배치 고정</text>
                   <div className="w-6"></div>
 
-                  <button className="text-sm">현재 고정 인원 5명 +</button>
+                  <button className="text-sm hover:underline">
+                    현재 고정 인원 5명 +
+                  </button>
                   <div className="w-6"></div>
-                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded ">
+                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 ">
                     고정 저장
                   </button>
-                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4">
+                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4 hover:bg-sky-500">
                     고정 1
                   </button>
-                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4">
+                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4 hover:bg-sky-500">
                     고정 2
                   </button>
-                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4">
+                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4 hover:bg-sky-500">
                     고정 3
                   </button>
                 </div>
@@ -541,7 +568,7 @@ function App() {
                         ? setIsFixCollapsed(!isFixCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded "
+                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
                   >
                     {isFixCollapsed ? "늘리기" : "접기"}
                   </button>
@@ -560,10 +587,10 @@ function App() {
                       <th scope="col" className="p-4">
                         <div className="flex items-center">
                           <input
-                            id="elderCheckbox-all"
+                            id="fixCheckbox-all"
                             type="checkbox"
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            onChange={handleElderCheckboxAll}
+                            onChange={handleFixCheckboxAll}
                           />
                           <label htmlFor="checkbox-all" className="sr-only">
                             checkbox
@@ -590,7 +617,7 @@ function App() {
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
-                              id={`elderCheckbox-table-${employee.id}`}
+                              id={`fixCheckbox-table-${employee.id}`}
                               type="checkbox"
                               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                             />
@@ -640,11 +667,11 @@ function App() {
             </div>
             <div className="h-10"></div>
             <div className="flex flex-row items-center justify-center">
-              <button className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg">
+              <button className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg hover:bg-sky-500">
                 출근 차량 배치
               </button>
               <div className="w-4"></div>
-              <button className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg">
+              <button className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg hover:bg-sky-500">
                 퇴근 차량 배치
               </button>
             </div>
