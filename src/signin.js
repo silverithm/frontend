@@ -39,17 +39,17 @@ function Signin() {
 
     await fetch(`${config.apiUrl}/signin`, requestOptions)
       .then((response) => response.json())
-      .then((result) => {
+      .then(async (result) => {
         console.log(result);
         if (result.status !== 500) {
-          handleBack();
+          await toast("로그인에 성공하였습니다.");
+          await setJwt(result["tokenInfo"]["accessToken"]);
+          await setCompany(result["companyName"], result["companyAddress"]);
+          await setUserId(result["userId"]);
+          await setUserEmail(email);
+          await setIsSignin(true);
 
-          setJwt(result["tokenInfo"]["accessToken"]);
-          setCompany(result["companyName"], result["companyAddress"]);
-          setUserId(result["userId"]);
-          setUserEmail(email);
-          toast("로그인에 성공하였습니다.");
-          setIsSignin(true);
+          await handleBack();
         }
 
         return result;

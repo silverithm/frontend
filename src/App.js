@@ -73,6 +73,7 @@ const initialRows = [
 
   // 더 많은 데이터 추가 가능
 ];
+
 function App() {
   const [rows, setRows] = useState(initialRows);
   const [selectedRows, setSelectedRows] = useState(new Set());
@@ -87,13 +88,13 @@ function App() {
 
   const navigate = useNavigate();
 
+  const { setIsSignin, setJwt, setUserId, setUserEmail, setCompany } =
+    useStore();
+
   const { isSignin, company, jwt, userId, userEmail } = useStore();
 
   const fetchEmployeesAndElders = async () => {
     if (jwt === "") {
-      toast(
-        "불러오기를 하려면 로그인이 필요합니다. 먼저 로그인을 시도해 주세요."
-      );
       return;
     }
     await fetchEmployees();
@@ -197,8 +198,19 @@ function App() {
     navigate("/signin");
   };
 
+  const handleSignout = () => {
+    setJwt("");
+    setUserId("");
+    setUserEmail("");
+    setIsSignin(false);
+    setCompany("", "");
+    setElders([]);
+    setEmployees([]);
+  };
+
   return (
     <div className="App">
+      <ToastContainer />
       <header className="App-header">
         <div className="h-16 bg-sky-950	text-white flex flex-row place-items-center ">
           <div className="flex items-center justify-between w-full">
@@ -212,10 +224,13 @@ function App() {
                   ? `${userEmail}님 (${company.name}) 환영합니다!`
                   : "로그인이 필요합니다."}
               </text>
-              <button className="text-xs" onClick={handleSignin}>
-                로그인
+              <button
+                className="text-xs"
+                onClick={isSignin === false ? handleSignin : handleSignout}
+              >
+                {isSignin === true ? "로그아웃" : "로그인"}
               </button>
-              <button className="text-xs">로그아웃</button>
+
               <button className="text-xs">회원가입</button>
               <div className="flex-grow"></div>
             </div>
