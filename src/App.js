@@ -4,6 +4,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Form from "react-bootstrap/Form";
 import { toast, ToastContainer } from "react-toastify";
 import config from "./config";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
+import useStore from "./store/useStore";
 
 const initialRows = [
   {
@@ -82,9 +85,9 @@ function App() {
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
 
-  var jwt =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MTAxIiwiYXV0aCI6IlJPTEVfQURNSU4iLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzIyMDg2MzI4LCJleHAiOjE3MjIwODgxMjh9.dxzLNvUreMd7f6UkicFBHuTeLdoyM9o2nM3hfdkeFuU";
-  var userId = "1";
+  const navigate = useNavigate();
+
+  const { isSignin, company, jwt, userId, userEmail } = useStore();
 
   const fetchEmployeesAndElders = async () => {
     if (jwt === "") {
@@ -190,6 +193,10 @@ function App() {
     });
   };
 
+  const handleSignin = () => {
+    navigate("/signin");
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -201,9 +208,13 @@ function App() {
             </div>
             <div className="flex items-center space-x-4">
               <text className="font-bold text-sm">
-                test101님 (진주숲속어르신학교) 환영합니다!
+                {isSignin === true
+                  ? `${userEmail}님 (${company.name}) 환영합니다!`
+                  : "로그인이 필요합니다."}
               </text>
-              <button className="text-xs">로그인</button>
+              <button className="text-xs" onClick={handleSignin}>
+                로그인
+              </button>
               <button className="text-xs">로그아웃</button>
               <button className="text-xs">회원가입</button>
               <div className="flex-grow"></div>
