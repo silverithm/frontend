@@ -253,13 +253,17 @@ function App() {
           <div className="flex flex-row space-x-4">
             <button
               onClick={() => setView("current")}
-              className="text-base hover:underline"
+              className={`text-base hover:underline ${
+                view === "current" ? "underline" : ""
+              }`}
             >
               차량 배치 진행하기
             </button>
             <button
               onClick={() => setView("previous")}
-              className="text-base hover:underline"
+              className={`text-base hover:underline ${
+                view === "current" ? "" : "underline"
+              }`}
             >
               이전 배치 보기
             </button>
