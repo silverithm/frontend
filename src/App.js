@@ -3,7 +3,7 @@ import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Form from "react-bootstrap/Form";
 import { toast, ToastContainer } from "react-toastify";
-import config from "../config";
+import config from "./config";
 
 const initialRows = [
   {
@@ -13,98 +13,60 @@ const initialRows = [
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 2,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 3,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 4,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 5,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
 
   {
-    id: 1,
+    id: 6,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 7,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 8,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 9,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
   {
-    id: 1,
+    id: 10,
     name: "John Doe",
     address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
     maxPeople: 10,
   },
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-
-  { id: 2, name: "Jane Smith", address: "456 Elm St", maxPeople: 5 },
 
   // 더 많은 데이터 추가 가능
 ];
@@ -114,10 +76,15 @@ function App() {
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
   const [isElderCollapsed, setIsElderCollapsed] = useState(true);
+  const [isFixCollapsed, setIsFixCollapsed] = useState(true);
   const [maxDisaptchStatus, setMaxDispatchStatus] = useState("under");
 
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
+
+  var jwt =
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MTAxIiwiYXV0aCI6IlJPTEVfQURNSU4iLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzIyMDg2MzI4LCJleHAiOjE3MjIwODgxMjh9.dxzLNvUreMd7f6UkicFBHuTeLdoyM9o2nM3hfdkeFuU";
+  var userId = "1";
 
   const fetchEmployeesAndElders = async () => {
     if (jwt === "") {
@@ -129,6 +96,10 @@ function App() {
     await fetchEmployees();
     await fetchElders();
   };
+
+  useEffect(() => {
+    fetchEmployeesAndElders();
+  }, []);
 
   const fetchEmployees = async () => {
     const myHeaders = new Headers();
@@ -148,6 +119,8 @@ function App() {
         return result;
       })
       .catch((error) => console.error(error));
+
+    console.log(response);
 
     await setEmployees(response); // 상태 업데이트
   };
@@ -169,6 +142,7 @@ function App() {
         return result;
       })
       .catch((error) => console.error(error));
+    console.log(response);
 
     await setElders(response); // 상태 업데이트
   };
@@ -266,7 +240,11 @@ function App() {
 
                 <div className="flex flex-row mr-1">
                   <button
-                    onClick={() => setIsEmployeeCollapsed(!isEmployeeCollapsed)}
+                    onClick={() =>
+                      employees.length > 5
+                        ? setIsEmployeeCollapsed(!isEmployeeCollapsed)
+                        : null
+                    }
                     className="text-sm bg-sky-950 text-white w-20 h-8 rounded "
                   >
                     {isEmployeeCollapsed ? "늘리기" : "접기"}
@@ -316,7 +294,7 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row) => (
+                    {employees.map((row) => (
                       <tr
                         key={row.id}
                         className={`${
@@ -396,7 +374,11 @@ function App() {
 
                 <div className="flex flex-row mr-1">
                   <button
-                    onClick={() => setIsElderCollapsed(!isElderCollapsed)}
+                    onClick={() =>
+                      elders.length > 5
+                        ? setIsElderCollapsed(!isElderCollapsed)
+                        : null
+                    }
                     className="text-sm bg-sky-950 text-white w-20 h-8 rounded "
                   >
                     {isElderCollapsed ? "늘리기" : "접기"}
@@ -446,7 +428,7 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row) => (
+                    {elders.map((row) => (
                       <tr
                         key={row.id}
                         className={`${
@@ -509,27 +491,41 @@ function App() {
                 <div className="flex flex-row items-center">
                   <text className="text-lg font-bold">배치 고정</text>
                   <div className="w-6"></div>
+
                   <button className="text-sm">현재 고정 인원 5명 +</button>
+                  <div className="w-6"></div>
+                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded ">
+                    고정 저장
+                  </button>
+                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4">
+                    고정 1
+                  </button>
+                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4">
+                    고정 2
+                  </button>
+                  <button className="text-sm bg-sky-950 text-white w-14 h-8 rounded ml-4">
+                    고정 3
+                  </button>
                 </div>
 
                 <div className="flex flex-row mr-1">
                   <button
-                    onClick={() => setIsElderCollapsed(!isElderCollapsed)}
+                    onClick={() =>
+                      employees.length > 5
+                        ? setIsFixCollapsed(!isFixCollapsed)
+                        : null
+                    }
                     className="text-sm bg-sky-950 text-white w-20 h-8 rounded "
                   >
-                    {isElderCollapsed ? "늘리기" : "접기"}
+                    {isFixCollapsed ? "늘리기" : "접기"}
                   </button>
                   <div className="w-4"></div>
-
-                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded ">
-                    어르신 추가
-                  </button>
                 </div>
               </div>
 
               <div
                 className={`relative overflow-x-auto shadow-md ${
-                  isElderCollapsed ? "h-80 overflow-y-scroll" : ""
+                  isFixCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
                 <table className="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 table-auto">
@@ -560,7 +556,7 @@ function App() {
                   <tbody>
                     {employees.map((employee, index) => (
                       <tr
-                        key={index}
+                        key={employee.id}
                         className={`${
                           selectedRows.has(index) ? "bg-blue-200" : ""
                         } hover:bg-blue-100`}
@@ -568,12 +564,12 @@ function App() {
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
-                              id={`elderCheckbox-table-${index}`}
+                              id={`elderCheckbox-table-${employee.id}`}
                               type="checkbox"
                               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                             />
                             <label
-                              htmlFor={`checkbox-table-${index}`}
+                              htmlFor={`checkbox-table-${employee.id}`}
                               className="sr-only"
                             >
                               checkbox
@@ -587,7 +583,11 @@ function App() {
                             (_, index) => (
                               <Form.Select
                                 key={index}
-                                style={{ textAlign: "center", width: "100px" }}
+                                style={{
+                                  textAlign: "center",
+                                  width: "100px",
+                                  marginLeft: "20px",
+                                }}
                                 onChange={(e) =>
                                   handleSelect(
                                     employee.id,
@@ -611,6 +611,16 @@ function App() {
                   </tbody>
                 </table>
               </div>
+            </div>
+            <div className="h-10"></div>
+            <div className="flex flex-row items-center justify-center">
+              <button className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg">
+                출근 차량 배치
+              </button>
+              <div className="w-4"></div>
+              <button className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg">
+                퇴근 차량 배치
+              </button>
             </div>
             <div className="h-10"></div>
           </div>
