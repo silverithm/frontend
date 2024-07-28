@@ -337,10 +337,21 @@ function App() {
                   <text className="text-lg font-bold">직원 목록</text>
                   <div className="w-6"></div>
                   <button className="text-sm hover:underline">
-                    현재 선택 인원 16명 +
+                    현재 선택 인원 {selectedEmployeeIds.length}명 +
                   </button>
                   <div className="w-6"></div>
-                  <text className="text-sm">최대 배차 인원 45명</text>
+                  <text className="text-sm">
+                    최대 배차 인원{" "}
+                    {employees
+                      .filter((employee) =>
+                        selectedEmployeeIds.includes(employee.id)
+                      )
+                      .reduce(
+                        (sum, employee) => sum + employee.maximumCapacity,
+                        0
+                      )}
+                    명
+                  </text>
                 </div>
 
                 <div className="flex flex-row mr-1">
@@ -465,10 +476,21 @@ function App() {
                   <text className="text-lg font-bold">어르신 목록</text>
                   <div className="w-6"></div>
                   <button className="text-sm hover:underline">
-                    현재 선택 인원 55명 +
+                    현재 선택 인원 {selectedElderIds.length}명 +
                   </button>
                   <div className="w-6"></div>
-                  <text className="text-sm">최대 배차 인원 45명</text>
+                  <text className="text-sm">
+                    최대 배차 인원
+                    {employees
+                      .filter((employee) =>
+                        selectedEmployeeIds.includes(employee.id)
+                      )
+                      .reduce(
+                        (sum, employee) => sum + employee.maximumCapacity,
+                        0
+                      )}
+                    명
+                  </text>
                   <div className="w-4"></div>
 
                   {maxDisaptchStatus === "over" ? (
