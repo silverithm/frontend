@@ -15,8 +15,6 @@
     "@mui/x-data-grid": "^7.11.0",
     "@mui/x-data-grid-generator": "^7.11.0",
     "@mui/x-data-grid-pro": "^7.11.0",
-    "@syncfusion/ej2-react-base": "^26.2.4",
-    "@syncfusion/ej2-react-grids": "^26.2.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

@@ -7,24 +7,24 @@ const useStore = create((set) => ({
   isSignin: false,
   userEmail: "",
 
-  staticSelectedElderIds: [],
-  staticSelectedEmployeeIds: [],
-  staticEmployees: [],
-  staticElders: [],
-  staticDurationTimes: [],
+  selectedElderIds: [],
+  selectedEmployeeIds: [],
+  employees: [],
+  elders: [],
+  durationTimes: [],
+  setEmployees: (employees) => set({ employees: employees }),
+  setElders: (elders) => set({ elders: elders }),
+  setSelectedElderIds: (ids) => set({ selectedElderIds: ids }),
+  setSelectedEmployeeIds: (ids) => set({ selectedEmployeeIds: ids }),
+  setStaticDurationTimes: (durationTimes) =>
+    set({ durationTimes: durationTimes }),
+
   setJwt: (jwt) => set({ jwt: jwt }),
   setUserId: (userId) => set({ userId: userId }),
   setCompany: (name, address) =>
     set({ company: { name: name, address: address } }),
   setIsSignin: (isSignin) => set({ isSignin: isSignin }),
   setUserEmail: (email) => set({ userEmail: email }),
-  setStaticEmployees: (employees) => set({ staticEmployees: employees }),
-  setStaticElders: (elders) => set({ staticElders: elders }),
-  setStaticSelectedElderIds: (ids) => set({ staticSelectedElderIds: ids }),
-  setStaticSelectedEmployeeIds: (ids) =>
-    set({ staticSelectedEmployeeIds: ids }),
-  setStaticDurationTimes: (durationTimes) =>
-    set({ staticDurationTimes: durationTimes }),
 }));
 
 export default useStore;

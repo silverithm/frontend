@@ -86,22 +86,89 @@ function App() {
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
 
+  const [allEmployeeSelected, setAllEmployeeSelected] = useState(true);
+  const [allElderSelected, setAllElderSelected] = useState(true);
+
   const navigate = useNavigate();
 
-  const { setIsSignin, setJwt, setUserId, setUserEmail, setCompany } =
-    useStore();
+  const {
+    setIsSignin,
+    setJwt,
+    setUserId,
+    setUserEmail,
+    setCompany,
+    setSelectedElderIds,
+    setSelectedEmployeeIds,
+  } = useStore();
 
-  const { isSignin, company, jwt, userId, userEmail } = useStore();
+  const {
+    isSignin,
+    company,
+    jwt,
+    userId,
+    userEmail,
+    selectedElderIds,
+    selectedEmployeeIds,
+  } = useStore();
 
-  const fetchEmployeesAndElders = async () => {
-    if (jwt === "") {
-      return;
+  const handleSelectEmployee = (id) => {
+    if (selectedEmployeeIds.includes(id)) {
+      setSelectedEmployeeIds(
+        selectedEmployeeIds.filter((employeeId) => employeeId !== id)
+      );
+    } else {
+      setSelectedEmployeeIds([...selectedEmployeeIds, id]);
     }
-    await fetchEmployees();
-    await fetchElders();
+    console.log(selectedEmployeeIds);
+  };
+
+  const handleSelectElder = (id) => {
+    if (selectedElderIds.includes(id)) {
+      setSelectedElderIds(selectedElderIds.filter((elderId) => elderId !== id));
+    } else {
+      setSelectedElderIds([...selectedElderIds, id]);
+    }
+    console.log(selectedElderIds);
+  };
+
+  const handleSelectAllEmployee = async () => {
+    if (allEmployeeSelected) {
+      console.log("1");
+      await setSelectedEmployeeIds([]);
+    } else {
+      console.log("2");
+      console.log(employees);
+      await setSelectedEmployeeIds(
+        await employees.map((employee) => employee.id)
+      );
+    }
+    await setAllEmployeeSelected(!allEmployeeSelected);
+    await console.log(selectedEmployeeIds);
+  };
+
+  const handleSelectAllElder = () => {
+    if (allElderSelected) {
+      setSelectedElderIds([]);
+    } else {
+      setSelectedElderIds(elders.map((elder) => elder.id));
+    }
+    setAllElderSelected(!allElderSelected);
   };
 
   useEffect(() => {
+    const fetchEmployeesAndElders = async () => {
+      if (jwt === "") {
+        return;
+      }
+      var employees = await fetchEmployees();
+      var elders = await fetchElders();
+
+      await setEmployees(employees);
+      await setElders(elders);
+      await setSelectedEmployeeIds(employees.map((employee) => employee.id));
+      await setSelectedElderIds(elders.map((elder) => elder.id));
+    };
+
     fetchEmployeesAndElders();
   }, []);
 
@@ -126,7 +193,7 @@ function App() {
 
     console.log(response);
 
-    await setEmployees(response); // 상태 업데이트
+    return response;
   };
   const fetchElders = async () => {
     const myHeaders = new Headers();
@@ -148,7 +215,7 @@ function App() {
       .catch((error) => console.error(error));
     console.log(response);
 
-    await setElders(response); // 상태 업데이트
+    return response;
   };
 
   const handleSelect = (employeeId, elderId, sequence) => {
@@ -170,40 +237,29 @@ function App() {
     setRows(rows.filter((row) => row.id !== id));
   };
 
-  const handleEmployeeCheckboxAll = () => {
-    const checkboxes = document.querySelectorAll(
-      'input[id^="employeeCheckbox"]'
-    );
-    const isChecked = checkboxes[0].checked;
+  // const handleEmployeeCheckboxAll = () => {
+  //   const checkboxes = document.querySelectorAll(
+  //     'input[id^="employeeCheckbox"]'
+  //   );
+  //   const isChecked = checkboxes[0].checked;
 
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked !== isChecked) {
-        checkbox.checked = isChecked;
-      }
-    });
-  };
+  //   checkboxes.forEach((checkbox) => {
+  //     if (checkbox.checked !== isChecked) {
+  //       checkbox.checked = isChecked;
+  //     }
+  //   });
+  // };
 
-  const handleElderCheckboxAll = () => {
-    const checkboxes = document.querySelectorAll('input[id^="elderCheckbox"]');
-    const isChecked = checkboxes[0].checked;
+  // const handleElderCheckboxAll = () => {
+  //   const checkboxes = document.querySelectorAll('input[id^="elderCheckbox"]');
+  //   const isChecked = checkboxes[0].checked;
 
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked !== isChecked) {
-        checkbox.checked = isChecked;
-      }
-    });
-  };
-
-  const handleFixCheckboxAll = () => {
-    const checkboxes = document.querySelectorAll('input[id^="fixCheckbox"]');
-    const isChecked = checkboxes[0].checked;
-
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked !== isChecked) {
-        checkbox.checked = isChecked;
-      }
-    });
-  };
+  //   checkboxes.forEach((checkbox) => {
+  //     if (checkbox.checked !== isChecked) {
+  //       checkbox.checked = isChecked;
+  //     }
+  //   });
+  // };
 
   const handleSignin = () => {
     navigate("/signin");
@@ -321,7 +377,7 @@ function App() {
                             defaultChecked={true}
                             type="checkbox"
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            onChange={handleEmployeeCheckboxAll}
+                            onChange={handleSelectAllEmployee}
                           />
                           <label htmlFor="checkbox-all" className="sr-only">
                             checkbox
@@ -354,7 +410,8 @@ function App() {
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
-                              defaultChecked={true}
+                              checked={selectedEmployeeIds.includes(row.id)}
+                              onChange={() => handleSelectEmployee(row.id)}
                               id={`employeeCheckbox-table-${row.id}`}
                               type="checkbox"
                               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -459,7 +516,7 @@ function App() {
                             defaultChecked={true}
                             type="checkbox"
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            onChange={handleElderCheckboxAll}
+                            onChange={handleSelectAllElder}
                           />
                           <label htmlFor="checkbox-all" className="sr-only">
                             checkbox
@@ -492,7 +549,8 @@ function App() {
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
-                              defaultChecked={true}
+                              onChange={() => handleSelectElder(row.id)}
+                              checked={selectedElderIds.includes(row.id)}
                               id={`elderCheckbox-table-${row.id}`}
                               type="checkbox"
                               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
