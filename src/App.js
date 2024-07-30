@@ -20,81 +20,18 @@ import "./styles/bootstrapcss.css";
 
 const { kakao } = window;
 
-const initialRows = [
-  {
-    id: 1,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 2,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 3,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 4,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 5,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-
-  {
-    id: 6,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 7,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 8,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 9,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-  {
-    id: 10,
-    name: "John Doe",
-    address: "경상남도 진주시 신안동 804번시 신안빌라 101호",
-    maxPeople: 10,
-  },
-
-  // 더 많은 데이터 추가 가능
-];
-
 function App() {
-  const [rows, setRows] = useState(initialRows);
-  const [selectedRows, setSelectedRows] = useState(new Set());
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
   const [isElderCollapsed, setIsElderCollapsed] = useState(true);
   const [isFixCollapsed, setIsFixCollapsed] = useState(true);
   const [maxDisaptchStatus, setMaxDispatchStatus] = useState("under");
   const [fixedAssignments, setFixedAssignments] = useState([]);
+
+  const [editingEmployeeId, setEditingEmployeeId] = useState(null);
+  const [editingElderId, setEditingElderId] = useState(null);
+  const [editedEmployee, setEditedEmployee] = useState({});
+  const [editedElder, setEditedElder] = useState({});
 
   const [elders, setElders] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -112,6 +49,8 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const [progress, setProgress] = useState();
+
+  const [address, setAddress] = useState("");
 
   const [colors, setColors] = useState([]);
   var randomColors = [];
@@ -137,6 +76,129 @@ function App() {
     selectedElderIds,
     selectedEmployeeIds,
   } = useStore();
+
+  const updateEmployee = async (id, data) => {
+    const updateData = {
+      name: data.name,
+      workPlace: data.workPlaceName,
+      homeAddress: data.homeAddressName,
+      maxCapacity: data.maximumCapacity,
+    };
+
+    console.log(updateData);
+
+    const response = await fetch(
+      `http://localhost:8080/api/v1/employee/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+    await toast("직원 수정에 성공하였습니다.");
+
+    return response;
+  };
+
+  const updateElder = async (id, data) => {
+    const updateData = {
+      name: data.name,
+      homeAddress: data.homeAddressName,
+      requiredFrontSeat: data.requiredFrontSeat,
+    };
+
+    console.log(updateData);
+
+    const response = await fetch(`http://localhost:8080/api/v1/elder/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+
+    await toast("어르신 수정에 성공하였습니다.");
+
+    return response;
+  };
+
+  const handleEmployeeEdit = async (id) => {
+    if (editingEmployeeId === id) {
+      try {
+        const response = await updateEmployee(id, editedEmployee);
+        if (response.ok) {
+          // 수정 완료
+          setEmployees(
+            employees.map((emp) =>
+              emp.id === id ? { ...emp, ...editedEmployee } : emp
+            )
+          );
+          setEditingEmployeeId(null);
+          setEditedEmployee({});
+        } else {
+          throw new Error("Server responded with an error");
+        }
+      } catch (error) {
+        console.error("Error updating employee:", error);
+      }
+    } else {
+      // 수정 시작
+      setEditingEmployeeId(id);
+      setEditedEmployee(employees.find((emp) => emp.id === id));
+    }
+  };
+
+  const handleElderEdit = async (id) => {
+    if (editingElderId === id) {
+      // 수정 완료
+      try {
+        const response = await updateElder(id, editedElder);
+        if (response.ok) {
+          setElders(
+            elders.map((elder) =>
+              elder.id === id ? { ...elder, ...editedElder } : elder
+            )
+          );
+          setEditingElderId(null);
+          setEditedElder({});
+        } else {
+          throw new Error("Server responded with an error");
+        }
+      } catch (error) {
+        console.error("Error updating elder:", error);
+      }
+    } else {
+      // 수정 시작
+      setEditingElderId(id);
+      setEditedElder(elders.find((elder) => elder.id === id));
+    }
+  };
+
+  const handleEmployeeInputChange = (e, field) => {
+    setEditedEmployee({ ...editedEmployee, [field]: e.target.value });
+  };
+
+  const handleElderInputChange = (e, field) => {
+    setEditedElder({ ...editedElder, [field]: e.target.value });
+  };
+
+  const handleSelectChange = (e, field) => {
+    setEditedElder({ ...editedElder, [field]: e.target.value === "true" });
+  };
 
   const handleSelectEmployee = (id) => {
     if (selectedEmployeeIds.includes(id)) {
@@ -279,41 +341,82 @@ function App() {
     }
   }
 
-  const handleEdit = (id) => {
-    // 수정 로직 추가
-    console.log(`Edit row with id: ${id}`);
+  const handleDeleteEmployee = async (id) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "DELETE",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    await fetch(`${config.apiUrl}/employee/` + id, requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+    setEmployees((prevEmployees) =>
+      prevEmployees.filter((employee) => employee.id !== id)
+    );
+    await toast("직원 삭제에 성공하였습니다.");
   };
 
-  const handleDelete = (id) => {
-    setRows(rows.filter((row) => row.id !== id));
+  const handleDeleteElder = async (id) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "DELETE",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    await fetch(`${config.apiUrl}/elder/` + id, requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+    setElders((prevElders) => prevElders.filter((elder) => elder.id !== id));
+
+    await toast("어르신 삭제에 성공하였습니다.");
   };
-
-  // const handleEmployeeCheckboxAll = () => {
-  //   const checkboxes = document.querySelectorAll(
-  //     'input[id^="employeeCheckbox"]'
-  //   );
-  //   const isChecked = checkboxes[0].checked;
-
-  //   checkboxes.forEach((checkbox) => {
-  //     if (checkbox.checked !== isChecked) {
-  //       checkbox.checked = isChecked;
-  //     }
-  //   });
-  // };
-
-  // const handleElderCheckboxAll = () => {
-  //   const checkboxes = document.querySelectorAll('input[id^="elderCheckbox"]');
-  //   const isChecked = checkboxes[0].checked;
-
-  //   checkboxes.forEach((checkbox) => {
-  //     if (checkbox.checked !== isChecked) {
-  //       checkbox.checked = isChecked;
-  //     }
-  //   });
-  // };
-
   const handleSignin = () => {
     navigate("/signin");
+  };
+
+  const handleComplete = (data, type) => {
+    let fullAddress = data.address;
+    let extraAddress = "";
+
+    if (data.addressType === "R") {
+      if (data.bname !== "") {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== "") {
+        extraAddress +=
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+    }
+    console.log(fullAddress);
+    console.log(type);
+
+    if (type === "employee") {
+      setEditedEmployee((prevState) => ({
+        ...prevState,
+        homeAddressName: fullAddress,
+      }));
+    } else if (type === "elder") {
+      setEditedElder((prevState) => ({
+        ...prevState,
+        homeAddressName: fullAddress,
+      }));
+    }
+  };
+
+  const openPostcode = (type) => {
+    new window.daum.Postcode({
+      oncomplete: (data) => handleComplete(data, type), // Pass both data and type
+    }).open();
   };
 
   const handleSignout = () => {
@@ -500,12 +603,7 @@ function App() {
                   </thead>
                   <tbody>
                     {employees.map((row) => (
-                      <tr
-                        key={row.id}
-                        className={`${
-                          selectedRows.has(row.id) ? "bg-blue-200" : ""
-                        } hover:bg-blue-100`}
-                      >
+                      <tr key={row.id} className="hover:bg-blue-100">
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
@@ -523,28 +621,59 @@ function App() {
                             </label>
                           </div>
                         </td>
-                        <td className="px-6 py-4">{row.name}</td>
-                        <td className="px-6 py-4">{row.homeAddressName}</td>
-                        <td className="px-6 py-4">{row.maximumCapacity}</td>
+                        <td className="px-6 py-4">
+                          {editingEmployeeId === row.id ? (
+                            <input
+                              value={editedEmployee.name}
+                              onChange={(e) =>
+                                handleEmployeeInputChange(e, "name")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            />
+                          ) : (
+                            row.name
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingEmployeeId === row.id ? (
+                            <input
+                              onClick={() => openPostcode("employee")}
+                              value={editedEmployee.homeAddressName}
+                              onChange={(e) =>
+                                handleEmployeeInputChange(e, "homeAddressName")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            />
+                          ) : (
+                            row.homeAddressName
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingEmployeeId === row.id ? (
+                            <input
+                              type="number"
+                              value={editedEmployee.maximumCapacity}
+                              onChange={(e) =>
+                                handleEmployeeInputChange(e, "maximumCapacity")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            />
+                          ) : (
+                            row.maximumCapacity
+                          )}
+                        </td>
 
                         <td className="px-6 py-4">
-                          {selectedRows.has(row.id) ? (
-                            <button
-                              onClick={() => handleEdit(row.id)}
-                              className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            >
-                              Complete
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleEdit(row.id)}
-                              className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            >
-                              수정
-                            </button>
-                          )}
                           <button
-                            onClick={() => handleDelete(row.id)}
+                            onClick={() =>
+                              handleEmployeeEdit(row.id, "employee")
+                            }
+                            className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            {editingEmployeeId === row.id ? "완료" : "수정"}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteEmployee(row.id)}
                             className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
                           >
                             삭제
@@ -650,12 +779,7 @@ function App() {
                   </thead>
                   <tbody>
                     {elders.map((row) => (
-                      <tr
-                        key={row.id}
-                        className={`${
-                          selectedRows.has(row.id) ? "bg-blue-200" : ""
-                        } hover:bg-blue-100`}
-                      >
+                      <tr key={row.id} className={"hover:bg-blue-100"}>
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
@@ -673,32 +797,61 @@ function App() {
                             </label>
                           </div>
                         </td>
-                        <td className="px-6 py-4">{row.name}</td>
-                        <td className="px-6 py-4">{row.homeAddressName}</td>
                         <td className="px-6 py-4">
-                          {row.requiredFrontSeat === false
-                            ? "필요 없음"
-                            : "필요"}
+                          {editingElderId === row.id ? (
+                            <input
+                              value={editedElder.name}
+                              onChange={(e) =>
+                                handleElderInputChange(e, "name")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            />
+                          ) : (
+                            row.name
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingElderId === row.id ? (
+                            <input
+                              onClick={() => openPostcode("elder")}
+                              value={editedElder.homeAddressName}
+                              onChange={(e) =>
+                                handleElderInputChange(e, "address")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            />
+                          ) : (
+                            row.homeAddressName
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingElderId === row.id ? (
+                            <select
+                              value={editedElder.requiredFrontSeat}
+                              onChange={(e) =>
+                                handleSelectChange(e, "requiredFrontSeat")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            >
+                              <option value="true">필요</option>
+                              <option value="false">필요 없음</option>
+                            </select>
+                          ) : row.requiredFrontSeat ? (
+                            "필요"
+                          ) : (
+                            "필요 없음"
+                          )}
                         </td>
 
                         <td className="px-6 py-4">
-                          {selectedRows.has(row.id) ? (
-                            <button
-                              onClick={() => handleEdit(row.id)}
-                              className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            >
-                              Complete
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleEdit(row.id)}
-                              className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            >
-                              수정
-                            </button>
-                          )}
                           <button
-                            onClick={() => handleDelete(row.id)}
+                            onClick={() => handleElderEdit(row.id)}
+                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
+                          >
+                            {editingElderId === row.id ? "완료" : "수정"}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteElder(row.id)}
                             className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
                           >
                             삭제
@@ -759,12 +912,7 @@ function App() {
                   </thead>
                   <tbody>
                     {employees.map((employee, index) => (
-                      <tr
-                        key={employee.id}
-                        className={`${
-                          selectedRows.has(index) ? "bg-blue-200" : ""
-                        } hover:bg-blue-100`}
-                      >
+                      <tr key={employee.id} className={"hover:bg-blue-100"}>
                         <td className="px-6 py-4">{employee.name}</td>
                         <td className="px-6 py-4">
                           {Array.from(
