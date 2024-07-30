@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import Form from "react-bootstrap/Form";
 import { toast, ToastContainer } from "react-toastify";
 import config from "./config";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import useStore from "./store/useStore";
 import Modal from "react-bootstrap/Modal";
-import defaultKey from "../node_modules/uncontrollable/lib/esm/utils";
-import Button from "react-bootstrap/Button";
 import React from "react";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { styled } from "styled-components";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import ScaleLoader from "react-spinners/ScaleLoader";
+import { Form } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 import "./styles/bootstrapcss.css";
 
@@ -49,8 +48,6 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const [progress, setProgress] = useState();
-
-  const [address, setAddress] = useState("");
 
   const [colors, setColors] = useState([]);
   var randomColors = [];
@@ -419,6 +416,180 @@ function App() {
     }).open();
   };
 
+  const [addEmployeeModalIsOpen, setAddEmployeeModalIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    workPlace: company.addressName,
+    homeAddress: "",
+    maxCapacity: "",
+  });
+
+  const openAddEmployeeModal = () => setAddEmployeeModalIsOpen(true);
+  const closeAddEmployeeModal = () => setAddEmployeeModalIsOpen(false);
+
+  const [addElderModalIsOpen, setAddElderModalIsOpen] = useState(false);
+
+  const [elderFormData, setElderFormData] = useState({
+    name: "",
+    homeAddress: "",
+    requiredFrontSeat: false,
+  });
+
+  const openAddElderModal = () => setAddElderModalIsOpen(true);
+  const closeAddElderModal = () => setAddElderModalIsOpen(false);
+
+  const handleAddEmployeeModalChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleAddElderModalChange = (e) => {
+    const { name, value } = e.target;
+    setElderFormData({
+      ...elderFormData,
+      [name]: value,
+    });
+  };
+
+  const handleEmployeePostcode = () => {
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        let fullAddress = data.address;
+        let extraAddress = "";
+
+        if (data.addressType === "R") {
+          if (data.bname !== "") {
+            extraAddress += data.bname;
+          }
+          if (data.buildingName !== "") {
+            extraAddress +=
+              extraAddress !== ""
+                ? `, ${data.buildingName}`
+                : data.buildingName;
+          }
+          fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+        }
+
+        setFormData({
+          ...formData,
+          homeAddress: fullAddress,
+        });
+      },
+    }).open();
+  };
+
+  const handleElderPostcode = () => {
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        let fullAddress = data.address;
+        let extraAddress = "";
+
+        if (data.addressType === "R") {
+          if (data.bname !== "") {
+            extraAddress += data.bname;
+          }
+          if (data.buildingName !== "") {
+            extraAddress +=
+              extraAddress !== ""
+                ? `, ${data.buildingName}`
+                : data.buildingName;
+          }
+          fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+        }
+
+        setElderFormData({
+          ...elderFormData,
+          homeAddress: fullAddress,
+        });
+      },
+    }).open();
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log(formData);
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/employee/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      setEmployees(await fetchEmployees());
+      await toast("직원 추가에 성공하였습니다.");
+      setFormData({
+        name: "",
+        workPlace: company.addressName,
+        homeAddress: "",
+      });
+
+      closeAddEmployeeModal(); // 제출 후 모달 닫기
+    } catch (error) {
+      console.error("There was an error adding the employee!", error);
+    }
+  };
+
+  const handleElderSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log(formData);
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/elder/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(elderFormData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      setElders(await fetchElders());
+      await toast("어르신 추가에 성공하였습니다.");
+
+      await setElderFormData({
+        name: "",
+        homeAddress: "",
+        requiredFrontSeat: false,
+      });
+
+      closeAddElderModal(); // 제출 후 모달 닫기
+      setElderFormData({ name: "", homeAddress: "", requiredFrontSeat: false });
+    } catch (error) {
+      console.error("There was an error adding the employee!", error);
+    }
+  };
+
+  function handleCloseAddElderModal() {
+    setAddElderModalIsOpen(false);
+    setElderFormData({ name: "", homeAddress: "", requiredFrontSeat: false });
+  }
+  function handleCloseAddEmployeeModal() {
+    setAddEmployeeModalIsOpen(false);
+    setFormData({ name: "", workPlace: company.addressName, homeAddress: "" });
+  }
+
   const handleSignout = () => {
     setJwt("");
     setUserId("");
@@ -558,7 +729,10 @@ function App() {
                   </button>
                   <div className="w-4"></div>
 
-                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500">
+                  <button
+                    onClick={openAddEmployeeModal}
+                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500"
+                  >
                     직원 추가
                   </button>
                 </div>
@@ -734,7 +908,10 @@ function App() {
                   </button>
                   <div className="w-4"></div>
 
-                  <button className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 ">
+                  <button
+                    onClick={openAddElderModal}
+                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                  >
                     어르신 추가
                   </button>
                 </div>
@@ -1002,6 +1179,138 @@ function App() {
         show={beforeOutModalShow}
         onHide={() => setBeforeOutModalShow(false)}
       />
+      <Modal show={addElderModalIsOpen} onHide={closeAddElderModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>어르신 추가</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleElderSubmit}>
+            <Form.Group controlId="formName">
+              <Form.Label>이름</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={elderFormData.name}
+                onChange={handleAddElderModalChange}
+                required
+              />
+            </Form.Group>
+            <div className="h-6"></div>
+
+            <Form.Group controlId="formHomeAddress">
+              <Form.Label>집 주소</Form.Label>
+              <Form.Control
+                type="text"
+                name="homeAddress"
+                value={elderFormData.homeAddress}
+                onClick={handleElderPostcode}
+                readOnly
+                required
+              />
+            </Form.Group>
+            <div className="h-6"></div>
+            <Form.Group controlId="formRequiredFrontSeat">
+              <Form.Label>앞자리 탑승 여부</Form.Label>
+              <Form.Control
+                as="select"
+                name="requiredFrontSeat"
+                value={elderFormData.requiredFrontSeat}
+                onChange={handleAddElderModalChange}
+                required
+              >
+                <option value="">선택하세요</option>
+                <option value="true">필요</option>
+                <option value="false">필요 없음</option>
+              </Form.Control>
+            </Form.Group>
+            <div className="h-6"></div>
+
+            <div className="flex flex-row  justify-center">
+              <button
+                className="bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
+                variant="primary"
+                type="submit"
+              >
+                추가
+              </button>
+
+              <button
+                type="button"
+                className="ml-4 bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
+                variant="secondary"
+                onClick={() => handleCloseAddElderModal()}
+              >
+                닫기
+              </button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={addEmployeeModalIsOpen} onHide={closeAddEmployeeModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>직원 추가</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="formName">
+              <Form.Label>이름</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleAddEmployeeModalChange}
+                required
+              />
+            </Form.Group>
+            <div className="h-6"></div>
+
+            <Form.Group controlId="formHomeAddress">
+              <Form.Label>집 주소</Form.Label>
+              <Form.Control
+                type="text"
+                name="homeAddress"
+                value={formData.homeAddress}
+                onClick={handleEmployeePostcode}
+                readOnly
+                required
+              />
+            </Form.Group>
+            <div className="h-6"></div>
+
+            <Form.Group controlId="formMaxCapacity">
+              <Form.Label>최대 탑승 인원</Form.Label>
+              <Form.Control
+                type="number"
+                name="maxCapacity"
+                value={formData.maxCapacity}
+                onChange={handleAddEmployeeModalChange}
+                required
+              />
+            </Form.Group>
+            <div className="h-6"></div>
+
+            <div className="flex flex-row  justify-center">
+              <button
+                className="bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
+                variant="primary"
+                type="submit"
+              >
+                추가
+              </button>
+
+              <button
+                type="button"
+                className="ml-4 bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
+                variant="secondary"
+                onClick={() => handleCloseAddEmployeeModal()}
+              >
+                닫기
+              </button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 

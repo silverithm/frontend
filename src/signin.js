@@ -44,7 +44,11 @@ function Signin() {
         if (result.status !== 500) {
           await toast("로그인에 성공하였습니다.");
           await setJwt(result["tokenInfo"]["accessToken"]);
-          await setCompany(result["companyName"], result["companyAddress"]);
+          await setCompany(
+            result["companyName"],
+            result["companyAddress"],
+            result["companyAddressName"]
+          );
           await setUserId(result["userId"]);
           await setUserEmail(email);
           await setIsSignin(true);

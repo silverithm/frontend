@@ -21,8 +21,10 @@ const useStore = create((set) => ({
 
   setJwt: (jwt) => set({ jwt: jwt }),
   setUserId: (userId) => set({ userId: userId }),
-  setCompany: (name, address) =>
-    set({ company: { name: name, address: address } }),
+  setCompany: (name, address, addressName) =>
+    set({
+      company: { name: name, address: address, addressName: addressName },
+    }),
   setIsSignin: (isSignin) => set({ isSignin: isSignin }),
   setUserEmail: (email) => set({ userEmail: email }),
 }));
