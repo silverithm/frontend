@@ -92,17 +92,14 @@ function App() {
 
     console.log(updateData);
 
-    const response = await fetch(
-      `http://localhost:8080/api/v1/employee/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
-      }
-    );
+    const response = await fetch(`${config.apiUrl}/employee/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updateData),
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -124,7 +121,7 @@ function App() {
 
     console.log(updateData);
 
-    const response = await fetch(`http://localhost:8080/api/v1/elder/${id}`, {
+    const response = await fetch(`${config.apiUrl}/elder/${id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -583,17 +580,14 @@ function App() {
     console.log(formData);
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/employee/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${config.apiUrl}/employee/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -622,17 +616,14 @@ function App() {
     console.log(formData);
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/elder/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          body: JSON.stringify(elderFormData),
-        }
-      );
+      const response = await fetch(`${config.apiUrl}/elder/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify(elderFormData),
+      });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
