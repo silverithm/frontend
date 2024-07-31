@@ -781,6 +781,8 @@ function App() {
     setAllEmployeeSelected(true);
     setAllElderSelected(true);
     setFixedCount(0);
+    window.history.replaceState({}, "");
+
     await setLoadingSpinner(false);
   };
 
