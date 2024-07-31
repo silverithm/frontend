@@ -49,6 +49,7 @@ function Signin() {
             result["companyAddress"],
             result["companyAddressName"]
           );
+          console.log(result["companyAddressName"]);
           await setUserId(result["userId"]);
           await setUserEmail(email);
           await setIsSignin(true);

@@ -17,6 +17,8 @@ import { Button } from "react-bootstrap";
 
 import "./styles/bootstrapcss.css";
 
+import LoadingSpinnerOverlay from "./components/LoadingSpinner";
+
 const { kakao } = window;
 
 function App() {
@@ -49,6 +51,10 @@ function App() {
 
   const [progress, setProgress] = useState();
 
+  const [selections, setSelections] = useState({});
+
+  const [LoadingSpinner, setLoadingSpinner] = useState(false);
+
   const [colors, setColors] = useState([]);
   var randomColors = [];
 
@@ -75,6 +81,8 @@ function App() {
   } = useStore();
 
   const updateEmployee = async (id, data) => {
+    setLoadingSpinner(true);
+
     const updateData = {
       name: data.name,
       workPlace: data.workPlaceName,
@@ -101,11 +109,13 @@ function App() {
       throw new Error(errorData.message || "Something went wrong");
     }
     await toast("직원 수정에 성공하였습니다.");
+    await setLoadingSpinner(false);
 
     return response;
   };
 
   const updateElder = async (id, data) => {
+    setLoadingSpinner(true);
     const updateData = {
       name: data.name,
       homeAddress: data.homeAddressName,
@@ -129,11 +139,13 @@ function App() {
     }
 
     await toast("어르신 수정에 성공하였습니다.");
+    await setLoadingSpinner(false);
 
     return response;
   };
 
   const handleEmployeeEdit = async (id) => {
+    setLoadingSpinner(true);
     if (editingEmployeeId === id) {
       try {
         const response = await updateEmployee(id, editedEmployee);
@@ -157,9 +169,11 @@ function App() {
       setEditingEmployeeId(id);
       setEditedEmployee(employees.find((emp) => emp.id === id));
     }
+    await setLoadingSpinner(false);
   };
 
   const handleElderEdit = async (id) => {
+    setLoadingSpinner(true);
     if (editingElderId === id) {
       // 수정 완료
       try {
@@ -183,21 +197,29 @@ function App() {
       setEditingElderId(id);
       setEditedElder(elders.find((elder) => elder.id === id));
     }
+    await setLoadingSpinner(false);
   };
 
-  const handleEmployeeInputChange = (e, field) => {
+  const handleEmployeeInputChange = async (e, field) => {
+    await setLoadingSpinner(true);
     setEditedEmployee({ ...editedEmployee, [field]: e.target.value });
+    await setLoadingSpinner(false);
   };
 
-  const handleElderInputChange = (e, field) => {
+  const handleElderInputChange = async (e, field) => {
+    await setLoadingSpinner(true);
     setEditedElder({ ...editedElder, [field]: e.target.value });
+    await setLoadingSpinner(false);
   };
 
-  const handleSelectChange = (e, field) => {
+  const handleSelectChange = async (e, field) => {
+    await setLoadingSpinner(true);
     setEditedElder({ ...editedElder, [field]: e.target.value === "true" });
+    await setLoadingSpinner(true);
   };
 
-  const handleSelectEmployee = (id) => {
+  const handleSelectEmployee = async (id) => {
+    await setLoadingSpinner(true);
     if (selectedEmployeeIds.includes(id)) {
       setSelectedEmployeeIds(
         selectedEmployeeIds.filter((employeeId) => employeeId !== id)
@@ -205,24 +227,24 @@ function App() {
     } else {
       setSelectedEmployeeIds([...selectedEmployeeIds, id]);
     }
-    console.log(selectedEmployeeIds);
+    await setLoadingSpinner(false);
   };
 
-  const handleSelectElder = (id) => {
+  const handleSelectElder = async (id) => {
+    await setLoadingSpinner(true);
     if (selectedElderIds.includes(id)) {
       setSelectedElderIds(selectedElderIds.filter((elderId) => elderId !== id));
     } else {
       setSelectedElderIds([...selectedElderIds, id]);
     }
-    console.log(selectedElderIds);
+    await setLoadingSpinner(false);
   };
 
   const handleSelectAllEmployee = async () => {
+    await setLoadingSpinner(true);
     if (allEmployeeSelected) {
-      console.log("1");
       await setSelectedEmployeeIds([]);
     } else {
-      console.log("2");
       console.log(employees);
       await setSelectedEmployeeIds(
         await employees.map((employee) => employee.id)
@@ -230,35 +252,45 @@ function App() {
     }
     await setAllEmployeeSelected(!allEmployeeSelected);
     await console.log(selectedEmployeeIds);
+    await setLoadingSpinner(false);
   };
 
-  const handleSelectAllElder = () => {
+  const handleSelectAllElder = async () => {
+    setLoadingSpinner(true);
     if (allElderSelected) {
       setSelectedElderIds([]);
     } else {
       setSelectedElderIds(elders.map((elder) => elder.id));
     }
     setAllElderSelected(!allElderSelected);
+    await setLoadingSpinner(false);
   };
 
   useEffect(() => {
     const fetchEmployeesAndElders = async () => {
+      setLoadingSpinner(true);
+
       if (jwt === "") {
         return;
       }
       var employees = await fetchEmployees();
       var elders = await fetchElders();
 
+      console.log(employees);
+
       await setEmployees(employees);
       await setElders(elders);
       await setSelectedEmployeeIds(employees.map((employee) => employee.id));
       await setSelectedElderIds(elders.map((elder) => elder.id));
+      await setLoadingSpinner(false);
     };
 
     fetchEmployeesAndElders();
   }, []);
 
   const fetchEmployees = async () => {
+    await setLoadingSpinner(true);
+
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
@@ -277,11 +309,13 @@ function App() {
       })
       .catch((error) => console.error(error));
 
-    console.log(response);
+    await setLoadingSpinner(false);
 
     return response;
   };
   const fetchElders = async () => {
+    await setLoadingSpinner(true);
+
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
@@ -301,32 +335,39 @@ function App() {
       .catch((error) => console.error(error));
     console.log(response);
 
+    await setLoadingSpinner(false);
+
     return response;
   };
 
-  const handleSelect = (employeeId, elderId, sequence) => {
+  const handleSelect = async (employeeId, elderId, sequence) => {
+    setLoadingSpinner(true);
+
     const selectedAssignment = {
       employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
       elderly_id: elderId,
       sequence: sequence,
     };
 
-    setFixedCount((prev) => {
-      return prev + 1;
-    });
+    await setLoadingSpinner(false);
 
     onSelectAssignment(selectedAssignment);
   };
 
   async function onSelectAssignment(fixedAssignment) {
+    await setLoadingSpinner(true);
+
     if (fixedAssignment.elderly_id === "없음") {
       // '없음'을 선택했을 때는 해당 엘더의 모든 할당을 제거
 
-      const filteredAssignments = await fixedAssignments.filter(
+      const filteredAssignments = fixedAssignments.filter(
         (assignment) =>
-          assignment.sequence !== fixedAssignment.sequence ||
-          assignment.employee_id !== fixedAssignment.employee_id
+          !(
+            assignment.sequence === fixedAssignment.sequence &&
+            assignment.employee_id === fixedAssignment.employee_id
+          )
       );
+
       await setFixedAssignments(filteredAssignments);
     } else {
       const filteredAssignments = await fixedAssignments.filter(
@@ -334,11 +375,18 @@ function App() {
           assignment.sequence !== fixedAssignment.sequence ||
           assignment.employee_id !== fixedAssignment.employee_id
       );
+
+      console.log(fixedAssignment);
+      console.log(filteredAssignments);
+
       await setFixedAssignments([...filteredAssignments, fixedAssignment]);
+      await setLoadingSpinner(false);
     }
   }
 
   const handleDeleteEmployee = async (id) => {
+    await setLoadingSpinner(true);
+
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
@@ -355,10 +403,18 @@ function App() {
     setEmployees((prevEmployees) =>
       prevEmployees.filter((employee) => employee.id !== id)
     );
+    if (selectedEmployeeIds.includes(id)) {
+      setSelectedEmployeeIds(
+        selectedEmployeeIds.filter((employeeId) => employeeId !== id)
+      );
+    }
     await toast("직원 삭제에 성공하였습니다.");
+    await setLoadingSpinner(false);
   };
 
   const handleDeleteElder = async (id) => {
+    setLoadingSpinner(true);
+
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
 
@@ -374,13 +430,20 @@ function App() {
       .catch((error) => console.error(error));
     setElders((prevElders) => prevElders.filter((elder) => elder.id !== id));
 
+    if (selectedElderIds.includes(id)) {
+      setSelectedElderIds(selectedElderIds.filter((elderId) => elderId !== id));
+    }
+
     await toast("어르신 삭제에 성공하였습니다.");
+    await setLoadingSpinner(false);
   };
   const handleSignin = () => {
     navigate("/signin");
   };
 
-  const handleComplete = (data, type) => {
+  const handleComplete = async (data, type) => {
+    setLoadingSpinner(true);
+
     let fullAddress = data.address;
     let extraAddress = "";
 
@@ -408,6 +471,7 @@ function App() {
         homeAddressName: fullAddress,
       }));
     }
+    await setLoadingSpinner(false);
   };
 
   const openPostcode = (type) => {
@@ -422,6 +486,7 @@ function App() {
     workPlace: company.addressName,
     homeAddress: "",
     maxCapacity: "",
+    isDriver: false,
   });
 
   const openAddEmployeeModal = () => setAddEmployeeModalIsOpen(true);
@@ -454,7 +519,8 @@ function App() {
     });
   };
 
-  const handleEmployeePostcode = () => {
+  const handleEmployeePostcode = async () => {
+    setLoadingSpinner(true);
     new window.daum.Postcode({
       oncomplete: (data) => {
         let fullAddress = data.address;
@@ -479,9 +545,11 @@ function App() {
         });
       },
     }).open();
+    await setLoadingSpinner(false);
   };
 
-  const handleElderPostcode = () => {
+  const handleElderPostcode = async () => {
+    await setLoadingSpinner(true);
     new window.daum.Postcode({
       oncomplete: (data) => {
         let fullAddress = data.address;
@@ -506,8 +574,10 @@ function App() {
         });
       },
     }).open();
+    await setLoadingSpinner(false);
   };
   const handleSubmit = async (e) => {
+    await setLoadingSpinner(true);
     e.preventDefault();
 
     console.log(formData);
@@ -535,15 +605,18 @@ function App() {
         name: "",
         workPlace: company.addressName,
         homeAddress: "",
+        isDriver: false,
       });
 
       closeAddEmployeeModal(); // 제출 후 모달 닫기
     } catch (error) {
       console.error("There was an error adding the employee!", error);
     }
+    await setLoadingSpinner(false);
   };
 
   const handleElderSubmit = async (e) => {
+    await setLoadingSpinner(true);
     e.preventDefault();
 
     console.log(formData);
@@ -579,6 +652,7 @@ function App() {
     } catch (error) {
       console.error("There was an error adding the employee!", error);
     }
+    await setLoadingSpinner(false);
   };
 
   function handleCloseAddElderModal() {
@@ -587,10 +661,112 @@ function App() {
   }
   function handleCloseAddEmployeeModal() {
     setAddEmployeeModalIsOpen(false);
-    setFormData({ name: "", workPlace: company.addressName, homeAddress: "" });
+    setFormData({
+      name: "",
+      workPlace: company.addressName,
+      homeAddress: "",
+      isDriver: false,
+    });
   }
 
-  const handleSignout = () => {
+  useEffect(() => {
+    setLoadingSpinner(true);
+    const savedSelections = localStorage.getItem(
+      `employeeSelections_${userId}`
+    );
+
+    if (savedSelections) {
+      const parsedSelections = JSON.parse(savedSelections);
+      setSelections(parsedSelections);
+      console.log(parsedSelections);
+
+      let newAssignments = [...fixedAssignments]; // 기존 배열을 복사
+
+      Object.entries(parsedSelections).forEach(
+        ([employeeId, employeeSelections]) => {
+          Object.entries(employeeSelections).forEach(([sequence, elderId]) => {
+            const selectedAssignment = {
+              employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
+              elderly_id: elderId,
+              sequence: Number(sequence),
+            };
+
+            // 중복 확인
+            const existingIndex = newAssignments.findIndex(
+              (assignment) =>
+                assignment.employee_id === selectedAssignment.employee_id &&
+                assignment.sequence === selectedAssignment.sequence
+            );
+
+            if (existingIndex !== -1) {
+              // 이미 존재하는 경우 업데이트
+              newAssignments[existingIndex] = selectedAssignment;
+            } else {
+              // 새로운 경우 추가
+              newAssignments.push(selectedAssignment);
+            }
+          });
+        }
+      );
+
+      console.log(newAssignments);
+      setFixedAssignments(newAssignments);
+    }
+    setLoadingSpinner(false);
+  }, [userId]);
+
+  const handleLocalFixSelect = async (employeeId, elderId, position) => {
+    await setLoadingSpinner(true);
+
+    let newSelections = { ...selections };
+    if (
+      newSelections[employeeId] &&
+      Object.values(newSelections[employeeId]).includes(elderId)
+    ) {
+      toast("같은 직원에게 중복된 어르신을 고정할 수 없습니다.");
+
+      return;
+    }
+    handleSelect(employeeId, elderId, position);
+
+    if (elderId === "없음") {
+      // elderId가 "없음"인 경우, 해당 선택을 제거
+      if (newSelections[employeeId]) {
+        const { [position]: removedPosition, ...restPositions } =
+          newSelections[employeeId];
+        if (Object.keys(restPositions).length === 0) {
+          // 만약 이 직원의 모든 선택이 제거되었다면, 해당 직원 키도 제거
+          const { [employeeId]: removedEmployee, ...restEmployees } =
+            newSelections;
+          newSelections = restEmployees;
+        } else {
+          // 그렇지 않다면, 해당 position만 제거
+          newSelections[employeeId] = restPositions;
+        }
+      }
+    } else {
+      // elderId가 "없음"이 아닌 경우, 새로운 선택을 추가
+      newSelections = {
+        ...newSelections,
+        [employeeId]: {
+          ...(newSelections[employeeId] || {}),
+          [position]: elderId,
+        },
+      };
+    }
+
+    setSelections(newSelections);
+
+    localStorage.setItem(
+      `employeeSelections_${userId}`,
+      JSON.stringify(newSelections)
+    );
+    await setLoadingSpinner(false);
+  };
+
+  const handleSignout = async () => {
+    await setLoadingSpinner(true);
+
     setJwt("");
     setUserId("");
     setUserEmail("");
@@ -605,6 +781,7 @@ function App() {
     setAllEmployeeSelected(true);
     setAllElderSelected(true);
     setFixedCount(0);
+    await setLoadingSpinner(false);
   };
 
   const Map = ({ setMap, map }) => {
@@ -640,6 +817,7 @@ function App() {
   return (
     <div className="App">
       <ToastContainer />
+      {LoadingSpinner && <LoadingSpinnerOverlay />}
       <header className="App-header">
         <div className="h-16 bg-sky-950	text-white flex flex-row place-items-center ">
           <div className="flex items-center justify-between w-full">
@@ -678,9 +856,17 @@ function App() {
               차량 배치 진행하기
             </button>
             <button
+              onClick={() => setView("one")}
+              className={`text-base hover:underline ${
+                view === "one" ? "underline" : ""
+              }`}
+            >
+              단일 경로 배치 진행하기
+            </button>
+            <button
               onClick={() => setView("previous")}
               className={`text-base hover:underline ${
-                view === "current" ? "" : "underline"
+                view === "previous" ? "underline" : ""
               }`}
             >
               이전 배치 보기
@@ -1049,8 +1235,11 @@ function App() {
                   <text className="text-lg font-bold">배치 고정</text>
                   <div className="w-6"></div>
 
-                  <button className="text-sm hover:underline">
-                    현재 고정 인원 {fixedCount}명 +
+                  <button
+                    onClick={() => console.log(fixedAssignments)}
+                    className="text-sm hover:underline"
+                  >
+                    현재 고정 인원 {fixedAssignments.length}명 +
                   </button>
                   <div className="w-6"></div>
                 </div>
@@ -1088,8 +1277,8 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {employees.map((employee, index) => (
-                      <tr key={employee.id} className={"hover:bg-blue-100"}>
+                    {employees.map((employee) => (
+                      <tr key={employee.id} className="hover:bg-blue-100">
                         <td className="px-6 py-4">{employee.name}</td>
                         <td className="px-6 py-4">
                           {Array.from(
@@ -1102,8 +1291,11 @@ function App() {
                                   width: "100px",
                                   marginLeft: "20px",
                                 }}
+                                value={
+                                  selections[employee.id]?.[index + 1] || "없음"
+                                }
                                 onChange={(e) =>
-                                  handleSelect(
+                                  handleLocalFixSelect(
                                     employee.id,
                                     e.target.value,
                                     index + 1
@@ -1111,8 +1303,8 @@ function App() {
                                 }
                               >
                                 <option value="없음">없음</option>
-                                {elders.map((elder, idx) => (
-                                  <option key={idx} value={elder.id}>
+                                {elders.map((elder) => (
+                                  <option key={elder.id} value={elder.id}>
                                     {elder.name}
                                   </option>
                                 ))}
@@ -1145,7 +1337,7 @@ function App() {
             <div className="h-10"></div>
           </div>
         ) : (
-          <div>이전 배치 보기 - 업데이트 예정</div>
+          <div> 업데이트 예정</div>
         )}
       </main>
 
@@ -1459,7 +1651,7 @@ function App() {
         if (!response.ok) {
           flag = true;
         }
-        console.log(response);
+
         return response.json();
       })
       .catch((error) => console.error(error));
@@ -1563,7 +1755,7 @@ function App() {
         if (!response.ok) {
           flag = true;
         }
-        console.log(response.text);
+
         return response.json();
       })
       .catch((error) => console.error(error));
