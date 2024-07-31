@@ -243,7 +243,9 @@ function App() {
       console.log(selectedElderIds.length);
     }
 
-    checkMaxDispatch();
+    if (employees.length > 0 && elders.length > 0) {
+      checkMaxDispatch();
+    }
   }, [selectedElderIds, selectedEmployeeIds]);
 
   const handleSelectElder = async (id) => {
