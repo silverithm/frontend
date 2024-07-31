@@ -227,6 +227,25 @@ function App() {
     await setLoadingSpinner(false);
   };
 
+  useEffect(() => {
+    async function checkMaxDispatch() {
+      var maxDispatchCount = await employees
+        .filter((employee) => selectedEmployeeIds.includes(employee.id))
+        .reduce((sum, employee) => sum + employee.maximumCapacity, 0);
+
+      if (maxDispatchCount < selectedElderIds.length) {
+        setMaxDispatchStatus("over");
+      } else {
+        setMaxDispatchStatus("under");
+      }
+
+      console.log(maxDispatchCount);
+      console.log(selectedElderIds.length);
+    }
+
+    checkMaxDispatch();
+  }, [selectedElderIds, selectedEmployeeIds]);
+
   const handleSelectElder = async (id) => {
     await setLoadingSpinner(true);
     if (selectedElderIds.includes(id)) {
