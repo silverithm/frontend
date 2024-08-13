@@ -683,47 +683,47 @@ function App() {
 
   useEffect(() => {
     setLoadingSpinner(true);
-    const savedSelections = localStorage.getItem(
-      `employeeSelections_${userId}`
-    );
+    // const savedSelections = localStorage.getItem(
+    //   `employeeSelections_${userId}`
+    // );
 
-    if (savedSelections) {
-      const parsedSelections = JSON.parse(savedSelections);
-      setSelections(parsedSelections);
-      console.log(parsedSelections);
+    // if (savedSelections) {
+    //   const parsedSelections = JSON.parse(savedSelections);
+    //   setSelections(parsedSelections);
+    //   console.log(parsedSelections);
 
-      let newAssignments = [...fixedAssignments]; // 기존 배열을 복사
+    //   let newAssignments = [...fixedAssignments]; // 기존 배열을 복사
 
-      Object.entries(parsedSelections).forEach(
-        ([employeeId, employeeSelections]) => {
-          Object.entries(employeeSelections).forEach(([sequence, elderId]) => {
-            const selectedAssignment = {
-              employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
-              elderly_id: elderId,
-              sequence: Number(sequence),
-            };
+    //   Object.entries(parsedSelections).forEach(
+    //     ([employeeId, employeeSelections]) => {
+    //       Object.entries(employeeSelections).forEach(([sequence, elderId]) => {
+    //         const selectedAssignment = {
+    //           employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
+    //           elderly_id: elderId,
+    //           sequence: Number(sequence),
+    //         };
 
-            // 중복 확인
-            const existingIndex = newAssignments.findIndex(
-              (assignment) =>
-                assignment.employee_id === selectedAssignment.employee_id &&
-                assignment.sequence === selectedAssignment.sequence
-            );
+    //         // 중복 확인
+    //         const existingIndex = newAssignments.findIndex(
+    //           (assignment) =>
+    //             assignment.employee_id === selectedAssignment.employee_id &&
+    //             assignment.sequence === selectedAssignment.sequence
+    //         );
 
-            if (existingIndex !== -1) {
-              // 이미 존재하는 경우 업데이트
-              newAssignments[existingIndex] = selectedAssignment;
-            } else {
-              // 새로운 경우 추가
-              newAssignments.push(selectedAssignment);
-            }
-          });
-        }
-      );
+    //         if (existingIndex !== -1) {
+    //           // 이미 존재하는 경우 업데이트
+    //           newAssignments[existingIndex] = selectedAssignment;
+    //         } else {
+    //           // 새로운 경우 추가
+    //           newAssignments.push(selectedAssignment);
+    //         }
+    //       });
+    //     }
+    //   );
 
-      console.log(newAssignments);
-      setFixedAssignments(newAssignments);
-    }
+    //   console.log(newAssignments);
+    //   setFixedAssignments(newAssignments);
+    // }
     setLoadingSpinner(false);
   }, [userId]);
 
