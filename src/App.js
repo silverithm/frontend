@@ -776,6 +776,27 @@ function App() {
     await setLoadingSpinner(false);
   };
 
+  function updateProgressStatus(progress) {
+    if (progress >= 0 && progress <= 5) {
+      return <div>거리 행렬 생성 중 ...</div>;
+    } else if (progress > 5 && progress <= 79) {
+      if (progress % 3 <= 0 && progress % 3 <= 1) {
+        return <div>유전 알고리즘 계산 중 . </div>;
+      }
+
+      if (progress % 3 <= 1 && progress % 3 <= 2) {
+        return <div>유전 알고리즘 계산 중 . . </div>;
+      }
+
+      if (progress % 3 <= 2 && progress % 3 <= 3) {
+        return <div>유전 알고리즘 계산 중 . . .</div>;
+      }
+      return <div>유전 알고리즘 계산 중 </div>;
+    } else if (progress >= 79) {
+      return <div>최종 결과 생성 중 . . .</div>;
+    }
+  }
+
   const handleSignout = async () => {
     await setLoadingSpinner(true);
 
@@ -822,7 +843,7 @@ function App() {
 
     return (
       <>
-        <div id="map" style={{ width: "100%", height: "450px" }} />
+        <div id="map" style={{ width: "100%", height: "100%" }} />
         <div style={{ display: "flex", gap: "10px" }}></div>
       </>
     );
@@ -1358,7 +1379,15 @@ function App() {
       {loading && (
         <LoadingOverlay>
           <ScaleLoader color="skyblue" loading={loading} size={50} />
-          <div style={{ height: 50 }}></div>
+          <div style={{ height: 10 }}></div>
+          <div
+            style={{
+              color: "#082F49",
+            }}
+          >
+            {updateProgressStatus(progress)}
+          </div>
+          <div style={{ height: 10 }}></div>
           <ProgressBar
             variant="info"
             style={{
@@ -1521,9 +1550,9 @@ function App() {
   );
 
   function MyVerticallyCenteredModalDispatchOutData(props) {
-    function dispatchOutStart() {
+    function dispatchOutStart(dispatchType) {
       props.onHide();
-      dispatchOut();
+      dispatchOut(dispatchType);
     }
     return (
       <Modal
@@ -1564,9 +1593,15 @@ function App() {
         <Modal.Footer>
           <button
             className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
-            onClick={dispatchOutStart}
+            onClick={() => dispatchOutStart("DISTANCE_OUT")}
           >
-            차량 배치 시작하기
+            거리 기준 배차
+          </button>
+          <button
+            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
+            onClick={() => dispatchOutStart("DURATION_OUT")}
+          >
+            시간 기준 배차
           </button>
           <button
             className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
@@ -1605,7 +1640,7 @@ function App() {
     });
   }
 
-  async function dispatchOut() {
+  async function dispatchOut(dispatchType) {
     if (jwt === "") {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
@@ -1627,7 +1662,7 @@ function App() {
       elderlys: selectedElderlysInfos,
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
-      dispatchType: "OUT",
+      dispatchType: dispatchType,
       userName: userId,
     };
     const requestJson2 = {
@@ -1635,7 +1670,7 @@ function App() {
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
       fixedAssignments: fixedAssignments,
-      dispatchType: "OUT",
+      dispatchType: dispatchType,
       userName: userId,
     };
 
@@ -1688,7 +1723,7 @@ function App() {
     setBeforeInModalShow(true);
   }
 
-  async function dispatchIn() {
+  async function dispatchIn(dispatchType) {
     console.log(employees);
 
     if (jwt === "") {
@@ -1731,7 +1766,7 @@ function App() {
       elderlys: selectedElderlysInfos,
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
-      dispatchType: "IN",
+      dispatchType: dispatchType,
       userName: userId,
     };
     const requestJson2 = {
@@ -1739,7 +1774,7 @@ function App() {
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
       fixedAssignments: fixedAssignments,
-      dispatchType: "IN",
+      dispatchType: dispatchType,
       userName: userId,
     };
 
@@ -1808,9 +1843,9 @@ function App() {
   }
 
   function MyVerticallyCenteredModalDispatchInData(props) {
-    function dispatchInStart() {
+    function dispatchInStart(dispatchType) {
       props.onHide();
-      dispatchIn();
+      dispatchIn(dispatchType);
     }
 
     return (
@@ -1853,9 +1888,16 @@ function App() {
           <button
             c
             className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
-            onClick={dispatchInStart}
+            onClick={() => dispatchInStart("DISTANCE_IN")}
           >
-            차량 배치 시작하기
+            거리 기준 배차
+          </button>
+          <button
+            c
+            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
+            onClick={() => dispatchInStart("DURATION_IN")}
+          >
+            시간 기준 배차
           </button>
           <button
             className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
@@ -1936,7 +1978,10 @@ function App() {
         let randomColor = await getRandomColor();
         randomColors.push(randomColor);
 
-        if (result.dispatchType === "IN") {
+        if (
+          result.dispatchType === "DISTANCE_IN" ||
+          result.dispatchType === "DURATION_IN"
+        ) {
           origin = {
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
@@ -1959,7 +2004,10 @@ function App() {
           };
         }
 
-        if (result.dispatchType === "OUT") {
+        if (
+          result.dispatchType === "DISTANCE_OUT" ||
+          result.dispatchType === "DURATION_OUT"
+        ) {
           origin = {
             x: result.workPlace.longitude,
             y: result.workPlace.latitude,
@@ -2122,6 +2170,7 @@ function App() {
         {...props}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
+        fullscreen
         centered
       >
         <Modal.Header closeButton>
