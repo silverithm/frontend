@@ -818,6 +818,7 @@ function App() {
         }
 
         await toast("부부 어르신 추가에 성공하였습니다.");
+        setCouples(await fetchCouples());
         setCoupleFormData({
           elderId1: "",
           elderId2: "",
