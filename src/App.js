@@ -25,16 +25,20 @@ function App() {
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
   const [isElderCollapsed, setIsElderCollapsed] = useState(true);
+  const [isCoupleCollapsed, setIsCoupleCollapsed] = useState(true);
   const [isFixCollapsed, setIsFixCollapsed] = useState(true);
   const [maxDisaptchStatus, setMaxDispatchStatus] = useState("under");
   const [fixedAssignments, setFixedAssignments] = useState([]);
 
   const [editingEmployeeId, setEditingEmployeeId] = useState(null);
   const [editingElderId, setEditingElderId] = useState(null);
+  const [editingCoupleId, setEditingCoupleId] = useState(null);
   const [editedEmployee, setEditedEmployee] = useState({});
   const [editedElder, setEditedElder] = useState({});
+  const [editedCouple, setEditedCouple] = useState({});
 
   const [elders, setElders] = useState([]);
+  const [couples, setCouples] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   const [allEmployeeSelected, setAllEmployeeSelected] = useState(true);
@@ -140,6 +144,35 @@ function App() {
 
     return response;
   };
+  const updateCouple = async (id, data) => {
+    setLoadingSpinner(true);
+    console.log(data);
+    const updateData = {
+      elderId1: data.elder1.id,
+      elderId2: data.elder2.id,
+    };
+
+    console.log(updateData);
+
+    const response = await fetch(`${config.apiUrl}/couple/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+
+    await toast("부부 어르신 수정에 성공하였습니다.");
+    await setLoadingSpinner(false);
+
+    return response;
+  };
 
   const handleEmployeeEdit = async (id) => {
     setLoadingSpinner(true);
@@ -197,6 +230,50 @@ function App() {
     await setLoadingSpinner(false);
   };
 
+  function transformToCoupleRequestDTO(couplesData) {
+    return couplesData.map((couple) => ({
+      elderId1: couple.elder1.id,
+      elderId2: couple.elder2.id,
+    }));
+  }
+
+  const handleCoupleEdit = async (id) => {
+    setLoadingSpinner(true);
+    console.log(editedCouple);
+    if (editingCoupleId === id) {
+      // 수정 완료
+      try {
+        const response = await updateCouple(id, editedCouple);
+        if (response.ok) {
+          console.log("response.ok");
+          console.log(id);
+          console.log(couples);
+          console.log(editedCouple);
+
+          // setCouples(
+          //   couples.map((couple) =>
+          //     couple.id === id ? { ...couple, ...editedCouple } : couple
+          //   )
+          // );
+
+          setCouples(await fetchCouples());
+
+          setEditingCoupleId(null);
+          setEditedCouple({});
+        } else {
+          throw new Error("Server responded with an error");
+        }
+      } catch (error) {
+        console.error("Error updating elder:", error);
+      }
+    } else {
+      // 수정 시작
+      setEditingCoupleId(id);
+      setEditedCouple(couples.find((couple) => couple.coupleId === id));
+    }
+    await setLoadingSpinner(false);
+  };
+
   const handleEmployeeInputChange = async (e, field) => {
     await setLoadingSpinner(true);
     setEditedEmployee({ ...editedEmployee, [field]: e.target.value });
@@ -207,6 +284,16 @@ function App() {
     await setLoadingSpinner(true);
     setEditedElder({ ...editedElder, [field]: e.target.value });
     await setLoadingSpinner(false);
+  };
+
+  const handleCoupleInputChange = (e, field) => {
+    const selectedElderId = Number(e.target.value);
+    const selectedElder = elders.find((elder) => elder.id === selectedElderId);
+
+    setEditedCouple((prevCouple) => ({
+      ...prevCouple,
+      [field]: selectedElder,
+    }));
   };
 
   const handleSelectChange = async (e, field) => {
@@ -284,6 +371,33 @@ function App() {
     await setLoadingSpinner(false);
   };
 
+  const fetchCouples = async () => {
+    await setLoadingSpinner(true);
+
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const response = await fetch(
+      `${config.apiUrl}/couple/` + userId,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => console.error(error));
+    console.log(response);
+
+    await setLoadingSpinner(false);
+
+    return response;
+  };
+
   useEffect(() => {
     const fetchEmployeesAndElders = async () => {
       setLoadingSpinner(true);
@@ -293,11 +407,13 @@ function App() {
       }
       var employees = await fetchEmployees();
       var elders = await fetchElders();
+      var couples = await fetchCouples();
 
       console.log(employees);
 
       await setEmployees(employees);
       await setElders(elders);
+      await setCouples(couples);
       await setSelectedEmployeeIds(employees.map((employee) => employee.id));
       await setSelectedElderIds(elders.map((elder) => elder.id));
       await setLoadingSpinner(false);
@@ -455,6 +571,32 @@ function App() {
     await toast("어르신 삭제에 성공하였습니다.");
     await setLoadingSpinner(false);
   };
+  const handleDeleteCouple = async (id) => {
+    setLoadingSpinner(true);
+
+    console.log(id);
+
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const requestOptions = {
+      method: "DELETE",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    await fetch(`${config.apiUrl}/couple/` + id, requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+
+    setCouples((prevCouples) =>
+      prevCouples.filter((couple) => couple.coupleId !== id)
+    );
+
+    await toast("부부 어르신 삭제에 성공하였습니다.");
+    await setLoadingSpinner(false);
+  };
   const handleSignin = () => {
     navigate("/signin");
   };
@@ -512,10 +654,17 @@ function App() {
 
   const [addElderModalIsOpen, setAddElderModalIsOpen] = useState(false);
 
+  const [addCoupleModalIsOpen, setAddCoupleModalIsOpen] = useState(false);
+
   const [elderFormData, setElderFormData] = useState({
     name: "",
     homeAddress: "",
     requiredFrontSeat: false,
+  });
+
+  const [coupleFormData, setCoupleFormData] = useState({
+    elderId1: "",
+    elderId2: "",
   });
 
   const openAddElderModal = () => setAddElderModalIsOpen(true);
@@ -536,6 +685,19 @@ function App() {
       [name]: value,
     });
   };
+
+  const handleAddCoupleModalChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    setCoupleFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    console.log(coupleFormData);
+  };
+
+  const openAddCoupleModal = () => setAddCoupleModalIsOpen(true);
+  const closeAddCoupleModal = () => setAddCoupleModalIsOpen(false);
 
   const handleEmployeePostcode = async () => {
     setLoadingSpinner(true);
@@ -630,6 +792,47 @@ function App() {
     await setLoadingSpinner(false);
   };
 
+  const updateCouples = async () => {
+    const newCouples = await fetchCouples();
+    setCouples((prevCouples) => newCouples);
+  };
+
+  const handleCoupleSubmit = async (e) => {
+    await setLoadingSpinner(true);
+    e.preventDefault();
+    if (coupleFormData.elderId1 && coupleFormData.elderId2) {
+      console.log(coupleFormData);
+
+      try {
+        const response = await fetch(`${config.apiUrl}/couple/${userId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(coupleFormData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        await toast("부부 어르신 추가에 성공하였습니다.");
+        setCoupleFormData({
+          elderId1: "",
+          elderId2: "",
+        });
+        closeAddEmployeeModal(); // 제출 후 모달 닫기
+      } catch (error) {
+        console.error("There was an error adding the couple!", error);
+      }
+    } else {
+      alert("두 명의 어르신을 모두 선택해주세요.");
+    }
+
+    await setLoadingSpinner(false);
+  };
+
   const handleElderSubmit = async (e) => {
     await setLoadingSpinner(true);
     e.preventDefault();
@@ -678,6 +881,14 @@ function App() {
       workPlace: company.addressName,
       homeAddress: "",
       isDriver: false,
+    });
+  }
+
+  function handleCloseAddCoupleModal() {
+    setAddCoupleModalIsOpen(false);
+    setCoupleFormData({
+      elderId1: "",
+      elderId2: "",
     });
   }
 
@@ -1263,6 +1474,126 @@ function App() {
             </div>
 
             <div className="h-10"></div>
+            <div>
+              <div className="flex flex-row items-center justify-between mb-4">
+                <div className="flex flex-row items-center">
+                  <text className="text-lg font-bold">부부 어르신 목록</text>
+                  <div className="w-6"></div>
+
+                  <div className="w-6"></div>
+
+                  <div className="w-4"></div>
+                </div>
+
+                <div className="flex flex-row mr-1">
+                  <button
+                    onClick={() =>
+                      couples.length > 5
+                        ? setIsCoupleCollapsed(!isCoupleCollapsed)
+                        : null
+                    }
+                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                  >
+                    {isCoupleCollapsed ? "늘리기" : "접기"}
+                  </button>
+                  <div className="w-4"></div>
+
+                  <button
+                    onClick={openAddCoupleModal}
+                    className="text-sm bg-sky-950 text-white w-32 h-8 rounded hover:bg-sky-500 "
+                  >
+                    부부 어르신 추가
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className={`relative overflow-x-auto shadow-md ${
+                  isCoupleCollapsed ? "h-80 overflow-y-scroll" : ""
+                }`}
+              >
+                <table className="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 table-auto">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                      <th scope="col" className="px-6 py-3">
+                        이름
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        이름
+                      </th>
+
+                      <th scope="col" className="px-6 py-3">
+                        수정 / 삭제
+                      </th>
+                    </tr>
+                  </thead>
+                  {couples.map((row) => (
+                    <tr key={row.coupleId} className="hover:bg-blue-100">
+                      <td className="px-6 py-4">
+                        {editingCoupleId === row.coupleId ? (
+                          <select
+                            style={{
+                              textAlign: "center",
+                            }}
+                            value={editedCouple.elder1.id}
+                            onChange={(e) =>
+                              handleCoupleInputChange(e, "elder1")
+                            }
+                            className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          >
+                            {elders.map((elder) => (
+                              <option key={elder.id} value={elder.id}>
+                                {elder.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          row.elder1.name
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {editingCoupleId === row.coupleId ? (
+                          <select
+                            style={{
+                              textAlign: "center",
+                            }}
+                            value={editedCouple.elder2.id}
+                            onChange={(e) =>
+                              handleCoupleInputChange(e, "elder2")
+                            }
+                            className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          >
+                            {elders.map((elder) => (
+                              <option key={elder.id} value={elder.id}>
+                                {elder.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          row.elder2.name
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleCoupleEdit(row.coupleId)}
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
+                        >
+                          {editingCoupleId === row.coupleId ? "완료" : "수정"}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCouple(row.coupleId)}
+                          className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
+                        >
+                          삭제
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </table>
+              </div>
+            </div>
+
+            <div className="h-10"></div>
 
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
@@ -1414,6 +1745,70 @@ function App() {
         show={beforeOutModalShow}
         onHide={() => setBeforeOutModalShow(false)}
       />
+      <Modal show={addCoupleModalIsOpen} onHide={closeAddCoupleModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>부부 어르신 추가</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleCoupleSubmit}>
+            <Form.Group controlId="formElder1">
+              <Form.Label>어르신 1</Form.Label>
+              <Form.Control
+                as="select"
+                name="elderId1"
+                value={coupleFormData.elderId1}
+                onChange={handleAddCoupleModalChange}
+                required
+              >
+                <option value="">선택하세요</option>
+                {elders.map((elder) => (
+                  <option key={elder.id} value={elder.id}>
+                    {elder.name}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+
+            <div className="h-6"></div>
+
+            <Form.Group controlId="formElder2">
+              <Form.Label>어르신 2</Form.Label>
+              <Form.Control
+                as="select"
+                name="elderId2"
+                value={coupleFormData.elderId2}
+                onChange={handleAddCoupleModalChange}
+                required
+              >
+                <option value="">선택하세요</option>
+                {elders.map((elder) => (
+                  <option key={elder.id} value={elder.id}>
+                    {elder.name}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+
+            <div className="h-6"></div>
+
+            <div className="flex flex-row justify-center">
+              <button
+                className="bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500"
+                type="submit"
+              >
+                추가
+              </button>
+              <button
+                type="button"
+                className="ml-4 bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500"
+                onClick={handleCloseAddCoupleModal}
+              >
+                닫기
+              </button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
       <Modal show={addElderModalIsOpen} onHide={closeAddElderModal}>
         <Modal.Header closeButton>
           <Modal.Title>어르신 추가</Modal.Title>
@@ -1660,6 +2055,7 @@ function App() {
 
     const requestJson1 = {
       elderlys: selectedElderlysInfos,
+      couples: transformToCoupleRequestDTO(couples),
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
       dispatchType: dispatchType,
@@ -1667,6 +2063,7 @@ function App() {
     };
     const requestJson2 = {
       elderlys: selectedElderlysInfos,
+      couples: transformToCoupleRequestDTO(couples),
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
       fixedAssignments: fixedAssignments,
@@ -1764,6 +2161,7 @@ function App() {
 
     const requestJson1 = {
       elderlys: selectedElderlysInfos,
+      couples: transformToCoupleRequestDTO(couples),
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
       dispatchType: dispatchType,
@@ -1771,6 +2169,7 @@ function App() {
     };
     const requestJson2 = {
       elderlys: selectedElderlysInfos,
+      couples: transformToCoupleRequestDTO(couples),
       employees: selectedEmployeesInfos,
       company: { companyAddress: company.address },
       fixedAssignments: fixedAssignments,
