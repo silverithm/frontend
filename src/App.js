@@ -275,15 +275,18 @@ function App() {
   };
 
   const handleEmployeeInputChange = async (e, field) => {
-    await setLoadingSpinner(true);
     setEditedEmployee({ ...editedEmployee, [field]: e.target.value });
-    await setLoadingSpinner(false);
   };
 
-  const handleElderInputChange = async (e, field) => {
-    await setLoadingSpinner(true);
-    setEditedElder({ ...editedElder, [field]: e.target.value });
-    await setLoadingSpinner(false);
+  const handleElderInputChange = (e, field) => {
+    console.log(e.target.value);
+    console.log(field);
+
+    setEditedElder((prevState) => {
+      const newState = { ...prevState, [field]: e.target.value };
+      console.log("Updated state:", newState); // 디버깅을 위한 로그
+      return newState;
+    });
   };
 
   const handleCoupleInputChange = (e, field) => {
@@ -297,9 +300,7 @@ function App() {
   };
 
   const handleSelectChange = async (e, field) => {
-    await setLoadingSpinner(true);
     setEditedElder({ ...editedElder, [field]: e.target.value === "true" });
-    await setLoadingSpinner(false);
   };
 
   const handleSelectEmployee = async (id) => {
