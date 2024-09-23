@@ -299,7 +299,7 @@ function App() {
   const handleSelectChange = async (e, field) => {
     await setLoadingSpinner(true);
     setEditedElder({ ...editedElder, [field]: e.target.value === "true" });
-    await setLoadingSpinner(true);
+    await setLoadingSpinner(false);
   };
 
   const handleSelectEmployee = async (id) => {
