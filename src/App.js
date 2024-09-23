@@ -275,7 +275,16 @@ function App() {
   };
 
   const handleEmployeeInputChange = async (e, field) => {
-    setEditedEmployee({ ...editedEmployee, [field]: e.target.value });
+    const value = e.target.value;
+    let newValue;
+    if (field === "maximumCapacity") {
+      // 빈 문자열이거나 숫자가 아닌 경우 0으로 설정
+      newValue = value === "" ? 0 : Math.max(0, parseInt(value, 10) || 0);
+    } else {
+      newValue = value;
+    }
+
+    setEditedEmployee({ ...editedEmployee, [field]: newValue });
   };
 
   const handleElderInputChange = (e, field) => {
@@ -1137,15 +1146,15 @@ function App() {
                   </button>
                   <div className="w-6"></div>
                   <text className="text-sm">
-                    최대 배차 인원
+                    최대 배차 인원 &nbsp;
                     {employees
                       .filter((employee) =>
                         selectedEmployeeIds.includes(employee.id)
                       )
-                      .reduce(
-                        (sum, employee) => sum + employee.maximumCapacity,
-                        0
-                      )}
+                      .reduce((sum, employee) => {
+                        // 그 외의 경우 원래 employee 객체의 값을 사용
+                        return sum + (employee.maximumCapacity || 0);
+                      }, 0)}{" "}
                     명
                   </text>
                 </div>
@@ -1305,15 +1314,19 @@ function App() {
                   </button>
                   <div className="w-6"></div>
                   <text className="text-sm">
-                    최대 배차 인원
+                    최대 배차 인원 &nbsp;
                     {employees
                       .filter((employee) =>
                         selectedEmployeeIds.includes(employee.id)
                       )
-                      .reduce(
-                        (sum, employee) => sum + employee.maximumCapacity,
-                        0
-                      )}
+                      .reduce((sum, employee) => {
+                        // 현재 편집 중인 직원이라면 editedEmployee의 값을 사용
+                        if (editingEmployeeId === employee.id) {
+                          return sum + (editedEmployee.maximumCapacity || 0);
+                        }
+                        // 그 외의 경우 원래 employee 객체의 값을 사용
+                        return sum + (employee.maximumCapacity || 0);
+                      }, 0)}{" "}
                     명
                   </text>
                   <div className="w-4"></div>
