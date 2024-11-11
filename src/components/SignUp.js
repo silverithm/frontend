@@ -125,28 +125,31 @@ function SignUp() {
 
         if (response.ok) {
           // Promise를 사용하여 toast가 표시된 후 페이지 이동
-          toast.success("회원가입에 성공했습니다. 로그인 해주세요.", {
-            onClose: () => {
-              navigate("/signin");
-              setLoadingSpinner(false);
-            },
-            autoClose: 500, // 2초 후 자동으로 닫힘
-          });
+          toast.success(
+            "회원가입에 성공했습니다. 로그인 페이지로 이동합니다.",
+            {
+              onClose: () => {
+                navigate("/signin");
+                setLoadingSpinner(false);
+              },
+              autoClose: 500, // 2초 후 자동으로 닫힘
+            }
+          );
         } else {
           const errorData = await response.json();
           toast.error(`회원가입 실패: 이메일 또는 데이터를 확인해 주세요.`, {
-            autoClose: 500,
+            autoClose: 1000,
           });
           setLoadingSpinner(false);
         }
       } catch (error) {
         toast.error("회원가입 중 오류가 발생했습니다.", {
-          autoClose: 500,
+          autoClose: 1000,
         });
       }
     } else {
       toast.error("입력 정보를 확인해주세요.", {
-        autoClose: 500,
+        autoClose: 1000,
       });
     }
   };
