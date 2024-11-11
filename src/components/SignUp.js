@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import config from "../config";
 import "react-toastify/dist/ReactToastify.css"; // CSS import 추가
+import LoadingSpinnerOverlay from "./LoadingSpinner";
 
 function SignUp() {
+  const [LoadingSpinner, setLoadingSpinner] = useState(false);
+
   const [signUpData, setSignUpData] = useState({
     email: "",
     password: "",
@@ -108,6 +111,7 @@ function SignUp() {
   };
 
   const handleSignUp = async (e) => {
+    await setLoadingSpinner(true);
     e.preventDefault();
     if (validateForm()) {
       try {
@@ -120,22 +124,37 @@ function SignUp() {
         });
 
         if (response.ok) {
-          toast.success("회원가입에 성공했습니다. 로그인 해주세요.");
-          navigate("/signin");
+          // Promise를 사용하여 toast가 표시된 후 페이지 이동
+          toast.success("회원가입에 성공했습니다. 로그인 해주세요.", {
+            onClose: () => {
+              navigate("/signin");
+              setLoadingSpinner(false);
+            },
+            autoClose: 500, // 2초 후 자동으로 닫힘
+          });
         } else {
           const errorData = await response.json();
-          toast.error(`회원가입 실패: ${errorData.message}`);
+          toast.error(`회원가입 실패: 이메일 또는 데이터를 확인해 주세요.`, {
+            autoClose: 500,
+          });
+          setLoadingSpinner(false);
         }
       } catch (error) {
-        toast.error("회원가입 중 오류가 발생했습니다.");
+        toast.error("회원가입 중 오류가 발생했습니다.", {
+          autoClose: 500,
+        });
       }
     } else {
-      toast.error("입력 정보를 확인해주세요.");
+      toast.error("입력 정보를 확인해주세요.", {
+        autoClose: 500,
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {LoadingSpinner && <LoadingSpinnerOverlay />}
+
       <ToastContainer
         position="top-right"
         autoClose={3000}
