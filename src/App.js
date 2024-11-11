@@ -69,6 +69,7 @@ function App() {
     setIsSignin,
     setJwt,
     setUserId,
+    setUserName,
     setUserEmail,
     setCompany,
     setSelectedElderIds,
@@ -80,6 +81,7 @@ function App() {
     company,
     jwt,
     userId,
+    userName,
     userEmail,
     selectedElderIds,
     selectedEmployeeIds,
@@ -1030,6 +1032,7 @@ function App() {
     setJwt("");
     setUserId("");
     setUserEmail("");
+    setUserName("");
     setIsSignin(false);
     setCompany("", "");
     setElders([]);
@@ -1090,7 +1093,7 @@ function App() {
             <div className="flex items-center space-x-4">
               <text className="font-bold text-sm">
                 {isSignin === true
-                  ? `${userEmail}님 (${company.name}) 환영합니다!`
+                  ? `${userName}님 (${company.name}) 환영합니다!`
                   : "로그인이 필요합니다."}
               </text>
               <button

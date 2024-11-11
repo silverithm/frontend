@@ -13,8 +13,14 @@ function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { setCompany, setJwt, setUserId, setIsSignin, setUserEmail } =
-    useStore();
+  const {
+    setCompany,
+    setJwt,
+    setUserId,
+    setIsSignin,
+    setUserEmail,
+    setUserName,
+  } = useStore();
 
   function handleBack() {
     navigate("/");
@@ -60,6 +66,7 @@ function Signin() {
           );
           console.log(result["companyAddressName"]);
           await setUserId(result["userId"]);
+          await setUserName(result["userName"]);
           await setUserEmail(email);
           await setIsSignin(true);
         } else {
