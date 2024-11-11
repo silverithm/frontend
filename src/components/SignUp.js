@@ -107,7 +107,7 @@ function SignUp() {
   };
 
   const handleGoBack = () => {
-    navigate("/");
+    window.history.back();
   };
 
   const handleSignUp = async (e) => {
