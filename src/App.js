@@ -18,6 +18,7 @@ import { Button } from "react-bootstrap";
 import "./styles/bootstrapcss.css";
 
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
+import SignUp from "./components/SignUp";
 
 const { kakao } = window;
 
@@ -83,6 +84,10 @@ function App() {
     selectedElderIds,
     selectedEmployeeIds,
   } = useStore();
+
+  const handleSignUp = () => {
+    navigate("/signup");
+  };
 
   const updateEmployee = async (id, data) => {
     setLoadingSpinner(true);
@@ -1095,7 +1100,12 @@ function App() {
                 {isSignin === true ? "로그아웃" : "로그인"}
               </button>
 
-              <button className="text-xs hover:underline">회원가입</button>
+              <button
+                className="text-xs hover:underline"
+                onClick={handleSignUp}
+              >
+                회원가입
+              </button>
               <div className="flex-grow"></div>
             </div>
           </div>
