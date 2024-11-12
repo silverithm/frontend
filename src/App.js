@@ -19,9 +19,15 @@ import "./styles/bootstrapcss.css";
 
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
 import SignUp from "./components/SignUp";
+import { AgAbstractField } from "@ag-grid-community/core";
 
 const { kakao } = window;
-
+const AGREEMENT_LINKS = {
+  privacyPolicy:
+    "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/consent/1.html", // 개인정보처리방침 URL
+  termsOfService:
+    " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
+};
 function App() {
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
@@ -61,6 +67,11 @@ function App() {
   const [LoadingSpinner, setLoadingSpinner] = useState(false);
 
   const [colors, setColors] = useState([]);
+
+  const openAgreement = (url) => {
+    window.open(url, "_blank");
+  };
+
   var randomColors = [];
 
   const navigate = useNavigate();
@@ -1716,14 +1727,14 @@ function App() {
             <div className="flex flex-row items-center justify-center">
               <button
                 onClick={checkDispatchInData}
-                className="text-szm bg-sky-950 text-white w-60 h-16 rounded-lg hover:bg-sky-500"
+                className="text-szm bg-sky-950 text-white w-60 h-12 rounded-lg hover:bg-sky-500"
               >
                 출근 차량 배치
               </button>
               <div className="w-4"></div>
               <button
                 onClick={checkDispatchOutData}
-                className="text-sm bg-sky-950 text-white w-60 h-16 rounded-lg hover:bg-sky-500"
+                className="text-sm bg-sky-950 text-white w-60 h-12 rounded-lg hover:bg-sky-500"
               >
                 퇴근 차량 배치
               </button>
@@ -1734,6 +1745,63 @@ function App() {
           <div> 업데이트 예정</div>
         )}
       </main>
+      <footer className="bg-sky-950 text-white">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {/* 회사 정보 */}
+            <div>
+              <h3 className="text-lg font-medium mb-6 text-sky-100">
+                회사 정보
+              </h3>
+              <div className="space-y-3 text-sm text-gray-300">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sky-300">회사명</span>
+                  <span className="text-gray-400">|</span>
+                  <span>silverithm</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sky-300">주소</span>
+                  <span className="text-gray-400">|</span>
+                  <span>서울특별시 신림동 1547-10</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sky-300">이메일</span>
+                  <span className="text-gray-400">|</span>
+                  <span>ggprgrkjh2@gmail.com</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 법적 고지 */}
+            <div>
+              <h3 className="text-lg font-medium mb-6 text-sky-100">
+                법적 고지
+              </h3>
+              <div className="space-y-3">
+                <a
+                  onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
+                  className="block text-sm text-gray-300 hover:text-sky-300 transition-colors duration-200"
+                >
+                  개인정보 처리방침
+                </a>
+                <a
+                  onClick={() => openAgreement(AGREEMENT_LINKS.termsOfService)}
+                  className="block text-sm text-gray-300 hover:text-sky-300 transition-colors duration-200"
+                >
+                  서비스 이용약관
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="pt-8 mt-8 border-t border-sky-900/60">
+            <p className="text-center text-sm text-gray-400">
+              &copy; {new Date().getFullYear()} silverithm. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {loading && (
         <LoadingOverlay>
