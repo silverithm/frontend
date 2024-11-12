@@ -18,6 +18,7 @@ import { Button } from "react-bootstrap";
 import "./styles/bootstrapcss.css";
 
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
+import SignUp from "./components/SignUp";
 
 const { kakao } = window;
 
@@ -68,6 +69,7 @@ function App() {
     setIsSignin,
     setJwt,
     setUserId,
+    setUserName,
     setUserEmail,
     setCompany,
     setSelectedElderIds,
@@ -79,10 +81,15 @@ function App() {
     company,
     jwt,
     userId,
+    userName,
     userEmail,
     selectedElderIds,
     selectedEmployeeIds,
   } = useStore();
+
+  const handleSignUp = () => {
+    navigate("/signup");
+  };
 
   const updateEmployee = async (id, data) => {
     setLoadingSpinner(true);
@@ -1025,6 +1032,7 @@ function App() {
     setJwt("");
     setUserId("");
     setUserEmail("");
+    setUserName("");
     setIsSignin(false);
     setCompany("", "");
     setElders([]);
@@ -1085,7 +1093,7 @@ function App() {
             <div className="flex items-center space-x-4">
               <text className="font-bold text-sm">
                 {isSignin === true
-                  ? `${userEmail}님 (${company.name}) 환영합니다!`
+                  ? `${userName}님 (${company.name}) 환영합니다!`
                   : "로그인이 필요합니다."}
               </text>
               <button
@@ -1095,7 +1103,12 @@ function App() {
                 {isSignin === true ? "로그아웃" : "로그인"}
               </button>
 
-              <button className="text-xs hover:underline">회원가입</button>
+              <button
+                className="text-xs hover:underline"
+                onClick={handleSignUp}
+              >
+                회원가입
+              </button>
               <div className="flex-grow"></div>
             </div>
           </div>
@@ -1154,8 +1167,8 @@ function App() {
                       .reduce((sum, employee) => {
                         // 그 외의 경우 원래 employee 객체의 값을 사용
                         return sum + (employee.maximumCapacity || 0);
-                      }, 0)}{" "}
-                    명
+                      }, 0)}
+                    {""}명
                   </text>
                 </div>
 
@@ -1326,8 +1339,8 @@ function App() {
                         }
                         // 그 외의 경우 원래 employee 객체의 값을 사용
                         return sum + (employee.maximumCapacity || 0);
-                      }, 0)}{" "}
-                    명
+                      }, 0)}
+                    {""}명
                   </text>
                   <div className="w-4"></div>
 

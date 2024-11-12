@@ -3,22 +3,31 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import useStore from "./store/useStore";
 import "react-toastify/dist/ReactToastify.css";
+import LoadingSpinnerOverlay from "./components/LoadingSpinner";
 
 import config from "./config";
 function Signin() {
   const navigate = useNavigate();
+  const [LoadingSpinner, setLoadingSpinner] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { setCompany, setJwt, setUserId, setIsSignin, setUserEmail } =
-    useStore();
+  const {
+    setCompany,
+    setJwt,
+    setUserId,
+    setIsSignin,
+    setUserEmail,
+    setUserName,
+  } = useStore();
 
   function handleBack() {
     navigate("/");
   }
 
   const handleSignin = async (event) => {
+    await setLoadingSpinner(true);
     console.log("submit!!!");
     event.preventDefault();
     console.log("submit!!!");
@@ -42,7 +51,13 @@ function Signin() {
       .then(async (result) => {
         console.log(result);
         if (result.status !== 500) {
-          await toast("로그인에 성공하였습니다.");
+          toast.success("로그인에 성공하였습니다.", {
+            onClose: () => {
+              setLoadingSpinner(false);
+              handleBack();
+            },
+            autoClose: 500, // 2초 후 자동으로 닫힘
+          });
           await setJwt(result["tokenInfo"]["accessToken"]);
           await setCompany(
             result["companyName"],
@@ -51,10 +66,20 @@ function Signin() {
           );
           console.log(result["companyAddressName"]);
           await setUserId(result["userId"]);
+          await setUserName(result["userName"]);
           await setUserEmail(email);
           await setIsSignin(true);
-
-          await handleBack();
+        } else {
+          toast.error(
+            "로그인 실패하였습니다. 이메일 또는 비밀번호를 다시 확인해 주세요.",
+            {
+              onClose: () => {
+                setLoadingSpinner(false);
+              },
+              autoClose: 1000,
+            }
+          );
+          setLoadingSpinner(false);
         }
 
         return result;
@@ -67,7 +92,7 @@ function Signin() {
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <ToastContainer />
-
+      {LoadingSpinner && <LoadingSpinnerOverlay />}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Sign in to your account
@@ -133,7 +158,7 @@ function Signin() {
         <p className="mt-10 text-center text-sm text-gray-500">
           회원이 아니신가요?
           <a
-            href="#"
+            href="/signup"
             className="ml-4 font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
           >
             회원가입
