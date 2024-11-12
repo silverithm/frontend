@@ -25,6 +25,19 @@ function SignUp() {
   const [showTermsOfService, setShowTermsOfService] = useState(false);
   const navigate = useNavigate();
 
+  // 약관 링크 상수 정의
+  const AGREEMENT_LINKS = {
+    privacyPolicy:
+      "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/consent/1.html", // 개인정보처리방침 URL
+    termsOfService:
+      " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
+  };
+
+  // 약관 링크 열기 핸들러
+  const openAgreement = (url) => {
+    window.open(url, "_blank");
+  };
+
   // 주소 검색 팝업 열기
   const handleAddressSearch = () => {
     new window.daum.Postcode({
@@ -350,7 +363,6 @@ function SignUp() {
                 뒤로 가기
               </button>
             </div>
-            {/* 약관 동의 섹션 추가 */}
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="flex items-center h-5">
@@ -372,14 +384,13 @@ function SignUp() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => setShowPrivacyPolicy(true)}
-                    className="text-sm text-indigo-600 hover:text-indigo-500"
+                    onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
+                    className="text-sm text-indigo-600 hover:text-indigo-500 underline"
                   >
                     전체보기
                   </button>
                 </div>
               </div>
-
               <div className="flex items-start">
                 <div className="flex items-center h-5">
                   <input
@@ -400,8 +411,10 @@ function SignUp() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => setShowTermsOfService(true)}
-                    className="text-sm text-indigo-600 hover:text-indigo-500"
+                    onClick={() =>
+                      openAgreement(AGREEMENT_LINKS.termsOfService)
+                    }
+                    className="text-sm text-indigo-600 hover:text-indigo-500 underline"
                   >
                     전체보기
                   </button>
@@ -413,69 +426,6 @@ function SignUp() {
           </form>
         </div>
       </div>
-
-      {/* 개인정보 처리방침 모달 */}
-      <dialog
-        open={showPrivacyPolicy}
-        onClose={() => setShowPrivacyPolicy(false)}
-      >
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <h3 className="text-lg font-medium text-gray-900">
-            개인정보 수집 및 이용 동의
-          </h3>
-          <div className="mt-4 text-sm text-gray-500 max-h-96 overflow-y-auto">
-            <p className="mb-4">
-              회사는 다음과 같이 개인정보를 수집 및 이용합니다.
-            </p>
-            <h4 className="font-medium mb-2">1. 수집하는 개인정보 항목</h4>
-            <ul className="list-disc pl-5 mb-4">
-              <li>이메일 주소</li>
-              <li>회사명</li>
-              <li>회사 주소</li>
-            </ul>
-            {/* ... 추가 개인정보 처리방침 내용 ... */}
-          </div>
-        </div>
-        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button
-            type="button"
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-            onClick={() => setShowPrivacyPolicy(false)}
-          >
-            확인
-          </button>
-        </div>
-      </dialog>
-
-      {/* 이용약관 모달 */}
-      <dialog
-        open={showTermsOfService}
-        onClose={() => setShowTermsOfService(false)}
-      >
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <h3 className="text-lg font-medium text-gray-900">서비스 이용약관</h3>
-          <div className="mt-4 text-sm text-gray-500 max-h-96 overflow-y-auto">
-            <p className="mb-4">
-              본 약관은 서비스 이용에 관한 기본적인 사항을 규정합니다.
-            </p>
-            <h4 className="font-medium mb-2">제1조 (목적)</h4>
-            <p className="mb-4">
-              본 약관은 회사가 제공하는 서비스의 이용조건 및 절차, 회사와 회원
-              간의 권리·의무 및 책임사항 등을 규정함을 목적으로 합니다.
-            </p>
-            {/* ... 추가 이용약관 내용 ... */}
-          </div>
-        </div>
-        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button
-            type="button"
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-            onClick={() => setShowTermsOfService(false)}
-          >
-            확인
-          </button>
-        </div>
-      </dialog>
     </div>
   );
 }
