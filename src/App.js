@@ -13,13 +13,10 @@ import { styled } from "styled-components";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { Form } from "react-bootstrap";
-import { Button } from "react-bootstrap";
 
 import "./styles/bootstrapcss.css";
 
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
-import SignUp from "./components/SignUp";
-import { AgAbstractField } from "@ag-grid-community/core";
 
 const { kakao } = window;
 const AGREEMENT_LINKS = {
@@ -1130,25 +1127,61 @@ function App() {
           <div className="flex flex-row space-x-4">
             <button
               onClick={() => setView("current")}
-              className={`text-base hover:underline ${
-                view === "current" ? "underline" : ""
-              }`}
+              className={`
+            text-base 
+            relative 
+            after:content-[''] 
+            after:absolute 
+            after:w-full 
+            after:h-0.5 
+            after:bg-black 
+            after:left-0 
+            after:bottom-0
+            after:transition-transform 
+            after:duration-300
+            after:ease-out
+            ${view === "current" ? "after:scale-x-100" : "after:scale-x-0"}
+          `}
             >
               차량 배치 진행하기
             </button>
             <button
               onClick={() => setView("one")}
-              className={`text-base hover:underline ${
-                view === "one" ? "underline" : ""
-              }`}
+              className={`
+            text-base 
+            relative 
+            after:content-[''] 
+            after:absolute 
+            after:w-full 
+            after:h-0.5 
+            after:bg-black 
+            after:left-0 
+            after:bottom-0
+            after:transition-transform 
+            after:duration-300
+            after:ease-out
+            ${view === "one" ? "after:scale-x-100" : "after:scale-x-0"}
+          `}
             >
               단일 경로 배치 진행하기
             </button>
             <button
               onClick={() => setView("previous")}
-              className={`text-base hover:underline ${
-                view === "previous" ? "underline" : ""
-              }`}
+              className={`
+            text-base 
+            relative 
+            after:content-[''] 
+            after:absolute 
+            after:w-full 
+            after:h-0.5 
+            after:bg-black 
+            after:left-0 
+            after:bottom-0
+            after:transition-transform 
+            after:duration-300
+            after:ease-out
+            ${view === "previous" ? "after:scale-x-100" : "after:scale-x-0"}
+          `}
             >
               이전 배치 보기
             </button>
