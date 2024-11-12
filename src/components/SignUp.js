@@ -78,19 +78,6 @@ function SignUp() {
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    Object.keys(signUpData).forEach((key) => {
-      const error = validateField(key, signUpData[key]);
-      if (error) {
-        newErrors[key] = error;
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   useEffect(() => {
     validateForm();
   }, []);
@@ -110,9 +97,42 @@ function SignUp() {
     window.history.back();
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // 기존 필드 검증
+    Object.keys(signUpData).forEach((key) => {
+      const error = validateField(key, signUpData[key]);
+      if (error) {
+        newErrors[key] = error;
+      }
+    });
+
+    // 약관 동의 검증 추가
+    if (!agreements.privacyPolicy) {
+      newErrors.privacyPolicy = "개인정보 수집 및 이용에 동의해주세요.";
+    }
+    if (!agreements.termsOfService) {
+      newErrors.termsOfService = "서비스 이용약관에 동의해주세요.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSignUp = async (e) => {
-    await setLoadingSpinner(true);
     e.preventDefault();
+    await setLoadingSpinner(true);
+
+    // 약관 동의 여부 확인
+    if (!agreements.privacyPolicy || !agreements.termsOfService) {
+      toast.error("필수 약관에 모두 동의해주세요.", {
+        autoClose: 1000,
+      });
+      setLoadingSpinner(false);
+      return;
+    }
+
     if (validateForm()) {
       try {
         const response = await fetch(`${config.apiUrl}/signup`, {
@@ -124,7 +144,6 @@ function SignUp() {
         });
 
         if (response.ok) {
-          // Promise를 사용하여 toast가 표시된 후 페이지 이동
           toast.success(
             "회원가입에 성공했습니다. 로그인 페이지로 이동합니다.",
             {
@@ -132,7 +151,7 @@ function SignUp() {
                 navigate("/signin");
                 setLoadingSpinner(false);
               },
-              autoClose: 500, // 2초 후 자동으로 닫힘
+              autoClose: 500,
             }
           );
         } else {
@@ -146,11 +165,13 @@ function SignUp() {
         toast.error("회원가입 중 오류가 발생했습니다.", {
           autoClose: 1000,
         });
+        setLoadingSpinner(false);
       }
     } else {
       toast.error("입력 정보를 확인해주세요.", {
         autoClose: 1000,
       });
+      setLoadingSpinner(false);
     }
   };
 
@@ -317,14 +338,14 @@ function SignUp() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sky-950 hover:bg-sky-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 회원가입
               </button>
               <button
                 type="button"
                 onClick={handleGoBack}
-                className="mt-3 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="mt-3 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-sky-950 hover:text-white hover:bg-gray-300 transition-all duration-200 focus:outline-none"
               >
                 뒤로 가기
               </button>

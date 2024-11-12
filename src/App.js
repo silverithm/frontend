@@ -1167,8 +1167,8 @@ function App() {
                       .reduce((sum, employee) => {
                         // 그 외의 경우 원래 employee 객체의 값을 사용
                         return sum + (employee.maximumCapacity || 0);
-                      }, 0)}{" "}
-                    명
+                      }, 0)}
+                    {""}명
                   </text>
                 </div>
 
@@ -1339,8 +1339,8 @@ function App() {
                         }
                         // 그 외의 경우 원래 employee 객체의 값을 사용
                         return sum + (employee.maximumCapacity || 0);
-                      }, 0)}{" "}
-                    명
+                      }, 0)}
+                    {""}명
                   </text>
                   <div className="w-4"></div>
 
