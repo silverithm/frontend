@@ -24,7 +24,7 @@ import { AgAbstractField } from "@ag-grid-community/core";
 const { kakao } = window;
 const AGREEMENT_LINKS = {
   privacyPolicy:
-    "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/consent/1.html", // 개인정보처리방침 URL
+    "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html", // 개인정보처리방침 URL
   termsOfService:
     " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
 };
