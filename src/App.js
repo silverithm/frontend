@@ -26,6 +26,10 @@ const AGREEMENT_LINKS = {
     " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
 };
 function App() {
+  const [selectedEmployeeForSingle, setSelectedEmployeeForSingle] = useState(null);
+const [selectedEldersForSingle, setSelectedEldersForSingle] = useState([]);
+const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
+
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
   const [isElderCollapsed, setIsElderCollapsed] = useState(true);
@@ -1040,7 +1044,7 @@ function App() {
         : `${hours}시간 ${remainingMinutes}분`;
     };
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col px-4">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 flex-none">
           이전 배치 목록
         </h2>
@@ -1170,7 +1174,7 @@ function App() {
         return (
           <div>
             <div>
-              <div className="flex flex-row items-center justify-between mb-4">
+              <div className="flex flex-row items-center justify-between mb-4 py-4">
                 <div className="flex flex-row items-center">
                   <text className="text-lg font-bold">직원 목록</text>
                   <div className="w-6"></div>
@@ -1755,7 +1759,7 @@ function App() {
         return (
           <div className="flex gap-6 h-[calc(100vh-250px)] overflow-hidden">
             {/* 왼쪽: 이전 배치 목록 영역 */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden py-4">
               {dispatchHistories.length > 0 ? (
                 <DispatchHistoryList
                   histories={dispatchHistories}
@@ -1771,7 +1775,209 @@ function App() {
           </div>
         );
       case "one":
-        return <div>단일 경로 배치 페이지 (업데이트 예정)</div>;
+        const maxCapacity = selectedEmployeeForSingle?.maximumCapacity || 0;
+        const handleSingleRouteDispatch = async () => {
+          if (!selectedEmployeeForSingle) {
+            toast("직원을 선택해주세요.");
+            return;
+          }
+          if (selectedEldersForSingle.length === 0) {
+            toast("어르신을 선택해주세요.");
+            return;
+          }
+        
+          try {
+            setLoadingSpinner(true);
+            
+            // 단일 경로 배치 결과 데이터 구성
+            const singleRouteResult = [{
+              employeeName: selectedEmployeeForSingle.name,
+              homeAddress: selectedEmployeeForSingle.homeAddress,
+              workPlace: selectedEmployeeForSingle.workPlace,
+              assignmentElders: elders
+                .filter(elder => selectedEldersForSingle.includes(elder.id))
+                .map(elder => ({
+                  name: elder.name,
+                  homeAddress: elder.homeAddress
+                })),
+              dispatchType: "DISTANCE_IN",
+              isSingleRoute: true
+            }];
+
+            console.log(singleRouteResult);
+        
+            // 기존 모달에 사용할 데이터 설정
+            setDispatchResult(singleRouteResult);
+            setModalShow(true);
+            
+          } catch (error) {
+            console.error("Error in single route dispatch:", error);
+            toast("배치 처리 중 오류가 발생했습니다.");
+          } finally {
+            setLoadingSpinner(false);
+          }
+        };
+
+        return (
+          <div className="w-full h-[calc(100vh-250px)] bg-gray-50/50 overflow-auto">
+            <div className="px-4 py-4">
+              {/* Header */}
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800">단일 경로 배치</h1>
+                  <p className="text-sm text-gray-500 mt-1">직원과 어르신을 선택하여 경로를 배치하세요</p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    className={`
+                      px-6 py-2 text-sm font-medium rounded-lg transition-colors
+                      ${selectedEmployeeForSingle && selectedEldersForSingle.length > 0
+                        ? 'bg-sky-600 text-white hover:bg-sky-500'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }
+                    `}
+                    onClick={handleSingleRouteDispatch}
+                  >
+                    배치 진행하기
+                  </button>
+                </div>
+              </div>
+      
+              <div className="grid grid-cols-3 gap-8">
+                {/* 직원 선택 */}
+                <div>
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="p-4 border-b border-gray-100">
+                      <h2 className="font-medium text-lg text-gray-800">직원 선택</h2>
+                    </div>
+                    <div className="p-4">
+                      <div className="space-y-2 max-h-[500px] overflow-auto pr-2">
+                        {employees.map(employee => (
+                          <div
+                            key={employee.id}
+                            onClick={() => {
+                              setSelectedEmployeeForSingle(employee);
+                              setSelectedEldersForSingle([]);
+                            }}
+                            className={`
+                              group p-4 rounded-lg border transition-all cursor-pointer
+                              ${selectedEmployeeForSingle?.id === employee.id
+                                ? 'bg-sky-50 border-sky-500 shadow-sm'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium text-gray-900">{employee.name}</span>
+                              <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                                최대 {employee.maximumCapacity}명
+                              </span>
+                            </div>
+                            <div className="text-sm text-gray-500">{employee.homeAddressName}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+      
+                {/* 어르신 선택 */}
+                <div>
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                      <h2 className="font-medium text-lg text-gray-800">어르신 선택</h2>
+                      {selectedEmployeeForSingle && (
+                        <span className="text-sm px-2 py-1 bg-sky-50 text-sky-600 rounded-full">
+                          {selectedEldersForSingle.length}/{maxCapacity}명
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      {selectedEmployeeForSingle ? (
+                        <div className="space-y-2 max-h-[500px] overflow-auto pr-2">
+                          {elders.map(elder => (
+                            <div
+                              key={elder.id}
+                              onClick={() => {
+                                if (selectedEldersForSingle.includes(elder.id)) {
+                                  setSelectedEldersForSingle(
+                                    selectedEldersForSingle.filter(id => id !== elder.id)
+                                  );
+                                } else if (selectedEldersForSingle.length < maxCapacity) {
+                                  setSelectedEldersForSingle([...selectedEldersForSingle, elder.id]);
+                                } else {
+                                  toast(`최대 ${maxCapacity}명까지 선택 가능합니다.`);
+                                }
+                              }}
+                              className={`
+                                group p-4 rounded-lg border transition-all cursor-pointer
+                                ${selectedEldersForSingle.includes(elder.id)
+                                  ? 'bg-sky-50 border-sky-500 shadow-sm'
+                                  : selectedEldersForSingle.length >= maxCapacity
+                                  ? 'opacity-50 cursor-not-allowed border-gray-200'
+                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                }
+                              `}
+                            >
+                              <div className="font-medium text-gray-900">{elder.name}</div>
+                              <div className="text-sm text-gray-500 mt-1">{elder.homeAddressName}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="h-[200px] flex items-center justify-center text-gray-400">
+                          직원을 먼저 선택해주세요
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+      
+                {/* 선택 요약 */}
+                <div>
+                  <div className="sticky top-4">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                      <div className="p-4 border-b border-gray-100">
+                        <h2 className="font-medium text-gray-800 text-lg">선택된 정보</h2>
+                      </div>
+                      <div className="p-4">
+                        {selectedEmployeeForSingle ? (
+                          <div className="space-y-4">
+                            <div>
+                              <h3 className="text-sm font-medium text-gray-500 mb-2">직원</h3>
+                              <div className="p-3 bg-gray-50 rounded-lg">
+                                <div className="text-gray-900">{selectedEmployeeForSingle.name}</div>
+                              </div>
+                            </div>
+                            {selectedEldersForSingle.length > 0 && (
+                              <div>
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">선택된 어르신</h3>
+                                <div className="p-3 bg-gray-50 rounded-lg space-y-2">
+                                  {elders
+                                    .filter(elder => selectedEldersForSingle.includes(elder.id))
+                                    .map((elder, index) => (
+                                      <div key={elder.id} className="flex items-center text-gray-900">
+                                        <span className="text-sky-600 mr-2">{index + 1}.</span>
+                                        {elder.name}
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-center text-gray-400 py-8">
+                            선택된 정보가 없습니다
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
       default:
         return <div>알 수 없는 탭</div>;
     }
@@ -1948,8 +2154,8 @@ function App() {
     );
   };
   const navigationItems = [
-    { id: "current", label: "차량 배치 진행하기", icon: "🚗" },
-    { id: "one", label: "단일 경로 배치 진행하기", icon: "🛣️" },
+    { id: "current", label: "인공지능 차량 배치", icon: "🚗" },
+    { id: "one", label: "단일 경로 길 찾기", icon: "🛣️" },
     { id: "previous", label: "이전 배치 보기", icon: "📋" },
   ];
   return (
@@ -1985,7 +2191,7 @@ function App() {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={isSignin ? handleSignout : handleSignin}
-                  className="px-3 py-1.5 text-sm text-sky-100 hover:text-white transition-colors"
+                  className="px-3 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
                 >
                   {isSignin ? "로그아웃" : "로그인"}
                 </button>
@@ -1994,7 +2200,7 @@ function App() {
                     <span className="text-gray-400">|</span>
                     <button
                       onClick={handleSignUp}
-                      className="px-3 py-1.5 text-sm bg-sky-700 text-white rounded-full hover:bg-sky-600 transition-all"
+                      className="px-3 py-1.5 text-sm  text-white rounded-full hover:bg-sky-600 transition-all"
                     >
                       회원가입
                     </button>
@@ -2037,7 +2243,7 @@ function App() {
         </div>
       </header>
       <main>
-        <div className="h-6"></div>
+        <div className=""></div>
         {renderContent()}
       </main>
       <footer className="bg-gradient-to-r from-sky-950 to-blue-900 text-white">
@@ -2767,7 +2973,32 @@ function App() {
         let randomColor = await getRandomColor();
         randomColors.push(randomColor);
 
-        if (
+
+        if (result.isSingleRoute) {
+          origin = {
+            x: result.homeAddress.longitude,
+            y: result.homeAddress.latitude,
+            name: result.employeeName
+          };
+    
+          // 마지막 어르신을 목적지로 설정
+          const lastElder = result.assignmentElders[result.assignmentElders.length - 1];
+          destination = {
+            x: lastElder.homeAddress.longitude,
+            y: lastElder.homeAddress.latitude,
+            name: lastElder.name
+          };
+    
+          // 마지막 어르신을 제외한 나머지 어르신들을 경유지로 설정
+          for (let i = 0; i < result.assignmentElders.length - 1; i++) {
+            let currentElder = result.assignmentElders[i];
+            waypoints.push({
+              x: currentElder.homeAddress.longitude,
+              y: currentElder.homeAddress.latitude,
+              name: currentElder.name
+            });
+          }
+        }else if (
           result.dispatchType === "DISTANCE_IN" ||
           result.dispatchType === "DURATION_IN"
         ) {
