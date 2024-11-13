@@ -1195,7 +1195,7 @@ function App() {
         return (
           <div>
             <div>
-              <div className="flex flex-row items-center justify-between mb-4 py-4">
+              <div className="flex flex-row items-center justify-between py-4">
                 <div className="flex flex-row items-center">
                   <text className="text-lg font-bold">직원 목록</text>
                   <div className="w-6"></div>
