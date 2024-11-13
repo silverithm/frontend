@@ -1842,49 +1842,56 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                   </button>
                 </div>
               </div>
-      
-              <div className="grid grid-cols-3 gap-8">
-                {/* 직원 선택 */}
-                <div>
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-4 border-b border-gray-100">
-                      <h2 className="font-medium text-lg text-gray-800">직원 선택</h2>
-                    </div>
-                    <div className="p-4">
-                      <div className="space-y-2 max-h-[500px] overflow-auto pr-2">
-                        {employees.map(employee => (
-                          <div
-                            key={employee.id}
-                            onClick={() => {
-                              setSelectedEmployeeForSingle(employee);
-                              setSelectedEldersForSingle([]);
-                            }}
-                            className={`
-                              group p-4 rounded-lg border transition-all cursor-pointer
-                              ${selectedEmployeeForSingle?.id === employee.id
-                                ? 'bg-sky-50 border-sky-500 shadow-sm'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                              }
-                            `}
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium text-gray-900">{employee.name}</span>
-                              <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                                최대 {employee.maximumCapacity}명
-                              </span>
-                            </div>
-                            <div className="text-sm text-gray-500">{employee.homeAddressName}</div>
-                          </div>
-                        ))}
+        
+ {/* 그리드 컨테이너 */}
+ <div className="grid grid-cols-3 gap-8 h-[600px]">
+        {/* 직원 선택 */}
+        <div className="h-full">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+            <div className="p-4 border-b border-gray-100 flex-none">
+              <h2 className="font-medium text-lg text-gray-800">직원 선택</h2>
+            </div>
+            <div className="flex-1 overflow-hidden p-4">
+              {jwt ? (
+                <div className="h-full overflow-auto pr-2 space-y-2">
+                  {employees.map(employee => (
+                    <div
+                      key={employee.id}
+                      onClick={() => {
+                        setSelectedEmployeeForSingle(employee);
+                        setSelectedEldersForSingle([]);
+                      }}
+                      className={`
+                        group p-4 rounded-lg border transition-all cursor-pointer
+                        ${selectedEmployeeForSingle?.id === employee.id
+                          ? 'bg-sky-50 border-sky-500 shadow-sm'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">{employee.name}</span>
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                          최대 {employee.maximumCapacity}명
+                        </span>
                       </div>
+                      <div className="text-sm text-gray-500">{employee.homeAddressName}</div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-      
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400">
+                  선택된 정보가 없습니다
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
                 {/* 어르신 선택 */}
-                <div>
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                <div className="h-full">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+                    <div className="p-4 border-b border-gray-100 flex-none flex justify-between items-center">
                       <h2 className="font-medium text-lg text-gray-800">어르신 선택</h2>
                       {selectedEmployeeForSingle && (
                         <span className="text-sm px-2 py-1 bg-sky-50 text-sky-600 rounded-full">
@@ -1892,9 +1899,9 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                         </span>
                       )}
                     </div>
-                    <div className="p-4">
+                    <div className="flex-1 overflow-hidden p-4">
                       {selectedEmployeeForSingle ? (
-                        <div className="space-y-2 max-h-[500px] overflow-auto pr-2">
+                        <div className="h-full overflow-auto pr-2 space-y-2">
                           {elders.map(elder => (
                             <div
                               key={elder.id}
@@ -1925,22 +1932,22 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                           ))}
                         </div>
                       ) : (
-                        <div className="h-[200px] flex items-center justify-center text-gray-400">
+                        <div className="h-full flex items-center justify-center text-gray-400">
                           직원을 먼저 선택해주세요
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
-      
+        
                 {/* 선택 요약 */}
-                <div>
-                  <div className="sticky top-4">
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                      <div className="p-4 border-b border-gray-100">
-                        <h2 className="font-medium text-gray-800 text-lg">선택된 정보</h2>
-                      </div>
-                      <div className="p-4">
+                <div className="h-full">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+                    <div className="p-4 border-b border-gray-100 flex-none">
+                      <h2 className="font-medium text-lg text-gray-800">선택된 정보</h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden p-4">
+                      <div className="h-full overflow-auto">
                         {selectedEmployeeForSingle ? (
                           <div className="space-y-4">
                             <div>
@@ -1966,7 +1973,7 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                             )}
                           </div>
                         ) : (
-                          <div className="text-center text-gray-400 py-8">
+                          <div className="h-full flex items-center justify-center text-gray-400">
                             선택된 정보가 없습니다
                           </div>
                         )}
