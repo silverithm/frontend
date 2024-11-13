@@ -1825,7 +1825,7 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
               <div className="flex justify-between items-center">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">단일 경로 배치</h1>
-                  <p className="text-sm text-gray-500 mt-1">직원과 어르신을 선택하여 경로를 배치하세요</p>
+                  <p className="text-sm text-gray-500 mt-1">직원과 어르신을 선택하여 단일 경로를 검색하세요</p>
                 </div>
                 <div className="flex gap-3">
                   <button
@@ -2121,13 +2121,22 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
     await setLoadingSpinner(false);
   };
 
-  const Map = ({ setMap, map }) => {
+  const Map = ({ setMap, map, isSingleRoute, employeeLongitude, employeeLatitude }) => {
+
+    console.log(isSingleRoute, employeeLongitude, employeeLatitude);
+
     useEffect(() => {
       const mapContainer = document.getElementById("map");
-      const mapOptions = {
+      const mapOptions = isSingleRoute == false ? {
         center: new kakao.maps.LatLng(
           company.address.latitude,
           company.address.longitude
+        ), //지도의 중심좌표.
+        level: 3, //지도의 레벨(확대, 축소 정도)
+      } : {
+        center: new kakao.maps.LatLng(
+          employeeLatitude,
+          employeeLongitude
         ), //지도의 중심좌표.
         level: 3, //지도의 레벨(확대, 축소 정도)
       };
@@ -2912,6 +2921,12 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
 
     const [durations, setDurations] = useState([]);
 
+    const firstResult = props.data?.[0];
+    const isSingleRoute = firstResult?.isSingleRoute || false;
+
+    console.log(props)
+  
+
     useEffect(() => {
       async function fetchData() {
         try {
@@ -3262,8 +3277,13 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                 {/* Left Side - Map */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                   <div className="h-[400px]">
-                    <Map setMap={setMap} map={map} />
-                  </div>
+                  <Map 
+            setMap={setMap} 
+            map={map} 
+            isSingleRoute={isSingleRoute}
+            employeeLongitude={firstResult?.homeAddress?.longitude}
+            employeeLatitude={firstResult?.homeAddress?.latitude}
+          />                  </div>
                 </div>
 
                 {/* Right Side - Assignment Details */}
