@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { toast, ToastContainer } from "react-toastify";
@@ -13,6 +13,11 @@ import { styled } from "styled-components";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { Form } from "react-bootstrap";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 
 import "./styles/bootstrapcss.css";
 
@@ -2996,43 +3001,121 @@ function App() {
   function MyVerticallyCenteredModal(props) {
     const REST_API_KEY = config.restApiKey;
     const [map, setMap] = useState(null);
-    var lineIndex = 0;
-
     const [durations, setDurations] = useState([]);
+    const [dispatchData, setDispatchData] = useState([]);
+    const [mapOverlays, setMapOverlays] = useState([]);
+    const [randomColors, setRandomColors] = useState([]); // 색상을 state로 관리
+    var lineIndex = 0;
+    // props.data가 변경될 때만 dispatchData 초기화
 
-    const firstResult = props.data?.[0];
+    // 초기 데이터 설정
+    useEffect(() => {
+      if (props.data) {
+        setDispatchData(props.data);
+      }
+    }, [props.data]);
+
+    // 지도 업데이트
+    useEffect(() => {
+      if (map) {
+        updateMapDisplay();
+      }
+    }, [map, dispatchData]); // dispatchData가 변경될 때마다 지도 업데이트
+
+    // 지도 표시 업데이트 함수
+    const updateMapDisplay = useCallback(async () => {
+      // 기존 오버레이 제거
+      mapOverlays.forEach((overlay) => {
+        if (overlay) {
+          overlay.setMap(null);
+        }
+      });
+      setMapOverlays([]);
+
+      // 맵 초기화
+      if (map) {
+        map.removeOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
+        map.removeOverlayMapTypeId(kakao.maps.MapTypeId.BICYCLE);
+        map.removeOverlayMapTypeId(kakao.maps.MapTypeId.USE_DISTRICT);
+      }
+
+      lineIndex = 0;
+      const data = await getCarDirection();
+      setDurations(data);
+    }, [map, dispatchData]);
+
+    const firstResult = dispatchData?.[0];
     const isSingleRoute = firstResult?.isSingleRoute || false;
 
     console.log(props);
+    const handleDragEnd = async (result) => {
+      if (!result.destination) return;
 
-    useEffect(() => {
-      async function fetchData() {
-        try {
-          const data = await getCarDirection();
+      const { source, destination } = result;
+      const sourceDroppableId = parseInt(source.droppableId);
+      const destDroppableId = parseInt(destination.droppableId);
 
-          await setDurations(data);
-        } catch (error) {
-          console.error("Error getCarDirection :", error);
-        } finally {
-        }
+      // 깊은 복사로 새로운 배열 생성
+      const newDispatchResult = JSON.parse(JSON.stringify(dispatchResult));
+
+      // 소스 그룹의 현재 어르신 수 확인
+      const sourceElders =
+        newDispatchResult[sourceDroppableId].assignmentElders;
+
+      // 이동 후 소스 그룹에 남을 어르신 수가 1명 이하인 경우
+      if (sourceElders.length <= 1 && sourceDroppableId !== destDroppableId) {
+        toast.warning("최소 1명의 어르신이 배정되어야 합니다.", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return; // 드래그 앤 드롭 취소
       }
 
-      if (map != null && durations != [] && colors != []) {
-        fetchData();
+      if (sourceDroppableId === destDroppableId) {
+        // 같은 직원 내에서 순서 변경
+        const elders = Array.from(
+          newDispatchResult[sourceDroppableId].assignmentElders
+        );
+        const [removed] = elders.splice(source.index, 1);
+        elders.splice(destination.index, 0, removed);
+        newDispatchResult[sourceDroppableId].assignmentElders = elders;
+      } else {
+        // 다른 직원으로 이동
+        const sourceElders = Array.from(
+          newDispatchResult[sourceDroppableId].assignmentElders
+        );
+        const destElders = Array.from(
+          newDispatchResult[destDroppableId].assignmentElders
+        );
+
+        const [removed] = sourceElders.splice(source.index, 1);
+        destElders.splice(destination.index, 0, removed);
+
+        newDispatchResult[sourceDroppableId].assignmentElders = sourceElders;
+        newDispatchResult[destDroppableId].assignmentElders = destElders;
       }
-    }, [map]);
+
+      // 상태 업데이트
+      setDispatchResult(newDispatchResult);
+
+      // 지도의 기존 오버레이 제거
+      if (map) {
+        mapOverlays.forEach((overlay) => {
+          overlay.setMap(null);
+        });
+        setMapOverlays([]);
+
+        // 새로운 경로 계산 및 그리기
+        await getCarDirection();
+      }
+    };
 
     // 호출방식의 URL을 입력합니다.
     const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
-
-    function getRandomColor() {
-      const letters = "0123456789ABCDEF";
-      let color = "#";
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    }
 
     function OffsetPolyline(path) {
       const offsetX = lineIndex * 2;
@@ -3055,218 +3138,6 @@ function App() {
       return offsetPath;
     }
 
-    // async function getCarDirection() {
-    //   var dur = [];
-    //   randomColors = [];
-
-    //   for (const result of dispatchResult) {
-    //     let origin;
-    //     let destination;
-    //     let waypoints = [];
-    //     let randomColor = await getRandomColor();
-    //     randomColors.push(randomColor);
-
-    //     if (result.isSingleRoute) {
-    //       origin = {
-    //         x: result.homeAddress.longitude,
-    //         y: result.homeAddress.latitude,
-    //         name: result.employeeName
-    //       };
-
-    //       // 마지막 어르신을 목적지로 설정
-    //       const lastElder = result.assignmentElders[result.assignmentElders.length - 1];
-    //       destination = {
-    //         x: lastElder.homeAddress.longitude,
-    //         y: lastElder.homeAddress.latitude,
-    //         name: lastElder.name
-    //       };
-
-    //       // 마지막 어르신을 제외한 나머지 어르신들을 경유지로 설정
-    //       for (let i = 0; i < result.assignmentElders.length - 1; i++) {
-    //         let currentElder = result.assignmentElders[i];
-    //         waypoints.push({
-    //           x: currentElder.homeAddress.longitude,
-    //           y: currentElder.homeAddress.latitude,
-    //           name: currentElder.name
-    //         });
-    //       }
-    //     }else if (
-    //       result.dispatchType === "DISTANCE_IN" ||
-    //       result.dispatchType === "DURATION_IN"
-    //     ) {
-    //       origin = {
-    //         x: result.homeAddress.longitude,
-    //         y: result.homeAddress.latitude,
-    //         name: result.employeeName,
-    //       };
-
-    //       for (let i = 0; i < result.assignmentElders.length; i++) {
-    //         let currentElder = result.assignmentElders[i];
-    //         waypoints.push({
-    //           x: currentElder.homeAddress.longitude,
-    //           y: currentElder.homeAddress.latitude,
-    //           name: currentElder.name,
-    //         });
-    //       }
-
-    //       destination = {
-    //         x: result.workPlace.longitude,
-    //         y: result.workPlace.latitude,
-    //         name: "학교",
-    //       };
-    //     }
-
-    //     if (
-    //       result.dispatchType === "DISTANCE_OUT" ||
-    //       result.dispatchType === "DURATION_OUT"
-    //     ) {
-    //       origin = {
-    //         x: result.workPlace.longitude,
-    //         y: result.workPlace.latitude,
-    //         name: "학교",
-    //       };
-
-    //       for (let i = 0; i < result.assignmentElders.length; i++) {
-    //         let currentElder = result.assignmentElders[i];
-    //         waypoints.push({
-    //           x: currentElder.homeAddress.longitude,
-    //           y: currentElder.homeAddress.latitude,
-    //           name: currentElder.name,
-    //         });
-    //       }
-
-    //       destination = {
-    //         x: result.homeAddress.longitude,
-    //         y: result.homeAddress.latitude,
-    //         name: result.employeeName,
-    //       };
-    //     }
-
-    //     // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
-
-    //     const headers = {
-    //       Authorization: `KakaoAK ${REST_API_KEY}`,
-    //       "Content-Type": "application/json",
-    //     };
-
-    //     const body = JSON.stringify({
-    //       origin: origin,
-    //       destination: destination,
-    //       waypoints: waypoints,
-    //       priority: "RECOMMEND",
-    //       car_fuel: "GASOLINE",
-    //       car_hipass: false,
-    //       alternatives: true,
-    //       road_details: false,
-    //     });
-
-    //     try {
-    //       const response = await fetch(url, {
-    //         method: "POST",
-    //         headers: headers,
-    //         body: body,
-    //       });
-
-    //       if (!response.ok) {
-    //         throw new Error(`HTTP error! Status: ${response.status}`);
-    //       }
-
-    //       const data = await response.json();
-
-    //       const duration = await data.routes[0].summary.duration;
-
-    //       dur.push(duration);
-
-    //       data.routes[0].sections.forEach(async (section) => {
-    //         const linePath = [];
-
-    //         await section.roads.forEach((road) => {
-    //           for (let i = 0; i < road.vertexes.length; i += 2) {
-    //             const latLng = new kakao.maps.LatLng(
-    //               road.vertexes[i + 1],
-    //               road.vertexes[i]
-    //             );
-    //             linePath.push(latLng);
-    //           }
-    //         });
-
-    //         var content = `<div style="
-    //         justify-content: center;
-    //         align-items: center;
-    //         color: ${randomColor};
-    //         background-color: rgba(255, 255, 255, 0.5);
-    //         border-radius: 30px;
-    //         font-size: 20px;
-    //         font-weight: bold;
-    //     ">
-    //     ${origin.name}
-    //     </div>`;
-
-    //         var position = new kakao.maps.LatLng(origin.y, origin.x);
-    //         var customOverlay = new kakao.maps.CustomOverlay({
-    //           position: position,
-    //           content: content,
-    //         });
-    //         customOverlay.setMap(map);
-
-    //         waypoints.forEach((point) => {
-    //           var content = `<div style="
-    //           justify-content: center;
-    //           align-items: center;
-    //           color: ${randomColor};
-    //           background-color: rgba(255, 255, 255, 0.5);
-    //           border-radius: 30px;
-    //           font-size: 20px;
-    //           font-weight: bold;
-    //       ">
-    //       ${point.name}
-    //       </div>`;
-
-    //           var position = new kakao.maps.LatLng(point.y, point.x);
-    //           var customOverlay = new kakao.maps.CustomOverlay({
-    //             position: position,
-    //             content: content,
-    //           });
-    //           customOverlay.setMap(map);
-    //         });
-
-    //         var content2 = `<div style="
-    //         justify-content: center;
-    //         align-items: center;
-    //         color: ${randomColor};
-    //         background-color: rgba(255, 255, 255, 0.5);
-    //         border-radius: 30px;
-    //         font-size: 20px;
-    //         font-weight: bold;
-    //     ">
-    //     ${destination.name}
-    //     </div>`;
-
-    //         var position2 = new kakao.maps.LatLng(destination.y, destination.x);
-    //         var customOverlay2 = new kakao.maps.CustomOverlay({
-    //           position: position2,
-    //           content: content2,
-    //         });
-    //         customOverlay2.setMap(map);
-
-    //         var newPolyline = await OffsetPolyline(linePath);
-
-    //         var polyline = new kakao.maps.Polyline({
-    //           path: newPolyline,
-    //           strokeWeight: 7,
-    //           strokeColor: randomColor,
-    //           strokeOpacity: 0.7,
-    //           strokeStyle: "solid",
-    //         });
-
-    //         polyline.setMap(map);
-    //       });
-    //     } catch (error) {
-    //       console.error("Error:", error);
-    //     }
-    //   }
-    //   return await dur;
-    // }
     function hexToHSL(hex) {
       let r = parseInt(hex.slice(1, 3), 16) / 255;
       let g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -3316,17 +3187,6 @@ function App() {
       return `#${f(0)}${f(8)}${f(4)}`;
     }
 
-    function calculateDistance(pos1, pos2) {
-      const lat1 = pos1.getLat();
-      const lng1 = pos1.getLng();
-      const lat2 = pos2.getLat();
-      const lng2 = pos2.getLng();
-
-      return (
-        Math.sqrt(Math.pow(lat2 - lat1, 2) + Math.pow(lng2 - lng1, 2)) * 111000
-      ); // 대략적인 미터 단위 변환
-    }
-
     // 스타일 관련 함수들
     function getLineStyle(index) {
       const baseColors = [
@@ -3369,84 +3229,21 @@ function App() {
         opacity: 0.85,
       };
     }
-
-    function adjustMarkerPosition(markers, newMarker, minDistance = 60) {
-      let adjusted = false;
-      let offsetY = 0;
-      let offsetX = 0;
-      const offsetStep = 30;
-      const maxAttempts = 10;
-      let attempts = 0;
-
-      const originalPosition = newMarker.getPosition();
-
-      while (!adjusted && attempts < maxAttempts) {
-        let overlapping = false;
-
-        for (const marker of markers) {
-          const distance = calculateDistance(
-            marker.getPosition(),
-            newMarker.getPosition()
-          );
-
-          if (distance < minDistance) {
-            overlapping = true;
-
-            // 나선형 패턴으로 오프셋 조정
-            offsetX =
-              Math.cos((attempts * Math.PI) / 2) *
-              offsetStep *
-              (1 + attempts / 4);
-            offsetY =
-              Math.sin((attempts * Math.PI) / 2) *
-              offsetStep *
-              (1 + attempts / 4);
-
-            const newPosition = new kakao.maps.LatLng(
-              originalPosition.getLat() + offsetY / 111000,
-              originalPosition.getLng() +
-                offsetX /
-                  (111000 *
-                    Math.cos((originalPosition.getLat() * Math.PI) / 180))
-            );
-
-            newMarker.setPosition(newPosition);
-            break;
-          }
-        }
-
-        if (!overlapping) {
-          adjusted = true;
-        }
-        attempts++;
-      }
-
-      markers.push(newMarker);
-      return newMarker;
-    }
-
-    function createMarker(point, content, map, existingMarkers) {
-      const position = new kakao.maps.LatLng(point.y, point.x);
-      const marker = new kakao.maps.CustomOverlay({
-        position: position,
-        content: content,
-        zIndex: 1,
-      });
-
-      return adjustMarkerPosition(existingMarkers, marker);
-    }
-
     async function getCarDirection() {
-      var dur = [];
-      randomColors = [];
+      if (!map || !dispatchData.length) return [];
 
-      for (const [index, result] of dispatchResult.entries()) {
+      const dur = [];
+      const newRandomColors = [];
+
+      // dispatchData를 사용하도록 수정
+      for (const [index, result] of dispatchData.entries()) {
         let origin;
         let destination;
         let waypoints = [];
         const lineStyle = getLineStyle(index);
-        randomColors.push(lineStyle.color);
+        newRandomColors.push(lineStyle.color);
 
+        // 경로 유형에 따른 origin, destination, waypoints 설정
         if (result.isSingleRoute) {
           origin = {
             x: result.homeAddress.longitude,
@@ -3573,6 +3370,7 @@ function App() {
               }
             });
 
+            // ... 마커 및 경로선 그리기 로직 유지
             const createMarkerContent = (point, index = "") => {
               const typeLabel = {
                 출발: "출발",
@@ -3581,58 +3379,57 @@ function App() {
               };
 
               return `
-                <div style="
-                  padding: 4px 8px;
-                  color: ${lineStyle.color};
-                  background-color: white;
-                  border: 2px solid ${lineStyle.color};
-                  border-radius: 12px;
-                  font-size: 12px;
-                  font-weight: bold;
-                  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                  white-space: nowrap;
-                ">
-                  ${point.name} 
-                  <span style="
-                    font-weight: normal;
-                    opacity: 0.7;
-                    margin-left: 2px;
-                    font-size: 10px;
-                  ">
-                    ${typeLabel[point.type]}
-                  </span>
-                </div>
-              `;
+                          <div style="
+                              padding: 4px 8px;
+                              color: ${lineStyle.color};
+                              background-color: white;
+                              border: 2px solid ${lineStyle.color};
+                              border-radius: 12px;
+                              font-size: 12px;
+                              font-weight: bold;
+                              box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                              white-space: nowrap;
+                          ">
+                              ${point.name} 
+                              <span style="
+                                  font-weight: normal;
+                                  opacity: 0.7;
+                                  margin-left: 2px;
+                                  font-size: 10px;
+                              ">
+                                  ${typeLabel[point.type]}
+                              </span>
+                          </div>
+                      `;
             };
 
-            // 출발지 마커
-            new kakao.maps.CustomOverlay({
+            // 마커와 경로선을 생성하고 mapOverlays에 추가
+            const startOverlay = new kakao.maps.CustomOverlay({
               position: new kakao.maps.LatLng(origin.y, origin.x),
               content: createMarkerContent(origin),
               map: map,
             });
+            setMapOverlays((prev) => [...prev, startOverlay]);
 
-            // 경유지 마커
             waypoints.forEach((point, idx) => {
-              new kakao.maps.CustomOverlay({
+              const waypointOverlay = new kakao.maps.CustomOverlay({
                 position: new kakao.maps.LatLng(point.y, point.x),
                 content: createMarkerContent(point, (idx + 1).toString()),
                 map: map,
               });
+              setMapOverlays((prev) => [...prev, waypointOverlay]);
             });
 
-            // 도착지 마커
-            new kakao.maps.CustomOverlay({
+            const endOverlay = new kakao.maps.CustomOverlay({
               position: new kakao.maps.LatLng(destination.y, destination.x),
               content: createMarkerContent(destination),
               map: map,
             });
+            setMapOverlays((prev) => [...prev, endOverlay]);
 
-            // 경로선 그리기
             const newPolyline = await OffsetPolyline(linePath);
 
-            // 흰색 테두리 효과를 위한 배경선
-            new kakao.maps.Polyline({
+            const backgroundPolyline = new kakao.maps.Polyline({
               path: newPolyline,
               strokeWeight: lineStyle.strokeWidth + 4,
               strokeColor: "#FFFFFF",
@@ -3640,9 +3437,9 @@ function App() {
               strokeStyle: "solid",
               map: map,
             });
+            setMapOverlays((prev) => [...prev, backgroundPolyline]);
 
-            // 메인 경로선
-            new kakao.maps.Polyline({
+            const mainPolyline = new kakao.maps.Polyline({
               path: newPolyline,
               strokeWeight: lineStyle.strokeWidth,
               strokeColor: lineStyle.color,
@@ -3650,11 +3447,14 @@ function App() {
               strokeStyle: "solid",
               map: map,
             });
+            setMapOverlays((prev) => [...prev, mainPolyline]);
           });
         } catch (error) {
           console.error("Error:", error);
         }
       }
+
+      setRandomColors(newRandomColors);
       return dur;
     }
 
@@ -3675,48 +3475,25 @@ function App() {
         aria-labelledby="dispatch-result-modal"
         dialogClassName="!max-w-[1200px] !w-[90vw]"
       >
-        <div className="max-h-[80vh] bg-gray-50">
-          {/* Header */}
-          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-            <div className="px-6 py-4 flex justify-between items-center">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-800">
-                  차량 배치 결과
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">{currentTime} 기준</p>
-              </div>
-              <button
-                onClick={props.onHide}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="max-h-[80vh] bg-gray-50">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+              <div className="px-6 py-4 flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    차량 배치 결과
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {currentTime} 기준
+                  </p>
+                </div>
+                <button
+                  onClick={props.onHide}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div
-            className="p-6 overflow-auto"
-            style={{ maxHeight: "calc(80vh - 73px)" }}
-          >
-            <div className="max-w-6xl mx-auto space-y-6">
-              {/* Notice Box */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg py-2.5 px-4">
-                <div className="flex items-center gap-3">
                   <svg
-                    className="w-5 h-5 text-blue-500 flex-shrink-0"
+                    className="w-6 h-6 text-gray-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -3725,112 +3502,175 @@ function App() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
-                  <div className="flex-1 text-sm">
-                    <span className="font-medium text-blue-900">
-                      카카오맵 API 기준 예상 운행시간입니다.
-                    </span>
-                    <span className="text-blue-800 ml-2">
-                      실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
-                    </span>
-                  </div>
-                </div>
+                </button>
               </div>
+            </div>
 
-              {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Side - Map */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="h-[400px]">
-                    <Map
-                      setMap={setMap}
-                      map={map}
-                      isSingleRoute={isSingleRoute}
-                      employeeLongitude={firstResult?.homeAddress?.longitude}
-                      employeeLatitude={firstResult?.homeAddress?.latitude}
-                    />{" "}
+            {/* Content */}
+            <div
+              className="p-6 overflow-auto"
+              style={{ maxHeight: "calc(80vh - 73px)" }}
+            >
+              <div className="max-w-6xl mx-auto space-y-6">
+                {/* Notice Box */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg py-2.5 px-4">
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className="w-5 h-5 text-blue-500 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <div className="flex-1 text-sm">
+                      <span className="font-medium text-blue-900">
+                        카카오맵 API 기준 예상 운행시간입니다.
+                      </span>
+                      <span className="text-blue-800 ml-2">
+                        실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right Side - Assignment Details */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <div className="max-h-[400px] overflow-auto pr-2">
-                    <div className="space-y-3">
-                      {props.data.map((item, index) => (
-                        <div
-                          key={index}
-                          className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-start">
-                            {/* Driver Info */}
-                            <div
-                              className={`flex-shrink-0 ${
-                                randomColors[index % randomColors.length]
-                              } font-medium w-24`}
-                            >
-                              {item.employeeName}
-                            </div>
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left Side - Map */}
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="h-[400px]">
+                      <Map
+                        setMap={setMap}
+                        map={map}
+                        isSingleRoute={isSingleRoute}
+                        employeeLongitude={firstResult?.homeAddress?.longitude}
+                        employeeLatitude={firstResult?.homeAddress?.latitude}
+                      />{" "}
+                    </div>
+                  </div>
 
-                            {/* Route Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                {item.assignmentElders.map((elder, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap"
-                                  >
-                                    {elder.name}
-                                  </span>
-                                ))}
+                  {/* Right Side - Assignment Details */}
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="max-h-[400px] overflow-y-auto pr-2">
+                      <div className="space-y-3">
+                        {dispatchData.map((item, dispatchIndex) => (
+                          <div
+                            key={`dispatch-${dispatchIndex}`}
+                            className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-start">
+                              <div
+                                className="flex-shrink-0 font-medium w-24"
+                                style={{
+                                  color:
+                                    randomColors[
+                                      dispatchIndex % randomColors.length
+                                    ],
+                                }}
+                              >
+                                {item.employeeName}
                               </div>
-                              <div className="flex items-center text-sm text-gray-600">
-                                <svg
-                                  className="w-4 h-4 mr-1 flex-shrink-0"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
+
+                              <div className="flex-1 min-w-0">
+                                <Droppable
+                                  droppableId={`${dispatchIndex}`}
+                                  direction="horizontal"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                  />
-                                </svg>
-                                예상 소요시간:{" "}
-                                <span className="font-medium ml-1">
-                                  {isNaN(durations[index])
-                                    ? "계산중..."
-                                    : `약 ${(durations[index] / 60).toFixed(
-                                        0
-                                      )}분`}
-                                </span>
+                                  {(provided) => (
+                                    <div
+                                      ref={provided.innerRef}
+                                      {...provided.droppableProps}
+                                      className="flex flex-wrap gap-2 mb-2"
+                                    >
+                                      {item.assignmentElders.map(
+                                        (elder, elderIndex) => (
+                                          <Draggable
+                                            key={`elder-${
+                                              elder.id || elderIndex
+                                            }`}
+                                            draggableId={`${dispatchIndex}-${
+                                              elder.id || elderIndex
+                                            }`}
+                                            index={elderIndex}
+                                          >
+                                            {(provided, snapshot) => (
+                                              <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                className={`px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap cursor-move
+                                            ${
+                                              snapshot.isDragging
+                                                ? "shadow-lg bg-blue-50"
+                                                : ""
+                                            }`}
+                                              >
+                                                {elder.name}
+                                              </div>
+                                            )}
+                                          </Draggable>
+                                        )
+                                      )}
+                                      {provided.placeholder}
+                                    </div>
+                                  )}
+                                </Droppable>
+
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <svg
+                                    className="w-4 h-4 mr-1 flex-shrink-0"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                  예상 소요시간:{" "}
+                                  <span className="font-medium ml-1">
+                                    {isNaN(durations[dispatchIndex])
+                                      ? "계산중..."
+                                      : `약 ${(
+                                          durations[dispatchIndex] / 60
+                                        ).toFixed(0)}분`}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Footer */}
-          <div className="bg-white border-t border-gray-200 p-4">
-            <div className="flex justify-end">
-              <button
-                onClick={props.onHide}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                닫기
-              </button>
+            {/* Footer */}
+            <div className="bg-white border-t border-gray-200 p-4">
+              <div className="flex justify-end">
+                <button
+                  onClick={props.onHide}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  닫기
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </DragDropContext>
       </Modal>
     );
   }
