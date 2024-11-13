@@ -1838,7 +1838,7 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                     `}
                     onClick={handleSingleRouteDispatch}
                   >
-                    배치 진행하기
+                    단일 경로 길 찾기
                   </button>
                 </div>
               </div>

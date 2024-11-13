@@ -189,7 +189,7 @@ function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-r from-sky-950 to-blue-900">
       {LoadingSpinner && <LoadingSpinnerOverlay />}
 
       <ToastContainer
@@ -205,7 +205,7 @@ function SignUp() {
         theme="light"
       />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-100 ">
           회원가입
         </h2>
       </div>

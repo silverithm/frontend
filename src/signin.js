@@ -90,11 +90,12 @@ function Signin() {
   };
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div className = "bg-gradient-to-r from-sky-950 to-blue-900 min-h-screen">
+    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 ">
       <ToastContainer />
       {LoadingSpinner && <LoadingSpinnerOverlay />}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-100">
           Sign in to your account
         </h2>
       </div>
@@ -104,7 +105,7 @@ function Signin() {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
+              className="block text-sm font-medium leading-6 text-gray-100"
             >
               Email address
             </label>
@@ -123,18 +124,18 @@ function Signin() {
             <div className="flex items-center justify-between">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium leading-6 text-gray-100"
               >
                 Password
               </label>
-              <div className="text-sm">
+              {/* <div className="text-sm">
                 <a
                   href="#"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
+                  className="font-semibold text-gray-100 hover:text-indigo-500"
                 >
                   Forgot password?
                 </a>
-              </div>
+              </div> */}
             </div>
             <div className="mt-2">
               <input
@@ -155,21 +156,22 @@ function Signin() {
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-10 text-center text-sm text-gray-300">
           회원이 아니신가요?
           <a
             href="/signup"
-            className="ml-4 font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+            className="ml-4 font-semibold leading-6 text-gray-300 hover:text-indigo-500"
           >
             회원가입
           </a>
           <a
             onClick={handleBack}
-            className="ml-4 font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+            className="ml-4 font-semibold leading-6 text-gray-300 hover:text-indigo-500"
           >
             돌아가기
           </a>
         </p>
+      </div>
       </div>
     </div>
   );
