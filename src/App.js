@@ -1085,9 +1085,7 @@ function App() {
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                           ></path>
                         </svg>
-                        {history?.createdAt
-                          ? new Date(history.createdAt).toLocaleString()
-                          : "날짜 정보 없음"}
+                        {history?.createdAt || "날짜 정보 없음"}
                       </div>
                       <div className="flex items-center justify-between">
                         <span
@@ -1949,118 +1947,100 @@ function App() {
       </>
     );
   };
-
+  const navigationItems = [
+    { id: "current", label: "차량 배치 진행하기", icon: "🚗" },
+    { id: "one", label: "단일 경로 배치 진행하기", icon: "🛣️" },
+    { id: "previous", label: "이전 배치 보기", icon: "📋" },
+  ];
   return (
     <div className="App">
       <ToastContainer />
       {LoadingSpinner && <LoadingSpinnerOverlay />}
-      <header className="App-header">
-        <div className="h-16 bg-sky-950	text-white flex flex-row place-items-center ">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center space-x-4">
-              <div className="flex-grow"></div>
-              <text className="font-bold">SILVERITHM</text>
+      <header className="bg-gradient-to-r from-sky-950 to-blue-900 shadow-lg">
+        {/* Top Bar */}
+        <div className="">
+          <div className="h-16 px-6 flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center">
+              <h1 className="text-white text-xl font-bold tracking-wider hover:text-sky-200 transition-colors cursor-pointer">
+                SILVERITHM
+              </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <text className="font-bold text-sm">
-                {isSignin === true
-                  ? `${userName}님 (${company.name}) 환영합니다!`
-                  : "로그인이 필요합니다."}
-              </text>
-              <button
-                className="text-xs hover:underline"
-                onClick={isSignin === false ? handleSignin : handleSignout}
-              >
-                {isSignin === true ? "로그아웃" : "로그인"}
-              </button>
 
-              <button
-                className="text-xs hover:underline"
-                onClick={handleSignUp}
-              >
-                회원가입
-              </button>
-              <div className="flex-grow"></div>
+            {/* User Actions */}
+            <div className="flex items-center space-x-6">
+              <div className="text-sky-100 font-medium">
+                {isSignin ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sky-200">👤</span>
+                    <span>
+                      {userName}님 ({company.name})
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-gray-300">로그인이 필요합니다</span>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={isSignin ? handleSignout : handleSignin}
+                  className="px-3 py-1.5 text-sm text-sky-100 hover:text-white transition-colors"
+                >
+                  {isSignin ? "로그아웃" : "로그인"}
+                </button>
+                {!isSignin && (
+                  <>
+                    <span className="text-gray-400">|</span>
+                    <button
+                      onClick={handleSignUp}
+                      className="px-3 py-1.5 text-sm bg-sky-700 text-white rounded-full hover:bg-sky-600 transition-all"
+                    >
+                      회원가입
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
+
+          {/* Navigation */}
+          <nav className="px-6 pb-3">
+            <div className="flex justify-end space-x-1">
+              {navigationItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setView(item.id);
+                    if (item.id === "previous" && jwt) {
+                      fetchDispatchHistories();
+                    }
+                  }}
+                  className={`
+                  px-4 py-2 
+                  text-sm font-medium 
+                  rounded-full
+                  transition-all 
+                  duration-200
+                  ${
+                    view === item.id
+                      ? "text-white bg-sky-700/50 shadow-inner"
+                      : "text-sky-200 hover:text-white hover:bg-sky-800/30"
+                  }
+                `}
+                >
+                  <span className="flex items-center gap-2">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </nav>
         </div>
       </header>
       <main>
-        <div className="flex justify-end space-x-4 mt-2">
-          <div className="flex flex-row space-x-4">
-            <button
-              onClick={() => setView("current")}
-              className={`
-            text-base 
-            relative 
-            after:content-[''] 
-            after:absolute 
-            after:w-full 
-            after:h-0.5 
-            after:bg-black 
-            after:left-0 
-            after:bottom-0
-            after:transition-transform 
-            after:duration-300
-            after:ease-out
-            ${view === "current" ? "after:scale-x-100" : "after:scale-x-0"}
-          `}
-            >
-              차량 배치 진행하기
-            </button>
-            <button
-              onClick={() => setView("one")}
-              className={`
-            text-base 
-            relative 
-            after:content-[''] 
-            after:absolute 
-            after:w-full 
-            after:h-0.5 
-            after:bg-black 
-            after:left-0 
-            after:bottom-0
-            after:transition-transform 
-            after:duration-300
-            after:ease-out
-            ${view === "one" ? "after:scale-x-100" : "after:scale-x-0"}
-          `}
-            >
-              단일 경로 배치 진행하기
-            </button>
-            <button
-              onClick={() => {
-                setView("previous");
-                if (jwt) {
-                  fetchDispatchHistories();
-                }
-              }}
-              className={`
-            text-base 
-            relative 
-            after:content-[''] 
-            after:absolute 
-            after:w-full 
-            after:h-0.5 
-            after:bg-black 
-            after:left-0 
-            after:bottom-0
-            after:transition-transform 
-            after:duration-300
-            after:ease-out
-            ${view === "previous" ? "after:scale-x-100" : "after:scale-x-0"}
-          `}
-            >
-              이전 배치 보기
-            </button>
-            <div className="flex-grow"></div>
-          </div>
-        </div>
-
         <div className="h-6"></div>
         {renderContent()}
       </main>
-      <footer className="bg-sky-950 text-white">
+      <footer className="bg-gradient-to-r from-sky-950 to-blue-900 text-white">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* 회사 정보 */}
