@@ -41,6 +41,10 @@ function App() {
   const [editedElder, setEditedElder] = useState({});
   const [editedCouple, setEditedCouple] = useState({});
 
+  const [dispatchHistories, setDispatchHistories] = useState([]);
+  const [selectedHistoryId, setSelectedHistoryId] = useState(null);
+  const [historyDetail, setHistoryDetail] = useState(null);
+
   const [elders, setElders] = useState([]);
   const [couples, setCouples] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -918,280 +922,254 @@ function App() {
     });
   }
 
-  useEffect(() => {
+  const fetchDispatchHistories = async () => {
     setLoadingSpinner(true);
-    // const savedSelections = localStorage.getItem(
-    //   `employeeSelections_${userId}`
-    // );
-
-    // if (savedSelections) {
-    //   const parsedSelections = JSON.parse(savedSelections);
-    //   setSelections(parsedSelections);
-    //   console.log(parsedSelections);
-
-    //   let newAssignments = [...fixedAssignments]; // 기존 배열을 복사
-
-    //   Object.entries(parsedSelections).forEach(
-    //     ([employeeId, employeeSelections]) => {
-    //       Object.entries(employeeSelections).forEach(([sequence, elderId]) => {
-    //         const selectedAssignment = {
-    //           employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
-    //           elderly_id: elderId,
-    //           sequence: Number(sequence),
-    //         };
-
-    //         // 중복 확인
-    //         const existingIndex = newAssignments.findIndex(
-    //           (assignment) =>
-    //             assignment.employee_id === selectedAssignment.employee_id &&
-    //             assignment.sequence === selectedAssignment.sequence
-    //         );
-
-    //         if (existingIndex !== -1) {
-    //           // 이미 존재하는 경우 업데이트
-    //           newAssignments[existingIndex] = selectedAssignment;
-    //         } else {
-    //           // 새로운 경우 추가
-    //           newAssignments.push(selectedAssignment);
-    //         }
-    //       });
-    //     }
-    //   );
-
-    //   console.log(newAssignments);
-    //   setFixedAssignments(newAssignments);
-    // }
-    setLoadingSpinner(false);
-  }, [userId]);
-
-  const handleLocalFixSelect = async (employeeId, elderId, position) => {
-    await setLoadingSpinner(true);
-
-    let newSelections = { ...selections };
-    if (
-      newSelections[employeeId] &&
-      Object.values(newSelections[employeeId]).includes(elderId)
-    ) {
-      toast("같은 직원에게 중복된 어르신을 고정할 수 없습니다.");
-
-      return;
-    }
-    handleSelect(employeeId, elderId, position);
-
-    if (elderId === "없음") {
-      // elderId가 "없음"인 경우, 해당 선택을 제거
-      if (newSelections[employeeId]) {
-        const { [position]: removedPosition, ...restPositions } =
-          newSelections[employeeId];
-        if (Object.keys(restPositions).length === 0) {
-          // 만약 이 직원의 모든 선택이 제거되었다면, 해당 직원 키도 제거
-          const { [employeeId]: removedEmployee, ...restEmployees } =
-            newSelections;
-          newSelections = restEmployees;
-        } else {
-          // 그렇지 않다면, 해당 position만 제거
-          newSelections[employeeId] = restPositions;
-        }
-      }
-    } else {
-      // elderId가 "없음"이 아닌 경우, 새로운 선택을 추가
-      newSelections = {
-        ...newSelections,
-        [employeeId]: {
-          ...(newSelections[employeeId] || {}),
-          [position]: elderId,
+    try {
+      const response = await fetch(`${config.apiUrl}/history`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
         },
-      };
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch dispatch histories");
+      }
+      const data = await response.json();
+
+      console.log(data);
+
+      setDispatchHistories(data);
+    } catch (error) {
+      console.error("Error fetching dispatch histories:", error);
+      toast.error("이전 배치 기록을 불러오는데 실패했습니다.");
+    } finally {
+      setLoadingSpinner(false);
     }
-
-    setSelections(newSelections);
-
-    localStorage.setItem(
-      `employeeSelections_${userId}`,
-      JSON.stringify(newSelections)
-    );
-    await setLoadingSpinner(false);
   };
 
-  function updateProgressStatus(progress) {
-    if (progress >= 0 && progress <= 5) {
-      return <div>거리 행렬 생성 중 ...</div>;
-    } else if (progress > 5 && progress <= 79) {
-      if (progress % 3 <= 0 && progress % 3 <= 1) {
-        return <div>유전 알고리즘 계산 중 . </div>;
+  const fetchHistoryDetail = async (historyId) => {
+    setLoadingSpinner(true);
+    try {
+      const response = await fetch(`${config.apiUrl}/history/${historyId}`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch history detail");
       }
+      const data = await response.json();
+      setHistoryDetail(data);
+      setSelectedHistoryId(historyId);
 
-      if (progress % 3 <= 1 && progress % 3 <= 2) {
-        return <div>유전 알고리즘 계산 중 . . </div>;
-      }
-
-      if (progress % 3 <= 2 && progress % 3 <= 3) {
-        return <div>유전 알고리즘 계산 중 . . .</div>;
-      }
-      return <div>유전 알고리즘 계산 중 </div>;
-    } else if (progress >= 79) {
-      return <div>최종 결과 생성 중 . . .</div>;
+      await setDispatchResult(data.assignments);
+      await console.log(data.assignments);
+      await setModalShow(true);
+    } catch (error) {
+      console.error("Error fetching history detail:", error);
+      toast.error("배치 상세 정보를 불러오는데 실패했습니다.");
+    } finally {
+      setLoadingSpinner(false);
     }
+  };
+
+  function DispatchHistoryList({
+    histories,
+    onSelectHistory,
+    selectedHistoryId,
+  }) {
+    const getDispatchTypeText = (type) => {
+      if (!type) return "알 수 없음";
+
+      switch (type) {
+        case "DISTANCE_IN":
+          return "거리 기반 (출근)";
+        case "DISTANCE_OUT":
+          return "거리 기반 (퇴근)";
+        case "DURATION_IN":
+          return "시간 기반 (출근)";
+        case "DURATION_OUT":
+          return "시간 기반 (퇴근)";
+        default:
+          return "알 수 없음";
+      }
+    };
+
+    const splitDispatchTypeText = (text) => {
+      if (!text) return { baseType: "알 수 없음", timeType: "" };
+
+      const match = text.match(/(.*?)\s*\((.*?)\)/);
+      if (match) {
+        return {
+          baseType: match[1], // "거리 기반" 또는 "시간 기반"
+          timeType: match[2], // "출근" 또는 "퇴근"
+        };
+      }
+      return { baseType: text, timeType: "" };
+    };
+
+    const getDispatchTypeColor = (type) => {
+      if (!type) return "bg-gray-100 text-gray-800";
+
+      if (type.includes("DISTANCE")) {
+        return "bg-emerald-100 text-emerald-800";
+      }
+      return "bg-violet-100 text-violet-800";
+    };
+
+    const getInOutColor = (type) => {
+      if (!type) return "text-gray-600";
+
+      if (type.includes("_IN")) {
+        return "text-blue-600";
+      }
+      return "text-orange-600";
+    };
+
+    const formatTotalTime = (seconds) => {
+      if (!seconds && seconds !== 0) return "시간 정보 없음";
+
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+
+      if (hours === 0) {
+        return `${remainingMinutes}분`;
+      }
+      return remainingMinutes === 0
+        ? `${hours}시간`
+        : `${hours}시간 ${remainingMinutes}분`;
+    };
+    return (
+      <div className="h-full flex flex-col">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800 flex-none">
+          이전 배치 목록
+        </h2>
+        <div className="flex-1 min-h-0 overflow-auto">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 content-start pb-4">
+            {histories?.map((history) => {
+              const dispatchTypeText = getDispatchTypeText(
+                history?.dispatchType
+              );
+              const { baseType, timeType } =
+                splitDispatchTypeText(dispatchTypeText);
+
+              return (
+                <div
+                  key={history?.id}
+                  className={`
+                                  rounded-lg shadow-sm border border-gray-200
+                                  transition-all duration-200 ease-in-out cursor-pointer
+                                  hover:shadow-md hover:border-gray-300 bg-white
+                                  ${
+                                    selectedHistoryId === history?.id
+                                      ? "ring-2 ring-sky-500"
+                                      : ""
+                                  }
+                              `}
+                  onClick={() => onSelectHistory(history?.id)}
+                >
+                  <div className="p-6">
+                    {/* 카드 내용은 이전과 동일 */}
+                    <div className="flex flex-col space-y-3">
+                      <div className="flex items-center text-gray-600 text-sm">
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          ></path>
+                        </svg>
+                        {history?.createdAt
+                          ? new Date(history.createdAt).toLocaleString()
+                          : "날짜 정보 없음"}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${getDispatchTypeColor(
+                            history?.dispatchType
+                          )}`}
+                        >
+                          {baseType}
+                        </span>
+                        <span
+                          className={`font-semibold ${getInOutColor(
+                            history?.dispatchType
+                          )}`}
+                        >
+                          {timeType}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-3 gap-3">
+                      <div className="flex flex-col items-center justify-center p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500 mb-1">소요 시간</p>
+                        <p className="font-medium text-gray-800 text-center">
+                          {formatTotalTime(history?.totalTime)}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-center justify-center p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500 mb-1">직원</p>
+                        <p className="font-medium text-gray-800">
+                          {history?.totalEmployees ?? 0}명
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-center justify-center p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500 mb-1">어르신</p>
+                        <p className="font-medium text-gray-800">
+                          {history?.totalElders ?? 0}명
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const handleSignout = async () => {
-    await setLoadingSpinner(true);
-
-    setJwt("");
-    setUserId("");
-    setUserEmail("");
-    setUserName("");
-    setIsSignin(false);
-    setCompany("", "");
-    setElders([]);
-    setEmployees([]);
-    setSelectedElderIds([]);
-    setFixedAssignments([]);
-    setView("current");
-    setMaxDispatchStatus("under");
-    setAllEmployeeSelected(true);
-    setAllElderSelected(true);
-    setFixedCount(0);
-    window.history.replaceState({}, "");
-
-    await setLoadingSpinner(false);
-  };
-
-  const Map = ({ setMap, map }) => {
-    useEffect(() => {
-      const mapContainer = document.getElementById("map");
-      const mapOptions = {
-        center: new kakao.maps.LatLng(35.1709043, 128.0820769), //지도의 중심좌표.
-        level: 3, //지도의 레벨(확대, 축소 정도)
-      };
-
-      const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
-      setMap(kakaoMap);
-    }, []);
-
-    function setCenter({ lat, lng }) {
-      const moveLatLon = new kakao.maps.LatLng(lat, lng);
-      map.setCenter(moveLatLon);
-    }
-
-    function panTo({ lat, lng }) {
-      const moveLatLon = new kakao.maps.LatLng(lat, lng);
-      map.panTo(moveLatLon);
-    }
-
+  function DispatchHistoryDetail({ detail }) {
     return (
-      <>
-        <div id="map" style={{ width: "100%", height: "100%" }} />
-        <div style={{ display: "flex", gap: "10px" }}></div>
-      </>
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">배치 상세 정보</h2>
+        <p>배치 시간: {new Date(detail.createdAt).toLocaleString()}</p>
+        <div className="mt-4">
+          <h3 className="text-xl font-semibold mb-2">배치 결과</h3>
+          {detail.assignments.map((assignment, index) => (
+            <div key={index} className="mb-4 p-4 border rounded">
+              <p>직원: {assignment.employeeName}</p>
+              <p>
+                배차 유형: {assignment.dispatchType === "IN" ? "출근" : "퇴근"}
+              </p>
+              <p>소요 시간: {assignment.time}분</p>
+              <h4 className="font-semibold mt-2">배정된 어르신:</h4>
+              <ul className="list-disc list-inside">
+                {assignment.assignmentElders.map((elder, elderIndex) => (
+                  <li key={elderIndex}>
+                    {elder.name} - {elder.address}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
     );
-  };
+  }
 
-  return (
-    <div className="App">
-      <ToastContainer />
-      {LoadingSpinner && <LoadingSpinnerOverlay />}
-      <header className="App-header">
-        <div className="h-16 bg-sky-950	text-white flex flex-row place-items-center ">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center space-x-4">
-              <div className="flex-grow"></div>
-              <text className="font-bold">SILVERITHM</text>
-            </div>
-            <div className="flex items-center space-x-4">
-              <text className="font-bold text-sm">
-                {isSignin === true
-                  ? `${userName}님 (${company.name}) 환영합니다!`
-                  : "로그인이 필요합니다."}
-              </text>
-              <button
-                className="text-xs hover:underline"
-                onClick={isSignin === false ? handleSignin : handleSignout}
-              >
-                {isSignin === true ? "로그아웃" : "로그인"}
-              </button>
-
-              <button
-                className="text-xs hover:underline"
-                onClick={handleSignUp}
-              >
-                회원가입
-              </button>
-              <div className="flex-grow"></div>
-            </div>
-          </div>
-        </div>
-      </header>
-      <main>
-        <div className="flex justify-end space-x-4 mt-2">
-          <div className="flex flex-row space-x-4">
-            <button
-              onClick={() => setView("current")}
-              className={`
-            text-base 
-            relative 
-            after:content-[''] 
-            after:absolute 
-            after:w-full 
-            after:h-0.5 
-            after:bg-black 
-            after:left-0 
-            after:bottom-0
-            after:transition-transform 
-            after:duration-300
-            after:ease-out
-            ${view === "current" ? "after:scale-x-100" : "after:scale-x-0"}
-          `}
-            >
-              차량 배치 진행하기
-            </button>
-            <button
-              onClick={() => setView("one")}
-              className={`
-            text-base 
-            relative 
-            after:content-[''] 
-            after:absolute 
-            after:w-full 
-            after:h-0.5 
-            after:bg-black 
-            after:left-0 
-            after:bottom-0
-            after:transition-transform 
-            after:duration-300
-            after:ease-out
-            ${view === "one" ? "after:scale-x-100" : "after:scale-x-0"}
-          `}
-            >
-              단일 경로 배치 진행하기
-            </button>
-            <button
-              onClick={() => setView("previous")}
-              className={`
-            text-base 
-            relative 
-            after:content-[''] 
-            after:absolute 
-            after:w-full 
-            after:h-0.5 
-            after:bg-black 
-            after:left-0 
-            after:bottom-0
-            after:transition-transform 
-            after:duration-300
-            after:ease-out
-            ${view === "previous" ? "after:scale-x-100" : "after:scale-x-0"}
-          `}
-            >
-              이전 배치 보기
-            </button>
-            <div className="flex-grow"></div>
-          </div>
-        </div>
-
-        <div className="h-6"></div>
-
-        {view === "current" ? (
+  const renderContent = () => {
+    switch (view) {
+      case "current":
+        return (
           <div>
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
@@ -1774,9 +1752,313 @@ function App() {
             </div>
             <div className="h-10"></div>
           </div>
-        ) : (
-          <div> 업데이트 예정</div>
-        )}
+        );
+      case "previous":
+        return (
+          <div className="flex gap-6 h-[calc(100vh-200px)] overflow-hidden">
+            {/* 왼쪽: 이전 배치 목록 영역 */}
+            <div className="flex-1 overflow-hidden">
+              {dispatchHistories.length > 0 ? (
+                <DispatchHistoryList
+                  histories={dispatchHistories}
+                  onSelectHistory={fetchHistoryDetail}
+                  selectedHistoryId={selectedHistoryId}
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
+                  배치 기록이 없습니다
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      case "one":
+        return <div>단일 경로 배치 페이지 (업데이트 예정)</div>;
+      default:
+        return <div>알 수 없는 탭</div>;
+    }
+  };
+  useEffect(() => {
+    setLoadingSpinner(true);
+    // const savedSelections = localStorage.getItem(
+    //   `employeeSelections_${userId}`
+    // );
+
+    // if (savedSelections) {
+    //   const parsedSelections = JSON.parse(savedSelections);
+    //   setSelections(parsedSelections);
+    //   console.log(parsedSelections);
+
+    //   let newAssignments = [...fixedAssignments]; // 기존 배열을 복사
+
+    //   Object.entries(parsedSelections).forEach(
+    //     ([employeeId, employeeSelections]) => {
+    //       Object.entries(employeeSelections).forEach(([sequence, elderId]) => {
+    //         const selectedAssignment = {
+    //           employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
+    //           elderly_id: elderId,
+    //           sequence: Number(sequence),
+    //         };
+
+    //         // 중복 확인
+    //         const existingIndex = newAssignments.findIndex(
+    //           (assignment) =>
+    //             assignment.employee_id === selectedAssignment.employee_id &&
+    //             assignment.sequence === selectedAssignment.sequence
+    //         );
+
+    //         if (existingIndex !== -1) {
+    //           // 이미 존재하는 경우 업데이트
+    //           newAssignments[existingIndex] = selectedAssignment;
+    //         } else {
+    //           // 새로운 경우 추가
+    //           newAssignments.push(selectedAssignment);
+    //         }
+    //       });
+    //     }
+    //   );
+
+    //   console.log(newAssignments);
+    //   setFixedAssignments(newAssignments);
+    // }
+    setLoadingSpinner(false);
+  }, [userId]);
+
+  const handleLocalFixSelect = async (employeeId, elderId, position) => {
+    await setLoadingSpinner(true);
+
+    let newSelections = { ...selections };
+    if (
+      newSelections[employeeId] &&
+      Object.values(newSelections[employeeId]).includes(elderId)
+    ) {
+      toast("같은 직원에게 중복된 어르신을 고정할 수 없습니다.");
+
+      return;
+    }
+    handleSelect(employeeId, elderId, position);
+
+    if (elderId === "없음") {
+      // elderId가 "없음"인 경우, 해당 선택을 제거
+      if (newSelections[employeeId]) {
+        const { [position]: removedPosition, ...restPositions } =
+          newSelections[employeeId];
+        if (Object.keys(restPositions).length === 0) {
+          // 만약 이 직원의 모든 선택이 제거되었다면, 해당 직원 키도 제거
+          const { [employeeId]: removedEmployee, ...restEmployees } =
+            newSelections;
+          newSelections = restEmployees;
+        } else {
+          // 그렇지 않다면, 해당 position만 제거
+          newSelections[employeeId] = restPositions;
+        }
+      }
+    } else {
+      // elderId가 "없음"이 아닌 경우, 새로운 선택을 추가
+      newSelections = {
+        ...newSelections,
+        [employeeId]: {
+          ...(newSelections[employeeId] || {}),
+          [position]: elderId,
+        },
+      };
+    }
+
+    setSelections(newSelections);
+
+    localStorage.setItem(
+      `employeeSelections_${userId}`,
+      JSON.stringify(newSelections)
+    );
+    await setLoadingSpinner(false);
+  };
+
+  function updateProgressStatus(progress) {
+    if (progress >= 0 && progress <= 5) {
+      return <div>거리 행렬 생성 중 ...</div>;
+    } else if (progress > 5 && progress <= 79) {
+      if (progress % 3 <= 0 && progress % 3 <= 1) {
+        return <div>유전 알고리즘 계산 중 . </div>;
+      }
+
+      if (progress % 3 <= 1 && progress % 3 <= 2) {
+        return <div>유전 알고리즘 계산 중 . . </div>;
+      }
+
+      if (progress % 3 <= 2 && progress % 3 <= 3) {
+        return <div>유전 알고리즘 계산 중 . . .</div>;
+      }
+      return <div>유전 알고리즘 계산 중 </div>;
+    } else if (progress >= 79) {
+      return <div>최종 결과 생성 중 . . .</div>;
+    }
+  }
+
+  const handleSignout = async () => {
+    await setLoadingSpinner(true);
+
+    setJwt("");
+    setUserId("");
+    setUserEmail("");
+    setUserName("");
+    setIsSignin(false);
+    setCompany("", "");
+    setElders([]);
+    setEmployees([]);
+    setSelectedElderIds([]);
+    setFixedAssignments([]);
+    setView("current");
+    setMaxDispatchStatus("under");
+    setAllEmployeeSelected(true);
+    setAllElderSelected(true);
+    setFixedCount(0);
+    window.history.replaceState({}, "");
+
+    await setLoadingSpinner(false);
+  };
+
+  const Map = ({ setMap, map }) => {
+    useEffect(() => {
+      const mapContainer = document.getElementById("map");
+      const mapOptions = {
+        center: new kakao.maps.LatLng(
+          company.address.latitude,
+          company.address.longitude
+        ), //지도의 중심좌표.
+        level: 3, //지도의 레벨(확대, 축소 정도)
+      };
+
+      const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
+      setMap(kakaoMap);
+    }, []);
+
+    function setCenter({ lat, lng }) {
+      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      map.setCenter(moveLatLon);
+    }
+
+    function panTo({ lat, lng }) {
+      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      map.panTo(moveLatLon);
+    }
+
+    return (
+      <>
+        <div id="map" style={{ width: "100%", height: "100%" }} />
+        <div style={{ display: "flex", gap: "10px" }}></div>
+      </>
+    );
+  };
+
+  return (
+    <div className="App">
+      <ToastContainer />
+      {LoadingSpinner && <LoadingSpinnerOverlay />}
+      <header className="App-header">
+        <div className="h-16 bg-sky-950	text-white flex flex-row place-items-center ">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center space-x-4">
+              <div className="flex-grow"></div>
+              <text className="font-bold">SILVERITHM</text>
+            </div>
+            <div className="flex items-center space-x-4">
+              <text className="font-bold text-sm">
+                {isSignin === true
+                  ? `${userName}님 (${company.name}) 환영합니다!`
+                  : "로그인이 필요합니다."}
+              </text>
+              <button
+                className="text-xs hover:underline"
+                onClick={isSignin === false ? handleSignin : handleSignout}
+              >
+                {isSignin === true ? "로그아웃" : "로그인"}
+              </button>
+
+              <button
+                className="text-xs hover:underline"
+                onClick={handleSignUp}
+              >
+                회원가입
+              </button>
+              <div className="flex-grow"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main>
+        <div className="flex justify-end space-x-4 mt-2">
+          <div className="flex flex-row space-x-4">
+            <button
+              onClick={() => setView("current")}
+              className={`
+            text-base 
+            relative 
+            after:content-[''] 
+            after:absolute 
+            after:w-full 
+            after:h-0.5 
+            after:bg-black 
+            after:left-0 
+            after:bottom-0
+            after:transition-transform 
+            after:duration-300
+            after:ease-out
+            ${view === "current" ? "after:scale-x-100" : "after:scale-x-0"}
+          `}
+            >
+              차량 배치 진행하기
+            </button>
+            <button
+              onClick={() => setView("one")}
+              className={`
+            text-base 
+            relative 
+            after:content-[''] 
+            after:absolute 
+            after:w-full 
+            after:h-0.5 
+            after:bg-black 
+            after:left-0 
+            after:bottom-0
+            after:transition-transform 
+            after:duration-300
+            after:ease-out
+            ${view === "one" ? "after:scale-x-100" : "after:scale-x-0"}
+          `}
+            >
+              단일 경로 배치 진행하기
+            </button>
+            <button
+              onClick={() => {
+                setView("previous");
+                if (jwt) {
+                  fetchDispatchHistories();
+                }
+              }}
+              className={`
+            text-base 
+            relative 
+            after:content-[''] 
+            after:absolute 
+            after:w-full 
+            after:h-0.5 
+            after:bg-black 
+            after:left-0 
+            after:bottom-0
+            after:transition-transform 
+            after:duration-300
+            after:ease-out
+            ${view === "previous" ? "after:scale-x-100" : "after:scale-x-0"}
+          `}
+            >
+              이전 배치 보기
+            </button>
+            <div className="flex-grow"></div>
+          </div>
+        </div>
+
+        <div className="h-6"></div>
+        {renderContent()}
       </main>
       <footer className="bg-sky-950 text-white">
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -2696,67 +2978,161 @@ function App() {
     return (
       <Modal
         {...props}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        fullscreen
+        size="xl"
         centered
+        aria-labelledby="dispatch-result-modal"
+        dialogClassName="!max-w-[1200px] !w-[90vw]"
       >
-        <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-            차량 배치 결과
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <h4>
-            이 운행 시간은 {currentTime} 기준 카카오맵 API로 계산된
-            운행시간입니다.
-          </h4>
-          <h5>
-            운행 당시 도로 혼잡도에 따라 운행시간은 10분 정도 차이 날 수
-            있습니다.
-          </h5>
-          <br></br>
-
-          <div>
-            {props.data.map((item, index) => (
-              <div
-                key={index}
-                style={{ display: "flex", marginBottom: "10px" }}
+        <div className="max-h-[80vh] bg-gray-50">
+          {/* Header */}
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="px-6 py-4 flex justify-between items-center">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  차량 배치 결과
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">{currentTime} 기준</p>
+              </div>
+              <button
+                onClick={props.onHide}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <div
-                  style={{
-                    color: randomColors[index],
-                    marginRight: "20px",
-                    fontWeight: "bold",
-                  }}
+                <svg
+                  className="w-6 h-6 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  {item.employeeName}
-                </div>
-                <div style={{ flexDirection: "row", display: "flex" }}>
-                  {item.assignmentElders.map((elder, idx) => (
-                    <div key={idx}> {elder.name} &nbsp;&nbsp;&nbsp;&nbsp; </div>
-                  ))}
-                  <div>
-                    |&nbsp;&nbsp;&nbsp;약{" "}
-                    {isNaN(durations[index])
-                      ? "계산중..."
-                      : (durations[index] / 60).toFixed(2)}
-                    분 소요
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div
+            className="p-6 overflow-auto"
+            style={{ maxHeight: "calc(80vh - 73px)" }}
+          >
+            <div className="max-w-6xl mx-auto space-y-6">
+              {/* Notice Box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg py-2.5 px-4">
+                <div className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 text-blue-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div className="flex-1 text-sm">
+                    <span className="font-medium text-blue-900">
+                      카카오맵 API 기준 예상 운행시간입니다.
+                    </span>
+                    <span className="text-blue-800 ml-2">
+                      실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
+                    </span>
                   </div>
                 </div>
               </div>
-            ))}
+
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Side - Map */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="h-[400px]">
+                    <Map setMap={setMap} map={map} />
+                  </div>
+                </div>
+
+                {/* Right Side - Assignment Details */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="max-h-[400px] overflow-auto pr-2">
+                    <div className="space-y-3">
+                      {props.data.map((item, index) => (
+                        <div
+                          key={index}
+                          className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-start">
+                            {/* Driver Info */}
+                            <div
+                              className={`flex-shrink-0 ${
+                                randomColors[index % randomColors.length]
+                              } font-medium w-24`}
+                            >
+                              {item.employeeName}
+                            </div>
+
+                            {/* Route Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {item.assignmentElders.map((elder, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap"
+                                  >
+                                    {elder.name}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="flex items-center text-sm text-gray-600">
+                                <svg
+                                  className="w-4 h-4 mr-1 flex-shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                                예상 소요시간:{" "}
+                                <span className="font-medium ml-1">
+                                  {isNaN(durations[index])
+                                    ? "계산중..."
+                                    : `약 ${(durations[index] / 60).toFixed(
+                                        0
+                                      )}분`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <Map setMap={setMap} map={map}></Map>
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500 "
-            onClick={props.onHide}
-          >
-            Close
-          </button>{" "}
-        </Modal.Footer>
+
+          {/* Footer */}
+          <div className="bg-white border-t border-gray-200 p-4">
+            <div className="flex justify-end">
+              <button
+                onClick={props.onHide}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
       </Modal>
     );
   }
