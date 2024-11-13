@@ -2208,22 +2208,18 @@ function App() {
 
     useEffect(() => {
       const mapContainer = document.getElementById("map");
-      const mapOptions =
-        isSingleRoute == false
-          ? {
-              center: new kakao.maps.LatLng(
-                company.address.latitude,
-                company.address.longitude
-              ), //지도의 중심좌표.
-              level: 3, //지도의 레벨(확대, 축소 정도)
-            }
-          : {
-              center: new kakao.maps.LatLng(
-                employeeLatitude,
-                employeeLongitude
-              ), //지도의 중심좌표.
-              level: 3, //지도의 레벨(확대, 축소 정도)
-            };
+      const mapOptions = !isSingleRoute
+        ? {
+            center: new kakao.maps.LatLng(
+              company.address.latitude,
+              company.address.longitude
+            ), //지도의 중심좌표.
+            level: 3, //지도의 레벨(확대, 축소 정도)
+          }
+        : {
+            center: new kakao.maps.LatLng(employeeLatitude, employeeLongitude), //지도의 중심좌표.
+            level: 3, //지도의 레벨(확대, 축소 정도)
+          };
 
       const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
       setMap(kakaoMap);
@@ -3040,6 +3036,18 @@ function App() {
       }
 
       lineIndex = 0;
+
+      // isSingleRoute가 true일 때 직원 위치로 중심점 설정
+      if (firstResult.isSingleRoute && firstResult.homeAddress) {
+        const employeePosition = new kakao.maps.LatLng(
+          firstResult.homeAddress.latitude,
+          firstResult.homeAddress.longitude
+        );
+
+        map.setCenter(employeePosition);
+        map.setLevel(3); // 적절한 줌 레벨 설정
+      }
+
       const data = await getCarDirection();
       setDurations(data);
     }, [map, dispatchData]);
