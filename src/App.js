@@ -1753,7 +1753,7 @@ function App() {
         );
       case "previous":
         return (
-          <div className="flex gap-6 h-[calc(100vh-200px)] overflow-hidden">
+          <div className="flex gap-6 h-[calc(100vh-250px)] overflow-hidden">
             {/* 왼쪽: 이전 배치 목록 영역 */}
             <div className="flex-1 overflow-hidden">
               {dispatchHistories.length > 0 ? (
@@ -2041,47 +2041,47 @@ function App() {
         {renderContent()}
       </main>
       <footer className="bg-gradient-to-r from-sky-950 to-blue-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* 회사 정보 */}
-            <div>
-              <h3 className="text-lg font-medium mb-6 text-sky-100">
-                회사 정보
-              </h3>
-              <div className="space-y-3 text-sm text-gray-300">
-                <div className="flex items-center space-x-2">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="space-y-2">
+            {/* Headers */}
+            <div className="flex justify-between">
+              <h3 className="text-xs font-semibold text-sky-100">회사 정보</h3>
+              <h3 className="text-xs font-semibold text-sky-100">법적 고지</h3>
+            </div>
+
+            {/* Content */}
+            <div className="flex justify-between">
+              {/* Company Info */}
+              <div className="text-xs text-gray-300 flex gap-6">
+                <div className="flex items-center space-x-1.5">
                   <span className="text-sky-300">회사명</span>
-                  <span className="text-gray-400">|</span>
+                  <span className="text-gray-400 text-xs">|</span>
                   <span>silverithm</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1.5">
                   <span className="text-sky-300">주소</span>
-                  <span className="text-gray-400">|</span>
+                  <span className="text-gray-400 text-xs">|</span>
                   <span>서울특별시 신림동 1547-10</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1.5">
                   <span className="text-sky-300">이메일</span>
-                  <span className="text-gray-400">|</span>
+                  <span className="text-gray-400 text-xs">|</span>
                   <span>ggprgrkjh2@gmail.com</span>
                 </div>
               </div>
-            </div>
 
-            {/* 법적 고지 */}
-            <div>
-              <h3 className="text-lg font-medium mb-6 text-sky-100">
-                법적 고지
-              </h3>
-              <div className="space-y-3">
+              {/* Legal Links */}
+              <div className="flex items-center space-x-4 text-xs text-gray-300">
                 <a
                   onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
-                  className="block text-sm text-gray-300 hover:text-sky-300 transition-colors duration-200"
+                  className="text-white hover:text-sky-300  duration-200 cursor-pointer"
                 >
                   개인정보 처리방침
                 </a>
+                <span className="text-gray-600">|</span>
                 <a
                   onClick={() => openAgreement(AGREEMENT_LINKS.termsOfService)}
-                  className="block text-sm text-gray-300 hover:text-sky-300 transition-colors duration-200"
+                  className="text-white hover:text-sky-300  duration-200 cursor-pointer"
                 >
                   서비스 이용약관
                 </a>
@@ -2090,14 +2090,13 @@ function App() {
           </div>
 
           {/* Copyright */}
-          <div className="pt-8 mt-8 border-t border-sky-900/60">
-            <p className="text-center text-sm text-gray-400">
+          <div className="mt-2">
+            <p className="text-center text-xs text-gray-400">
               &copy; {new Date().getFullYear()} silverithm. All rights reserved.
             </p>
           </div>
         </div>
       </footer>
-
       {loading && (
         <LoadingOverlay>
           <ScaleLoader color="skyblue" loading={loading} size={50} />
