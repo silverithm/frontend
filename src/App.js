@@ -2984,43 +2984,392 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
       return offsetPath;
     }
 
+    // async function getCarDirection() {
+    //   var dur = [];
+    //   randomColors = [];
+
+    //   for (const result of dispatchResult) {
+    //     let origin;
+    //     let destination;
+    //     let waypoints = [];
+    //     let randomColor = await getRandomColor();
+    //     randomColors.push(randomColor);
+
+
+    //     if (result.isSingleRoute) {
+    //       origin = {
+    //         x: result.homeAddress.longitude,
+    //         y: result.homeAddress.latitude,
+    //         name: result.employeeName
+    //       };
+    
+    //       // 마지막 어르신을 목적지로 설정
+    //       const lastElder = result.assignmentElders[result.assignmentElders.length - 1];
+    //       destination = {
+    //         x: lastElder.homeAddress.longitude,
+    //         y: lastElder.homeAddress.latitude,
+    //         name: lastElder.name
+    //       };
+    
+    //       // 마지막 어르신을 제외한 나머지 어르신들을 경유지로 설정
+    //       for (let i = 0; i < result.assignmentElders.length - 1; i++) {
+    //         let currentElder = result.assignmentElders[i];
+    //         waypoints.push({
+    //           x: currentElder.homeAddress.longitude,
+    //           y: currentElder.homeAddress.latitude,
+    //           name: currentElder.name
+    //         });
+    //       }
+    //     }else if (
+    //       result.dispatchType === "DISTANCE_IN" ||
+    //       result.dispatchType === "DURATION_IN"
+    //     ) {
+    //       origin = {
+    //         x: result.homeAddress.longitude,
+    //         y: result.homeAddress.latitude,
+    //         name: result.employeeName,
+    //       };
+
+    //       for (let i = 0; i < result.assignmentElders.length; i++) {
+    //         let currentElder = result.assignmentElders[i];
+    //         waypoints.push({
+    //           x: currentElder.homeAddress.longitude,
+    //           y: currentElder.homeAddress.latitude,
+    //           name: currentElder.name,
+    //         });
+    //       }
+
+    //       destination = {
+    //         x: result.workPlace.longitude,
+    //         y: result.workPlace.latitude,
+    //         name: "학교",
+    //       };
+    //     }
+
+    //     if (
+    //       result.dispatchType === "DISTANCE_OUT" ||
+    //       result.dispatchType === "DURATION_OUT"
+    //     ) {
+    //       origin = {
+    //         x: result.workPlace.longitude,
+    //         y: result.workPlace.latitude,
+    //         name: "학교",
+    //       };
+
+    //       for (let i = 0; i < result.assignmentElders.length; i++) {
+    //         let currentElder = result.assignmentElders[i];
+    //         waypoints.push({
+    //           x: currentElder.homeAddress.longitude,
+    //           y: currentElder.homeAddress.latitude,
+    //           name: currentElder.name,
+    //         });
+    //       }
+
+    //       destination = {
+    //         x: result.homeAddress.longitude,
+    //         y: result.homeAddress.latitude,
+    //         name: result.employeeName,
+    //       };
+    //     }
+
+    //     // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
+
+    //     const headers = {
+    //       Authorization: `KakaoAK ${REST_API_KEY}`,
+    //       "Content-Type": "application/json",
+    //     };
+
+    //     const body = JSON.stringify({
+    //       origin: origin,
+    //       destination: destination,
+    //       waypoints: waypoints,
+    //       priority: "RECOMMEND",
+    //       car_fuel: "GASOLINE",
+    //       car_hipass: false,
+    //       alternatives: true,
+    //       road_details: false,
+    //     });
+
+    //     try {
+    //       const response = await fetch(url, {
+    //         method: "POST",
+    //         headers: headers,
+    //         body: body,
+    //       });
+
+    //       if (!response.ok) {
+    //         throw new Error(`HTTP error! Status: ${response.status}`);
+    //       }
+
+    //       const data = await response.json();
+
+    //       const duration = await data.routes[0].summary.duration;
+
+    //       dur.push(duration);
+
+    //       data.routes[0].sections.forEach(async (section) => {
+    //         const linePath = [];
+
+    //         await section.roads.forEach((road) => {
+    //           for (let i = 0; i < road.vertexes.length; i += 2) {
+    //             const latLng = new kakao.maps.LatLng(
+    //               road.vertexes[i + 1],
+    //               road.vertexes[i]
+    //             );
+    //             linePath.push(latLng);
+    //           }
+    //         });
+
+    //         var content = `<div style="
+    //         justify-content: center;
+    //         align-items: center;
+    //         color: ${randomColor};
+    //         background-color: rgba(255, 255, 255, 0.5);
+    //         border-radius: 30px;
+    //         font-size: 20px;
+    //         font-weight: bold;
+    //     ">
+    //     ${origin.name}
+    //     </div>`;
+
+    //         var position = new kakao.maps.LatLng(origin.y, origin.x);
+    //         var customOverlay = new kakao.maps.CustomOverlay({
+    //           position: position,
+    //           content: content,
+    //         });
+    //         customOverlay.setMap(map);
+
+    //         waypoints.forEach((point) => {
+    //           var content = `<div style="
+    //           justify-content: center;
+    //           align-items: center;
+    //           color: ${randomColor};
+    //           background-color: rgba(255, 255, 255, 0.5);
+    //           border-radius: 30px;
+    //           font-size: 20px;
+    //           font-weight: bold;
+    //       ">
+    //       ${point.name}
+    //       </div>`;
+
+    //           var position = new kakao.maps.LatLng(point.y, point.x);
+    //           var customOverlay = new kakao.maps.CustomOverlay({
+    //             position: position,
+    //             content: content,
+    //           });
+    //           customOverlay.setMap(map);
+    //         });
+
+    //         var content2 = `<div style="
+    //         justify-content: center;
+    //         align-items: center;
+    //         color: ${randomColor};
+    //         background-color: rgba(255, 255, 255, 0.5);
+    //         border-radius: 30px;
+    //         font-size: 20px;
+    //         font-weight: bold;
+    //     ">
+    //     ${destination.name}
+    //     </div>`;
+
+    //         var position2 = new kakao.maps.LatLng(destination.y, destination.x);
+    //         var customOverlay2 = new kakao.maps.CustomOverlay({
+    //           position: position2,
+    //           content: content2,
+    //         });
+    //         customOverlay2.setMap(map);
+
+    //         var newPolyline = await OffsetPolyline(linePath);
+
+    //         var polyline = new kakao.maps.Polyline({
+    //           path: newPolyline,
+    //           strokeWeight: 7,
+    //           strokeColor: randomColor,
+    //           strokeOpacity: 0.7,
+    //           strokeStyle: "solid",
+    //         });
+
+    //         polyline.setMap(map);
+    //       });
+    //     } catch (error) {
+    //       console.error("Error:", error);
+    //     }
+    //   }
+    //   return await dur;
+    // }
+    function hexToHSL(hex) {
+      let r = parseInt(hex.slice(1, 3), 16) / 255;
+      let g = parseInt(hex.slice(3, 5), 16) / 255;
+      let b = parseInt(hex.slice(5, 7), 16) / 255;
+    
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+    
+      if (max === min) {
+        h = s = 0;
+      } else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+    
+      return { h: h * 360, s: s * 100, l: l * 100 };
+    }
+    
+    function hslToHex({ h, s, l }) {
+      l = Math.min(100, Math.max(0, l));
+      s = Math.min(100, Math.max(0, s));
+      
+      l /= 100;
+      const a = s * Math.min(l, 1 - l) / 100;
+      const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    }
+    
+    function calculateDistance(pos1, pos2) {
+      const lat1 = pos1.getLat();
+      const lng1 = pos1.getLng();
+      const lat2 = pos2.getLat();
+      const lng2 = pos2.getLng();
+      
+      return Math.sqrt(
+        Math.pow(lat2 - lat1, 2) + 
+        Math.pow(lng2 - lng1, 2)
+      ) * 111000; // 대략적인 미터 단위 변환
+    }
+    
+    // 스타일 관련 함수들
+    function getLineStyle(index) {
+      const baseColors = [
+        '#FF3B30', '#FF9500', '#FFCC00', '#4CD964', '#5856D6',
+        '#007AFF', '#5856D6', '#FF2D55', '#E73B3B', '#35C759',
+        '#147EFB', '#53D769', '#FC3158', '#8E8E93', '#FF9600',
+        '#B620E0', '#00C7BE', '#59C2FF', '#5856D6', '#FF6482'
+      ];
+    
+      function adjustColor(color, index) {
+        const hsl = hexToHSL(color);
+        hsl.l += (index % 3 - 1) * 5;
+        hsl.s += (index % 2) * 10;
+        return hslToHex(hsl);
+      }
+    
+      const baseColorIndex = index % baseColors.length;
+      const variationIndex = Math.floor(index / baseColors.length);
+      const color = adjustColor(baseColors[baseColorIndex], variationIndex);
+    
+      return {
+        color: color,
+        strokeWidth: 5,
+        opacity: 0.85
+      };
+    }
+    
+
+    
+    function adjustMarkerPosition(markers, newMarker, minDistance = 60) {
+      let adjusted = false;
+      let offsetY = 0;
+      let offsetX = 0;
+      const offsetStep = 30;
+      const maxAttempts = 10;
+      let attempts = 0;
+    
+      const originalPosition = newMarker.getPosition();
+    
+      while (!adjusted && attempts < maxAttempts) {
+        let overlapping = false;
+        
+        for (const marker of markers) {
+          const distance = calculateDistance(
+            marker.getPosition(),
+            newMarker.getPosition()
+          );
+          
+          if (distance < minDistance) {
+            overlapping = true;
+            
+            // 나선형 패턴으로 오프셋 조정
+            offsetX = Math.cos(attempts * Math.PI / 2) * offsetStep * (1 + attempts / 4);
+            offsetY = Math.sin(attempts * Math.PI / 2) * offsetStep * (1 + attempts / 4);
+            
+            const newPosition = new kakao.maps.LatLng(
+              originalPosition.getLat() + offsetY / 111000,
+              originalPosition.getLng() + offsetX / (111000 * Math.cos(originalPosition.getLat() * Math.PI / 180))
+            );
+            
+            newMarker.setPosition(newPosition);
+            break;
+          }
+        }
+    
+        if (!overlapping) {
+          adjusted = true;
+        }
+        attempts++;
+      }
+    
+      markers.push(newMarker);
+      return newMarker;
+    }
+    
+    function createMarker(point, content, map, existingMarkers) {
+      const position = new kakao.maps.LatLng(point.y, point.x);
+      const marker = new kakao.maps.CustomOverlay({
+        position: position,
+        content: content,
+        zIndex: 1
+      });
+    
+      return adjustMarkerPosition(existingMarkers, marker);
+    }
+    
     async function getCarDirection() {
       var dur = [];
       randomColors = [];
-
-      for (const result of dispatchResult) {
+    
+      for (const [index, result] of dispatchResult.entries()) {
         let origin;
         let destination;
         let waypoints = [];
-        let randomColor = await getRandomColor();
-        randomColors.push(randomColor);
-
-
+        const lineStyle = getLineStyle(index);
+        randomColors.push(lineStyle.color);
+    
         if (result.isSingleRoute) {
           origin = {
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
-            name: result.employeeName
+            name: result.employeeName,
+            type: '출발'
           };
     
-          // 마지막 어르신을 목적지로 설정
           const lastElder = result.assignmentElders[result.assignmentElders.length - 1];
           destination = {
             x: lastElder.homeAddress.longitude,
             y: lastElder.homeAddress.latitude,
-            name: lastElder.name
+            name: lastElder.name,
+            type: '도착'
           };
     
-          // 마지막 어르신을 제외한 나머지 어르신들을 경유지로 설정
           for (let i = 0; i < result.assignmentElders.length - 1; i++) {
             let currentElder = result.assignmentElders[i];
             waypoints.push({
               x: currentElder.homeAddress.longitude,
               y: currentElder.homeAddress.latitude,
-              name: currentElder.name
+              name: currentElder.name,
+              type: '경유'
             });
           }
-        }else if (
+        } else if (
           result.dispatchType === "DISTANCE_IN" ||
           result.dispatchType === "DURATION_IN"
         ) {
@@ -3028,25 +3377,26 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
             name: result.employeeName,
+            type: '출발'
           };
-
+    
           for (let i = 0; i < result.assignmentElders.length; i++) {
             let currentElder = result.assignmentElders[i];
             waypoints.push({
               x: currentElder.homeAddress.longitude,
               y: currentElder.homeAddress.latitude,
               name: currentElder.name,
+              type: '경유'
             });
           }
-
+    
           destination = {
             x: result.workPlace.longitude,
             y: result.workPlace.latitude,
             name: "학교",
+            type: '도착'
           };
-        }
-
-        if (
+        } else if (
           result.dispatchType === "DISTANCE_OUT" ||
           result.dispatchType === "DURATION_OUT"
         ) {
@@ -3054,31 +3404,32 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
             x: result.workPlace.longitude,
             y: result.workPlace.latitude,
             name: "학교",
+            type: '출발'
           };
-
+    
           for (let i = 0; i < result.assignmentElders.length; i++) {
             let currentElder = result.assignmentElders[i];
             waypoints.push({
               x: currentElder.homeAddress.longitude,
               y: currentElder.homeAddress.latitude,
               name: currentElder.name,
+              type: '경유'
             });
           }
-
+    
           destination = {
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
             name: result.employeeName,
+            type: '도착'
           };
         }
-
-        // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
-
+    
         const headers = {
           Authorization: `KakaoAK ${REST_API_KEY}`,
           "Content-Type": "application/json",
         };
-
+    
         const body = JSON.stringify({
           origin: origin,
           destination: destination,
@@ -3089,27 +3440,25 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
           alternatives: true,
           road_details: false,
         });
-
+    
         try {
           const response = await fetch(url, {
             method: "POST",
             headers: headers,
             body: body,
           });
-
+    
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-
+    
           const data = await response.json();
-
           const duration = await data.routes[0].summary.duration;
-
           dur.push(duration);
-
+    
           data.routes[0].sections.forEach(async (section) => {
             const linePath = [];
-
+    
             await section.roads.forEach((road) => {
               for (let i = 0; i < road.vertexes.length; i += 2) {
                 const latLng = new kakao.maps.LatLng(
@@ -3119,84 +3468,95 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                 linePath.push(latLng);
               }
             });
-
-            var content = `<div style="
-            justify-content: center;
-            align-items: center;
-            color: ${randomColor};
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 30px;
-            font-size: 20px;
-            font-weight: bold;
-        ">
-        ${origin.name}
-        </div>`;
-
-            var position = new kakao.maps.LatLng(origin.y, origin.x);
-            var customOverlay = new kakao.maps.CustomOverlay({
-              position: position,
-              content: content,
+    
+            const createMarkerContent = (point, index = '') => {
+              const typeLabel = {
+                '출발': '출발',
+                '경유': index,
+                '도착': '도착'
+              };
+              
+              return `
+                <div style="
+                  padding: 4px 8px;
+                  color: ${lineStyle.color};
+                  background-color: white;
+                  border: 2px solid ${lineStyle.color};
+                  border-radius: 12px;
+                  font-size: 12px;
+                  font-weight: bold;
+                  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                  white-space: nowrap;
+                ">
+                  ${point.name} 
+                  <span style="
+                    font-weight: normal;
+                    opacity: 0.7;
+                    margin-left: 2px;
+                    font-size: 10px;
+                  ">
+                    ${typeLabel[point.type]}
+                  </span>
+                </div>
+              `;
+            };
+    
+            // 출발지 마커
+            new kakao.maps.CustomOverlay({
+              position: new kakao.maps.LatLng(origin.y, origin.x),
+              content: createMarkerContent(origin),
+              map: map
             });
-            customOverlay.setMap(map);
-
-            waypoints.forEach((point) => {
-              var content = `<div style="
-              justify-content: center;
-              align-items: center;
-              color: ${randomColor};
-              background-color: rgba(255, 255, 255, 0.5);
-              border-radius: 30px;
-              font-size: 20px;
-              font-weight: bold;
-          ">
-          ${point.name}
-          </div>`;
-
-              var position = new kakao.maps.LatLng(point.y, point.x);
-              var customOverlay = new kakao.maps.CustomOverlay({
-                position: position,
-                content: content,
+    
+            // 경유지 마커
+            waypoints.forEach((point, idx) => {
+              new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(point.y, point.x),
+                content: createMarkerContent(point, (idx + 1).toString()),
+                map: map
               });
-              customOverlay.setMap(map);
             });
-
-            var content2 = `<div style="
-            justify-content: center;
-            align-items: center;
-            color: ${randomColor};
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 30px;
-            font-size: 20px;
-            font-weight: bold;
-        ">
-        ${destination.name}
-        </div>`;
-
-            var position2 = new kakao.maps.LatLng(destination.y, destination.x);
-            var customOverlay2 = new kakao.maps.CustomOverlay({
-              position: position2,
-              content: content2,
+    
+            // 도착지 마커
+            new kakao.maps.CustomOverlay({
+              position: new kakao.maps.LatLng(destination.y, destination.x),
+              content: createMarkerContent(destination),
+              map: map
             });
-            customOverlay2.setMap(map);
-
-            var newPolyline = await OffsetPolyline(linePath);
-
-            var polyline = new kakao.maps.Polyline({
+    
+            // 경로선 그리기
+            const newPolyline = await OffsetPolyline(linePath);
+    
+            // 흰색 테두리 효과를 위한 배경선
+            new kakao.maps.Polyline({
               path: newPolyline,
-              strokeWeight: 7,
-              strokeColor: randomColor,
-              strokeOpacity: 0.7,
-              strokeStyle: "solid",
+              strokeWeight: lineStyle.strokeWidth + 4,
+              strokeColor: '#FFFFFF',
+              strokeOpacity: 0.9,
+              strokeStyle: 'solid',
+              map: map
             });
-
-            polyline.setMap(map);
+    
+            // 메인 경로선
+            new kakao.maps.Polyline({
+              path: newPolyline,
+              strokeWeight: lineStyle.strokeWidth,
+              strokeColor: lineStyle.color,
+              strokeOpacity: lineStyle.opacity,
+              strokeStyle: 'solid',
+              map: map
+            });
+    
           });
         } catch (error) {
           console.error("Error:", error);
         }
       }
-      return await dur;
+      return dur;
     }
+    
+
+    
 
     const getCurrentTime = () => {
       const now = new Date();
