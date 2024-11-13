@@ -26,9 +26,10 @@ const AGREEMENT_LINKS = {
     " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
 };
 function App() {
-  const [selectedEmployeeForSingle, setSelectedEmployeeForSingle] = useState(null);
-const [selectedEldersForSingle, setSelectedEldersForSingle] = useState([]);
-const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
+  const [selectedEmployeeForSingle, setSelectedEmployeeForSingle] =
+    useState(null);
+  const [selectedEldersForSingle, setSelectedEldersForSingle] = useState([]);
+  const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
 
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
@@ -1031,6 +1032,7 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
 
     const formatTotalTime = (seconds) => {
       if (!seconds && seconds !== 0) return "시간 정보 없음";
+      console.log(seconds);
 
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
@@ -1111,9 +1113,23 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
 
                     <div className="mt-4 grid grid-cols-3 gap-3">
                       <div className="flex flex-col items-center justify-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500 mb-1">소요 시간</p>
+                        {history?.dispatchType === "DISTANCE_IN" ||
+                        history?.dispatchType === "DISTANCE_OUT" ? (
+                          <p className="text-xs text-gray-500 mb-1">
+                            소요 거리
+                          </p>
+                        ) : (
+                          <p className="text-xs text-gray-500 mb-1">
+                            소요 시간
+                          </p>
+                        )}
                         <p className="font-medium text-gray-800 text-center">
-                          {formatTotalTime(history?.totalTime)}
+                          {history?.dispatchType === "DISTANCE_IN" ||
+                          history?.dispatchType === "DISTANCE_OUT" ? (
+                            <p>약 {history?.totalTime / 1000}km</p>
+                          ) : (
+                            <p>약 {formatTotalTime(history?.totalTime)}</p>
+                          )}
                         </p>
                       </div>
                       <div className="flex flex-col items-center justify-center p-3 bg-gray-50 rounded-lg">
@@ -1785,31 +1801,32 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
             toast("어르신을 선택해주세요.");
             return;
           }
-        
+
           try {
             setLoadingSpinner(true);
-            
+
             // 단일 경로 배치 결과 데이터 구성
-            const singleRouteResult = [{
-              employeeName: selectedEmployeeForSingle.name,
-              homeAddress: selectedEmployeeForSingle.homeAddress,
-              workPlace: selectedEmployeeForSingle.workPlace,
-              assignmentElders: elders
-                .filter(elder => selectedEldersForSingle.includes(elder.id))
-                .map(elder => ({
-                  name: elder.name,
-                  homeAddress: elder.homeAddress
-                })),
-              dispatchType: "DISTANCE_IN",
-              isSingleRoute: true
-            }];
+            const singleRouteResult = [
+              {
+                employeeName: selectedEmployeeForSingle.name,
+                homeAddress: selectedEmployeeForSingle.homeAddress,
+                workPlace: selectedEmployeeForSingle.workPlace,
+                assignmentElders: elders
+                  .filter((elder) => selectedEldersForSingle.includes(elder.id))
+                  .map((elder) => ({
+                    name: elder.name,
+                    homeAddress: elder.homeAddress,
+                  })),
+                dispatchType: "DISTANCE_IN",
+                isSingleRoute: true,
+              },
+            ];
 
             console.log(singleRouteResult);
-        
+
             // 기존 모달에 사용할 데이터 설정
             setDispatchResult(singleRouteResult);
             setModalShow(true);
-            
           } catch (error) {
             console.error("Error in single route dispatch:", error);
             toast("배치 처리 중 오류가 발생했습니다.");
@@ -1824,16 +1841,22 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
               {/* Header */}
               <div className="flex justify-between items-center">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-800">단일 경로 배치</h1>
-                  <p className="text-sm text-gray-500 mt-1">직원과 어르신을 선택하여 단일 경로를 검색하세요</p>
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    단일 경로 배치
+                  </h1>
+                  <p className="text-sm text-gray-500 mt-1">
+                    직원과 어르신을 선택하여 단일 경로를 검색하세요
+                  </p>
                 </div>
                 <div className="flex gap-3">
                   <button
                     className={`
                       px-6 py-2 text-sm font-medium rounded-lg transition-colors
-                      ${selectedEmployeeForSingle && selectedEldersForSingle.length > 0
-                        ? 'bg-sky-600 text-white hover:bg-sky-500'
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      ${
+                        selectedEmployeeForSingle &&
+                        selectedEldersForSingle.length > 0
+                          ? "bg-sky-600 text-white hover:bg-sky-500"
+                          : "bg-gray-100 text-gray-400 cursor-not-allowed"
                       }
                     `}
                     onClick={handleSingleRouteDispatch}
@@ -1842,57 +1865,66 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                   </button>
                 </div>
               </div>
-        
- {/* 그리드 컨테이너 */}
- <div className="grid grid-cols-3 gap-8 h-[600px]">
-        {/* 직원 선택 */}
-        <div className="h-full">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
-            <div className="p-4 border-b border-gray-100 flex-none">
-              <h2 className="font-medium text-lg text-gray-800">직원 선택</h2>
-            </div>
-            <div className="flex-1 overflow-hidden p-4">
-              {jwt ? (
-                <div className="h-full overflow-auto pr-2 space-y-2">
-                  {employees.map(employee => (
-                    <div
-                      key={employee.id}
-                      onClick={() => {
-                        setSelectedEmployeeForSingle(employee);
-                        setSelectedEldersForSingle([]);
-                      }}
-                      className={`
+
+              {/* 그리드 컨테이너 */}
+              <div className="grid grid-cols-3 gap-8 h-[600px]">
+                {/* 직원 선택 */}
+                <div className="h-full">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+                    <div className="p-4 border-b border-gray-100 flex-none">
+                      <h2 className="font-medium text-lg text-gray-800">
+                        직원 선택
+                      </h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden p-4">
+                      {jwt ? (
+                        <div className="h-full overflow-auto pr-2 space-y-2">
+                          {employees.map((employee) => (
+                            <div
+                              key={employee.id}
+                              onClick={() => {
+                                setSelectedEmployeeForSingle(employee);
+                                setSelectedEldersForSingle([]);
+                              }}
+                              className={`
                         group p-4 rounded-lg border transition-all cursor-pointer
-                        ${selectedEmployeeForSingle?.id === employee.id
-                          ? 'bg-sky-50 border-sky-500 shadow-sm'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ${
+                          selectedEmployeeForSingle?.id === employee.id
+                            ? "bg-sky-50 border-sky-500 shadow-sm"
+                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                         }
                       `}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-gray-900">{employee.name}</span>
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                          최대 {employee.maximumCapacity}명
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-500">{employee.homeAddressName}</div>
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium text-gray-900">
+                                  {employee.name}
+                                </span>
+                                <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                                  최대 {employee.maximumCapacity}명
+                                </span>
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {employee.homeAddressName}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-gray-400">
+                          선택된 정보가 없습니다
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              ) : (
-                <div className="h-full flex items-center justify-center text-gray-400">
-                  선택된 정보가 없습니다
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        
+
                 {/* 어르신 선택 */}
                 <div className="h-full">
                   <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
                     <div className="p-4 border-b border-gray-100 flex-none flex justify-between items-center">
-                      <h2 className="font-medium text-lg text-gray-800">어르신 선택</h2>
+                      <h2 className="font-medium text-lg text-gray-800">
+                        어르신 선택
+                      </h2>
                       {selectedEmployeeForSingle && (
                         <span className="text-sm px-2 py-1 bg-sky-50 text-sky-600 rounded-full">
                           {selectedEldersForSingle.length}/{maxCapacity}명
@@ -1902,32 +1934,49 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                     <div className="flex-1 overflow-hidden p-4">
                       {selectedEmployeeForSingle ? (
                         <div className="h-full overflow-auto pr-2 space-y-2">
-                          {elders.map(elder => (
+                          {elders.map((elder) => (
                             <div
                               key={elder.id}
                               onClick={() => {
-                                if (selectedEldersForSingle.includes(elder.id)) {
+                                if (
+                                  selectedEldersForSingle.includes(elder.id)
+                                ) {
                                   setSelectedEldersForSingle(
-                                    selectedEldersForSingle.filter(id => id !== elder.id)
+                                    selectedEldersForSingle.filter(
+                                      (id) => id !== elder.id
+                                    )
                                   );
-                                } else if (selectedEldersForSingle.length < maxCapacity) {
-                                  setSelectedEldersForSingle([...selectedEldersForSingle, elder.id]);
+                                } else if (
+                                  selectedEldersForSingle.length < maxCapacity
+                                ) {
+                                  setSelectedEldersForSingle([
+                                    ...selectedEldersForSingle,
+                                    elder.id,
+                                  ]);
                                 } else {
-                                  toast(`최대 ${maxCapacity}명까지 선택 가능합니다.`);
+                                  toast(
+                                    `최대 ${maxCapacity}명까지 선택 가능합니다.`
+                                  );
                                 }
                               }}
                               className={`
                                 group p-4 rounded-lg border transition-all cursor-pointer
-                                ${selectedEldersForSingle.includes(elder.id)
-                                  ? 'bg-sky-50 border-sky-500 shadow-sm'
-                                  : selectedEldersForSingle.length >= maxCapacity
-                                  ? 'opacity-50 cursor-not-allowed border-gray-200'
-                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                ${
+                                  selectedEldersForSingle.includes(elder.id)
+                                    ? "bg-sky-50 border-sky-500 shadow-sm"
+                                    : selectedEldersForSingle.length >=
+                                      maxCapacity
+                                    ? "opacity-50 cursor-not-allowed border-gray-200"
+                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                                 }
                               `}
                             >
-                              <div className="font-medium text-gray-900">{elder.name}</div>
-                              <div className="text-sm text-gray-500 mt-1">{elder.homeAddressName}</div>
+                              <div className="font-medium text-gray-900">
+                                {elder.name}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-1">
+                                {elder.homeAddressName}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1939,32 +1988,47 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                     </div>
                   </div>
                 </div>
-        
+
                 {/* 선택 요약 */}
                 <div className="h-full">
                   <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
                     <div className="p-4 border-b border-gray-100 flex-none">
-                      <h2 className="font-medium text-lg text-gray-800">선택된 정보</h2>
+                      <h2 className="font-medium text-lg text-gray-800">
+                        선택된 정보
+                      </h2>
                     </div>
                     <div className="flex-1 overflow-hidden p-4">
                       <div className="h-full overflow-auto">
                         {selectedEmployeeForSingle ? (
                           <div className="space-y-4">
                             <div>
-                              <h3 className="text-sm font-medium text-gray-500 mb-2">직원</h3>
+                              <h3 className="text-sm font-medium text-gray-500 mb-2">
+                                직원
+                              </h3>
                               <div className="p-3 bg-gray-50 rounded-lg">
-                                <div className="text-gray-900">{selectedEmployeeForSingle.name}</div>
+                                <div className="text-gray-900">
+                                  {selectedEmployeeForSingle.name}
+                                </div>
                               </div>
                             </div>
                             {selectedEldersForSingle.length > 0 && (
                               <div>
-                                <h3 className="text-sm font-medium text-gray-500 mb-2">선택된 어르신</h3>
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">
+                                  선택된 어르신
+                                </h3>
                                 <div className="p-3 bg-gray-50 rounded-lg space-y-2">
                                   {elders
-                                    .filter(elder => selectedEldersForSingle.includes(elder.id))
+                                    .filter((elder) =>
+                                      selectedEldersForSingle.includes(elder.id)
+                                    )
                                     .map((elder, index) => (
-                                      <div key={elder.id} className="flex items-center text-gray-900">
-                                        <span className="text-sky-600 mr-2">{index + 1}.</span>
+                                      <div
+                                        key={elder.id}
+                                        className="flex items-center text-gray-900"
+                                      >
+                                        <span className="text-sky-600 mr-2">
+                                          {index + 1}.
+                                        </span>
                                         {elder.name}
                                       </div>
                                     ))}
@@ -2128,25 +2192,33 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
     await setLoadingSpinner(false);
   };
 
-  const Map = ({ setMap, map, isSingleRoute, employeeLongitude, employeeLatitude }) => {
-
+  const Map = ({
+    setMap,
+    map,
+    isSingleRoute,
+    employeeLongitude,
+    employeeLatitude,
+  }) => {
     console.log(isSingleRoute, employeeLongitude, employeeLatitude);
 
     useEffect(() => {
       const mapContainer = document.getElementById("map");
-      const mapOptions = isSingleRoute == false ? {
-        center: new kakao.maps.LatLng(
-          company.address.latitude,
-          company.address.longitude
-        ), //지도의 중심좌표.
-        level: 3, //지도의 레벨(확대, 축소 정도)
-      } : {
-        center: new kakao.maps.LatLng(
-          employeeLatitude,
-          employeeLongitude
-        ), //지도의 중심좌표.
-        level: 3, //지도의 레벨(확대, 축소 정도)
-      };
+      const mapOptions =
+        isSingleRoute == false
+          ? {
+              center: new kakao.maps.LatLng(
+                company.address.latitude,
+                company.address.longitude
+              ), //지도의 중심좌표.
+              level: 3, //지도의 레벨(확대, 축소 정도)
+            }
+          : {
+              center: new kakao.maps.LatLng(
+                employeeLatitude,
+                employeeLongitude
+              ), //지도의 중심좌표.
+              level: 3, //지도의 레벨(확대, 축소 정도)
+            };
 
       const kakaoMap = new kakao.maps.Map(mapContainer, mapOptions);
       setMap(kakaoMap);
@@ -2931,8 +3003,7 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
     const firstResult = props.data?.[0];
     const isSingleRoute = firstResult?.isSingleRoute || false;
 
-    console.log(props)
-  
+    console.log(props);
 
     useEffect(() => {
       async function fetchData() {
@@ -2995,14 +3066,13 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
     //     let randomColor = await getRandomColor();
     //     randomColors.push(randomColor);
 
-
     //     if (result.isSingleRoute) {
     //       origin = {
     //         x: result.homeAddress.longitude,
     //         y: result.homeAddress.latitude,
     //         name: result.employeeName
     //       };
-    
+
     //       // 마지막 어르신을 목적지로 설정
     //       const lastElder = result.assignmentElders[result.assignmentElders.length - 1];
     //       destination = {
@@ -3010,7 +3080,7 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
     //         y: lastElder.homeAddress.latitude,
     //         name: lastElder.name
     //       };
-    
+
     //       // 마지막 어르신을 제외한 나머지 어르신들을 경유지로 설정
     //       for (let i = 0; i < result.assignmentElders.length - 1; i++) {
     //         let currentElder = result.assignmentElders[i];
@@ -3201,81 +3271,105 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
       let r = parseInt(hex.slice(1, 3), 16) / 255;
       let g = parseInt(hex.slice(3, 5), 16) / 255;
       let b = parseInt(hex.slice(5, 7), 16) / 255;
-    
-      let max = Math.max(r, g, b), min = Math.min(r, g, b);
-      let h, s, l = (max + min) / 2;
-    
+
+      let max = Math.max(r, g, b),
+        min = Math.min(r, g, b);
+      let h,
+        s,
+        l = (max + min) / 2;
+
       if (max === min) {
         h = s = 0;
       } else {
         let d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
+          case r:
+            h = (g - b) / d + (g < b ? 6 : 0);
+            break;
+          case g:
+            h = (b - r) / d + 2;
+            break;
+          case b:
+            h = (r - g) / d + 4;
+            break;
         }
         h /= 6;
       }
-    
+
       return { h: h * 360, s: s * 100, l: l * 100 };
     }
-    
+
     function hslToHex({ h, s, l }) {
       l = Math.min(100, Math.max(0, l));
       s = Math.min(100, Math.max(0, s));
-      
+
       l /= 100;
-      const a = s * Math.min(l, 1 - l) / 100;
-      const f = n => {
+      const a = (s * Math.min(l, 1 - l)) / 100;
+      const f = (n) => {
         const k = (n + h / 30) % 12;
         const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color).toString(16).padStart(2, '0');
+        return Math.round(255 * color)
+          .toString(16)
+          .padStart(2, "0");
       };
       return `#${f(0)}${f(8)}${f(4)}`;
     }
-    
+
     function calculateDistance(pos1, pos2) {
       const lat1 = pos1.getLat();
       const lng1 = pos1.getLng();
       const lat2 = pos2.getLat();
       const lng2 = pos2.getLng();
-      
-      return Math.sqrt(
-        Math.pow(lat2 - lat1, 2) + 
-        Math.pow(lng2 - lng1, 2)
-      ) * 111000; // 대략적인 미터 단위 변환
+
+      return (
+        Math.sqrt(Math.pow(lat2 - lat1, 2) + Math.pow(lng2 - lng1, 2)) * 111000
+      ); // 대략적인 미터 단위 변환
     }
-    
+
     // 스타일 관련 함수들
     function getLineStyle(index) {
       const baseColors = [
-        '#FF3B30', '#FF9500', '#FFCC00', '#4CD964', '#5856D6',
-        '#007AFF', '#5856D6', '#FF2D55', '#E73B3B', '#35C759',
-        '#147EFB', '#53D769', '#FC3158', '#8E8E93', '#FF9600',
-        '#B620E0', '#00C7BE', '#59C2FF', '#5856D6', '#FF6482'
+        "#FF3B30",
+        "#FF9500",
+        "#FFCC00",
+        "#4CD964",
+        "#5856D6",
+        "#007AFF",
+        "#5856D6",
+        "#FF2D55",
+        "#E73B3B",
+        "#35C759",
+        "#147EFB",
+        "#53D769",
+        "#FC3158",
+        "#8E8E93",
+        "#FF9600",
+        "#B620E0",
+        "#00C7BE",
+        "#59C2FF",
+        "#5856D6",
+        "#FF6482",
       ];
-    
+
       function adjustColor(color, index) {
         const hsl = hexToHSL(color);
-        hsl.l += (index % 3 - 1) * 5;
+        hsl.l += ((index % 3) - 1) * 5;
         hsl.s += (index % 2) * 10;
         return hslToHex(hsl);
       }
-    
+
       const baseColorIndex = index % baseColors.length;
       const variationIndex = Math.floor(index / baseColors.length);
       const color = adjustColor(baseColors[baseColorIndex], variationIndex);
-    
+
       return {
         color: color,
         strokeWidth: 5,
-        opacity: 0.85
+        opacity: 0.85,
       };
     }
-    
 
-    
     function adjustMarkerPosition(markers, newMarker, minDistance = 60) {
       let adjusted = false;
       let offsetY = 0;
@@ -3283,90 +3377,100 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
       const offsetStep = 30;
       const maxAttempts = 10;
       let attempts = 0;
-    
+
       const originalPosition = newMarker.getPosition();
-    
+
       while (!adjusted && attempts < maxAttempts) {
         let overlapping = false;
-        
+
         for (const marker of markers) {
           const distance = calculateDistance(
             marker.getPosition(),
             newMarker.getPosition()
           );
-          
+
           if (distance < minDistance) {
             overlapping = true;
-            
+
             // 나선형 패턴으로 오프셋 조정
-            offsetX = Math.cos(attempts * Math.PI / 2) * offsetStep * (1 + attempts / 4);
-            offsetY = Math.sin(attempts * Math.PI / 2) * offsetStep * (1 + attempts / 4);
-            
+            offsetX =
+              Math.cos((attempts * Math.PI) / 2) *
+              offsetStep *
+              (1 + attempts / 4);
+            offsetY =
+              Math.sin((attempts * Math.PI) / 2) *
+              offsetStep *
+              (1 + attempts / 4);
+
             const newPosition = new kakao.maps.LatLng(
               originalPosition.getLat() + offsetY / 111000,
-              originalPosition.getLng() + offsetX / (111000 * Math.cos(originalPosition.getLat() * Math.PI / 180))
+              originalPosition.getLng() +
+                offsetX /
+                  (111000 *
+                    Math.cos((originalPosition.getLat() * Math.PI) / 180))
             );
-            
+
             newMarker.setPosition(newPosition);
             break;
           }
         }
-    
+
         if (!overlapping) {
           adjusted = true;
         }
         attempts++;
       }
-    
+
       markers.push(newMarker);
       return newMarker;
     }
-    
+
     function createMarker(point, content, map, existingMarkers) {
       const position = new kakao.maps.LatLng(point.y, point.x);
       const marker = new kakao.maps.CustomOverlay({
         position: position,
         content: content,
-        zIndex: 1
+        zIndex: 1,
       });
-    
+
       return adjustMarkerPosition(existingMarkers, marker);
     }
-    
+
     async function getCarDirection() {
       var dur = [];
       randomColors = [];
-    
+
       for (const [index, result] of dispatchResult.entries()) {
         let origin;
         let destination;
         let waypoints = [];
         const lineStyle = getLineStyle(index);
         randomColors.push(lineStyle.color);
-    
+
         if (result.isSingleRoute) {
           origin = {
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
             name: result.employeeName,
-            type: '출발'
+            type: "출발",
           };
-    
-          const lastElder = result.assignmentElders[result.assignmentElders.length - 1];
+
+          const lastElder =
+            result.assignmentElders[result.assignmentElders.length - 1];
           destination = {
             x: lastElder.homeAddress.longitude,
             y: lastElder.homeAddress.latitude,
             name: lastElder.name,
-            type: '도착'
+            type: "도착",
           };
-    
+
           for (let i = 0; i < result.assignmentElders.length - 1; i++) {
             let currentElder = result.assignmentElders[i];
             waypoints.push({
               x: currentElder.homeAddress.longitude,
               y: currentElder.homeAddress.latitude,
               name: currentElder.name,
-              type: '경유'
+              type: "경유",
             });
           }
         } else if (
@@ -3377,24 +3481,24 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
             name: result.employeeName,
-            type: '출발'
+            type: "출발",
           };
-    
+
           for (let i = 0; i < result.assignmentElders.length; i++) {
             let currentElder = result.assignmentElders[i];
             waypoints.push({
               x: currentElder.homeAddress.longitude,
               y: currentElder.homeAddress.latitude,
               name: currentElder.name,
-              type: '경유'
+              type: "경유",
             });
           }
-    
+
           destination = {
             x: result.workPlace.longitude,
             y: result.workPlace.latitude,
             name: "학교",
-            type: '도착'
+            type: "도착",
           };
         } else if (
           result.dispatchType === "DISTANCE_OUT" ||
@@ -3404,32 +3508,32 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
             x: result.workPlace.longitude,
             y: result.workPlace.latitude,
             name: "학교",
-            type: '출발'
+            type: "출발",
           };
-    
+
           for (let i = 0; i < result.assignmentElders.length; i++) {
             let currentElder = result.assignmentElders[i];
             waypoints.push({
               x: currentElder.homeAddress.longitude,
               y: currentElder.homeAddress.latitude,
               name: currentElder.name,
-              type: '경유'
+              type: "경유",
             });
           }
-    
+
           destination = {
             x: result.homeAddress.longitude,
             y: result.homeAddress.latitude,
             name: result.employeeName,
-            type: '도착'
+            type: "도착",
           };
         }
-    
+
         const headers = {
           Authorization: `KakaoAK ${REST_API_KEY}`,
           "Content-Type": "application/json",
         };
-    
+
         const body = JSON.stringify({
           origin: origin,
           destination: destination,
@@ -3440,25 +3544,25 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
           alternatives: true,
           road_details: false,
         });
-    
+
         try {
           const response = await fetch(url, {
             method: "POST",
             headers: headers,
             body: body,
           });
-    
+
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-    
+
           const data = await response.json();
           const duration = await data.routes[0].summary.duration;
           dur.push(duration);
-    
+
           data.routes[0].sections.forEach(async (section) => {
             const linePath = [];
-    
+
             await section.roads.forEach((road) => {
               for (let i = 0; i < road.vertexes.length; i += 2) {
                 const latLng = new kakao.maps.LatLng(
@@ -3468,14 +3572,14 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                 linePath.push(latLng);
               }
             });
-    
-            const createMarkerContent = (point, index = '') => {
+
+            const createMarkerContent = (point, index = "") => {
               const typeLabel = {
-                '출발': '출발',
-                '경유': index,
-                '도착': '도착'
+                출발: "출발",
+                경유: index,
+                도착: "도착",
               };
-              
+
               return `
                 <div style="
                   padding: 4px 8px;
@@ -3500,53 +3604,52 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                 </div>
               `;
             };
-    
+
             // 출발지 마커
             new kakao.maps.CustomOverlay({
               position: new kakao.maps.LatLng(origin.y, origin.x),
               content: createMarkerContent(origin),
-              map: map
+              map: map,
             });
-    
+
             // 경유지 마커
             waypoints.forEach((point, idx) => {
               new kakao.maps.CustomOverlay({
                 position: new kakao.maps.LatLng(point.y, point.x),
                 content: createMarkerContent(point, (idx + 1).toString()),
-                map: map
+                map: map,
               });
             });
-    
+
             // 도착지 마커
             new kakao.maps.CustomOverlay({
               position: new kakao.maps.LatLng(destination.y, destination.x),
               content: createMarkerContent(destination),
-              map: map
+              map: map,
             });
-    
+
             // 경로선 그리기
             const newPolyline = await OffsetPolyline(linePath);
-    
+
             // 흰색 테두리 효과를 위한 배경선
             new kakao.maps.Polyline({
               path: newPolyline,
               strokeWeight: lineStyle.strokeWidth + 4,
-              strokeColor: '#FFFFFF',
+              strokeColor: "#FFFFFF",
               strokeOpacity: 0.9,
-              strokeStyle: 'solid',
-              map: map
+              strokeStyle: "solid",
+              map: map,
             });
-    
+
             // 메인 경로선
             new kakao.maps.Polyline({
               path: newPolyline,
               strokeWeight: lineStyle.strokeWidth,
               strokeColor: lineStyle.color,
               strokeOpacity: lineStyle.opacity,
-              strokeStyle: 'solid',
-              map: map
+              strokeStyle: "solid",
+              map: map,
             });
-    
           });
         } catch (error) {
           console.error("Error:", error);
@@ -3554,9 +3657,6 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
       }
       return dur;
     }
-    
-
-    
 
     const getCurrentTime = () => {
       const now = new Date();
@@ -3644,13 +3744,14 @@ const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
                 {/* Left Side - Map */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                   <div className="h-[400px]">
-                  <Map 
-            setMap={setMap} 
-            map={map} 
-            isSingleRoute={isSingleRoute}
-            employeeLongitude={firstResult?.homeAddress?.longitude}
-            employeeLatitude={firstResult?.homeAddress?.latitude}
-          />                  </div>
+                    <Map
+                      setMap={setMap}
+                      map={map}
+                      isSingleRoute={isSingleRoute}
+                      employeeLongitude={firstResult?.homeAddress?.longitude}
+                      employeeLatitude={firstResult?.homeAddress?.latitude}
+                    />{" "}
+                  </div>
                 </div>
 
                 {/* Right Side - Assignment Details */}
