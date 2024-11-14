@@ -2122,6 +2122,7 @@ function App() {
       Object.values(newSelections[employeeId]).includes(elderId)
     ) {
       toast("같은 직원에게 중복된 어르신을 고정할 수 없습니다.");
+      await setLoadingSpinner(false);
 
       return;
     }
