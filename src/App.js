@@ -77,11 +77,20 @@ function App() {
 
   const [LoadingSpinner, setLoadingSpinner] = useState(false);
 
-  const [colors, setColors] = useState([]);
+  const [activeEmployeeId, setActiveEmployeeId] = useState(null);
 
+  const handleEmployeeSelect = (employeeId) => {
+    if (activeEmployeeId === employeeId) {
+      setActiveEmployeeId(null);
+    } else {
+      setActiveEmployeeId(employeeId);
+    }
+  };
   const openAgreement = (url) => {
     window.open(url, "_blank");
   };
+
+  const [activeCard, setActiveCard] = useState(null);
 
   var randomColors = [];
 
@@ -3243,150 +3252,164 @@ function App() {
       const dur = [];
       const newRandomColors = [];
 
+      // 기존 오버레이 제거
+      mapOverlays.forEach((overlay) => {
+        overlay.setMap(null);
+      });
+      setMapOverlays([]);
+
+      console.log(dispatchData);
+
       // dispatchData를 사용하도록 수정
       for (const [index, result] of dispatchData.entries()) {
-        let origin;
-        let destination;
-        let waypoints = [];
-        const lineStyle = getLineStyle(index);
-        newRandomColors.push(lineStyle.color);
-
-        // 경로 유형에 따른 origin, destination, waypoints 설정
-        if (result.isSingleRoute) {
-          origin = {
-            x: result.homeAddress.longitude,
-            y: result.homeAddress.latitude,
-            name: result.employeeName,
-            type: "출발",
-          };
-
-          const lastElder =
-            result.assignmentElders[result.assignmentElders.length - 1];
-          destination = {
-            x: lastElder.homeAddress.longitude,
-            y: lastElder.homeAddress.latitude,
-            name: lastElder.name,
-            type: "도착",
-          };
-
-          for (let i = 0; i < result.assignmentElders.length - 1; i++) {
-            let currentElder = result.assignmentElders[i];
-            waypoints.push({
-              x: currentElder.homeAddress.longitude,
-              y: currentElder.homeAddress.latitude,
-              name: currentElder.name,
-              type: "경유",
-            });
-          }
-        } else if (
-          result.dispatchType === "DISTANCE_IN" ||
-          result.dispatchType === "DURATION_IN"
+        console.log(result);
+        console.log(activeEmployeeId);
+        if (
+          activeEmployeeId === null ||
+          activeEmployeeId === result.employeeId
         ) {
-          origin = {
-            x: result.homeAddress.longitude,
-            y: result.homeAddress.latitude,
-            name: result.employeeName,
-            type: "출발",
-          };
+          let origin;
+          let destination;
+          let waypoints = [];
+          const lineStyle = getLineStyle(index);
+          newRandomColors.push(lineStyle.color);
 
-          for (let i = 0; i < result.assignmentElders.length; i++) {
-            let currentElder = result.assignmentElders[i];
-            waypoints.push({
-              x: currentElder.homeAddress.longitude,
-              y: currentElder.homeAddress.latitude,
-              name: currentElder.name,
-              type: "경유",
-            });
+          // 경로 유형에 따른 origin, destination, waypoints 설정
+          if (result.isSingleRoute) {
+            origin = {
+              x: result.homeAddress.longitude,
+              y: result.homeAddress.latitude,
+              name: result.employeeName,
+              type: "출발",
+            };
+
+            const lastElder =
+              result.assignmentElders[result.assignmentElders.length - 1];
+            destination = {
+              x: lastElder.homeAddress.longitude,
+              y: lastElder.homeAddress.latitude,
+              name: lastElder.name,
+              type: "도착",
+            };
+
+            for (let i = 0; i < result.assignmentElders.length - 1; i++) {
+              let currentElder = result.assignmentElders[i];
+              waypoints.push({
+                x: currentElder.homeAddress.longitude,
+                y: currentElder.homeAddress.latitude,
+                name: currentElder.name,
+                type: "경유",
+              });
+            }
+          } else if (
+            result.dispatchType === "DISTANCE_IN" ||
+            result.dispatchType === "DURATION_IN"
+          ) {
+            origin = {
+              x: result.homeAddress.longitude,
+              y: result.homeAddress.latitude,
+              name: result.employeeName,
+              type: "출발",
+            };
+
+            for (let i = 0; i < result.assignmentElders.length; i++) {
+              let currentElder = result.assignmentElders[i];
+              waypoints.push({
+                x: currentElder.homeAddress.longitude,
+                y: currentElder.homeAddress.latitude,
+                name: currentElder.name,
+                type: "경유",
+              });
+            }
+
+            destination = {
+              x: result.workPlace.longitude,
+              y: result.workPlace.latitude,
+              name: "학교",
+              type: "도착",
+            };
+          } else if (
+            result.dispatchType === "DISTANCE_OUT" ||
+            result.dispatchType === "DURATION_OUT"
+          ) {
+            origin = {
+              x: result.workPlace.longitude,
+              y: result.workPlace.latitude,
+              name: "학교",
+              type: "출발",
+            };
+
+            for (let i = 0; i < result.assignmentElders.length; i++) {
+              let currentElder = result.assignmentElders[i];
+              waypoints.push({
+                x: currentElder.homeAddress.longitude,
+                y: currentElder.homeAddress.latitude,
+                name: currentElder.name,
+                type: "경유",
+              });
+            }
+
+            destination = {
+              x: result.homeAddress.longitude,
+              y: result.homeAddress.latitude,
+              name: result.employeeName,
+              type: "도착",
+            };
           }
 
-          destination = {
-            x: result.workPlace.longitude,
-            y: result.workPlace.latitude,
-            name: "학교",
-            type: "도착",
-          };
-        } else if (
-          result.dispatchType === "DISTANCE_OUT" ||
-          result.dispatchType === "DURATION_OUT"
-        ) {
-          origin = {
-            x: result.workPlace.longitude,
-            y: result.workPlace.latitude,
-            name: "학교",
-            type: "출발",
+          const headers = {
+            Authorization: `KakaoAK ${REST_API_KEY}`,
+            "Content-Type": "application/json",
           };
 
-          for (let i = 0; i < result.assignmentElders.length; i++) {
-            let currentElder = result.assignmentElders[i];
-            waypoints.push({
-              x: currentElder.homeAddress.longitude,
-              y: currentElder.homeAddress.latitude,
-              name: currentElder.name,
-              type: "경유",
-            });
-          }
-
-          destination = {
-            x: result.homeAddress.longitude,
-            y: result.homeAddress.latitude,
-            name: result.employeeName,
-            type: "도착",
-          };
-        }
-
-        const headers = {
-          Authorization: `KakaoAK ${REST_API_KEY}`,
-          "Content-Type": "application/json",
-        };
-
-        const body = JSON.stringify({
-          origin: origin,
-          destination: destination,
-          waypoints: waypoints,
-          priority: "RECOMMEND",
-          car_fuel: "GASOLINE",
-          car_hipass: false,
-          alternatives: true,
-          road_details: false,
-        });
-
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            headers: headers,
-            body: body,
+          const body = JSON.stringify({
+            origin: origin,
+            destination: destination,
+            waypoints: waypoints,
+            priority: "RECOMMEND",
+            car_fuel: "GASOLINE",
+            car_hipass: false,
+            alternatives: true,
+            road_details: false,
           });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          const duration = await data.routes[0].summary.duration;
-          dur.push(duration);
-
-          data.routes[0].sections.forEach(async (section) => {
-            const linePath = [];
-
-            await section.roads.forEach((road) => {
-              for (let i = 0; i < road.vertexes.length; i += 2) {
-                const latLng = new kakao.maps.LatLng(
-                  road.vertexes[i + 1],
-                  road.vertexes[i]
-                );
-                linePath.push(latLng);
-              }
+          try {
+            const response = await fetch(url, {
+              method: "POST",
+              headers: headers,
+              body: body,
             });
 
-            // ... 마커 및 경로선 그리기 로직 유지
-            const createMarkerContent = (point, index = "") => {
-              const typeLabel = {
-                출발: "출발",
-                경유: index,
-                도착: "도착",
-              };
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-              return `
+            const data = await response.json();
+            const duration = await data.routes[0].summary.duration;
+            dur[index] = duration;
+
+            data.routes[0].sections.forEach(async (section) => {
+              const linePath = [];
+
+              await section.roads.forEach((road) => {
+                for (let i = 0; i < road.vertexes.length; i += 2) {
+                  const latLng = new kakao.maps.LatLng(
+                    road.vertexes[i + 1],
+                    road.vertexes[i]
+                  );
+                  linePath.push(latLng);
+                }
+              });
+
+              // ... 마커 및 경로선 그리기 로직 유지
+              const createMarkerContent = (point, index = "") => {
+                const typeLabel = {
+                  출발: "출발",
+                  경유: index,
+                  도착: "도착",
+                };
+
+                return `
                           <div style="
                               padding: 4px 8px;
                               color: ${lineStyle.color};
@@ -3409,56 +3432,57 @@ function App() {
                               </span>
                           </div>
                       `;
-            };
+              };
 
-            // 마커와 경로선을 생성하고 mapOverlays에 추가
-            const startOverlay = new kakao.maps.CustomOverlay({
-              position: new kakao.maps.LatLng(origin.y, origin.x),
-              content: createMarkerContent(origin),
-              map: map,
-            });
-            setMapOverlays((prev) => [...prev, startOverlay]);
-
-            waypoints.forEach((point, idx) => {
-              const waypointOverlay = new kakao.maps.CustomOverlay({
-                position: new kakao.maps.LatLng(point.y, point.x),
-                content: createMarkerContent(point, (idx + 1).toString()),
+              // 마커와 경로선을 생성하고 mapOverlays에 추가
+              const startOverlay = new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(origin.y, origin.x),
+                content: createMarkerContent(origin),
                 map: map,
               });
-              setMapOverlays((prev) => [...prev, waypointOverlay]);
-            });
+              setMapOverlays((prev) => [...prev, startOverlay]);
 
-            const endOverlay = new kakao.maps.CustomOverlay({
-              position: new kakao.maps.LatLng(destination.y, destination.x),
-              content: createMarkerContent(destination),
-              map: map,
-            });
-            setMapOverlays((prev) => [...prev, endOverlay]);
+              waypoints.forEach((point, idx) => {
+                const waypointOverlay = new kakao.maps.CustomOverlay({
+                  position: new kakao.maps.LatLng(point.y, point.x),
+                  content: createMarkerContent(point, (idx + 1).toString()),
+                  map: map,
+                });
+                setMapOverlays((prev) => [...prev, waypointOverlay]);
+              });
 
-            const newPolyline = await OffsetPolyline(linePath);
+              const endOverlay = new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(destination.y, destination.x),
+                content: createMarkerContent(destination),
+                map: map,
+              });
+              setMapOverlays((prev) => [...prev, endOverlay]);
 
-            const backgroundPolyline = new kakao.maps.Polyline({
-              path: newPolyline,
-              strokeWeight: lineStyle.strokeWidth + 4,
-              strokeColor: "#FFFFFF",
-              strokeOpacity: 0.9,
-              strokeStyle: "solid",
-              map: map,
-            });
-            setMapOverlays((prev) => [...prev, backgroundPolyline]);
+              const newPolyline = await OffsetPolyline(linePath);
 
-            const mainPolyline = new kakao.maps.Polyline({
-              path: newPolyline,
-              strokeWeight: lineStyle.strokeWidth,
-              strokeColor: lineStyle.color,
-              strokeOpacity: lineStyle.opacity,
-              strokeStyle: "solid",
-              map: map,
+              const backgroundPolyline = new kakao.maps.Polyline({
+                path: newPolyline,
+                strokeWeight: lineStyle.strokeWidth + 4,
+                strokeColor: "#FFFFFF",
+                strokeOpacity: 0.9,
+                strokeStyle: "solid",
+                map: map,
+              });
+              setMapOverlays((prev) => [...prev, backgroundPolyline]);
+
+              const mainPolyline = new kakao.maps.Polyline({
+                path: newPolyline,
+                strokeWeight: lineStyle.strokeWidth,
+                strokeColor: lineStyle.color,
+                strokeOpacity: lineStyle.opacity,
+                strokeStyle: "solid",
+                map: map,
+              });
+              setMapOverlays((prev) => [...prev, mainPolyline]);
             });
-            setMapOverlays((prev) => [...prev, mainPolyline]);
-          });
-        } catch (error) {
-          console.error("Error:", error);
+          } catch (error) {
+            console.error("Error:", error);
+          }
         }
       }
 
@@ -3474,6 +3498,11 @@ function App() {
     };
 
     const currentTime = getCurrentTime();
+
+    const handleModalClose = () => {
+      setActiveEmployeeId(null); // 선택된 직원 상태 초기화
+      props.onHide(); // 기존 모달 닫기 함수 호출
+    };
 
     return (
       <Modal
@@ -3497,7 +3526,7 @@ function App() {
                   </p>
                 </div>
                 <button
-                  onClick={props.onHide}
+                  onClick={handleModalClose}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <svg
@@ -3572,11 +3601,21 @@ function App() {
                         {dispatchData.map((item, dispatchIndex) => (
                           <div
                             key={`dispatch-${dispatchIndex}`}
-                            className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+                            className={`p-4 border border-gray-100 rounded-lg transition-colors ${
+                              activeEmployeeId === item.employeeId
+                                ? "bg-blue-100"
+                                : ""
+                            }  `}
                           >
-                            <div className="flex items-start">
+                            <div
+                              className={`flex items-start `}
+                              onClick={() =>
+                                handleEmployeeSelect(item.employeeId)
+                              }
+                            >
                               <div
-                                className="flex-shrink-0 font-medium w-24"
+                                key={item.employeeId}
+                                className={`flex-shrink-0 font-medium w-24 employee-card `}
                                 style={{
                                   color:
                                     randomColors[
@@ -3646,9 +3685,12 @@ function App() {
                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                   </svg>
-                                  예상 소요시간:{" "}
+                                  예상 소요시간 :
                                   <span className="font-medium ml-1">
-                                    {isNaN(durations[dispatchIndex])
+                                    {activeEmployeeId &&
+                                    activeEmployeeId !== item.employeeId
+                                      ? "" // 다른 직원이 선택되었을 때는 빈 문자열
+                                      : isNaN(durations[dispatchIndex])
                                       ? "계산중..."
                                       : `약 ${(
                                           durations[dispatchIndex] / 60
@@ -3670,7 +3712,7 @@ function App() {
             <div className="bg-white border-t border-gray-200 p-4">
               <div className="flex justify-end">
                 <button
-                  onClick={props.onHide}
+                  onClick={handleModalClose}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   닫기
