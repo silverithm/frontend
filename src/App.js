@@ -130,6 +130,7 @@ function App() {
       workPlace: data.workPlaceName,
       homeAddress: data.homeAddressName,
       maxCapacity: data.maximumCapacity,
+      isDriver: false,
     };
 
     console.log(updateData);
