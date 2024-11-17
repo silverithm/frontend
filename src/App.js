@@ -2788,7 +2788,7 @@ function App() {
     };
 
     let flag = false;
-    const result = await fetch(`${config.apiUrl}/dispatch`, requestOptions)
+    const result = await fetch(`${config.dispatchUrl}/dispatch`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           flag = true;
@@ -2809,11 +2809,6 @@ function App() {
     await setDispatchResult(result);
     await console.log(result);
     await setModalShow(true);
-  }
-
-  async function checkDispatchInData() {
-    console.log(fixedAssignments);
-    setBeforeInModalShow(true);
   }
 
   async function dispatchIn(dispatchType) {
@@ -2894,7 +2889,7 @@ function App() {
     };
 
     let flag = false;
-    const result = await fetch(`${config.apiUrl}/dispatch`, requestOptions)
+    const result = await fetch(`${config.dispatchUrl}/dispatch`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           flag = true;
@@ -2917,24 +2912,6 @@ function App() {
     await setDispatchResult(result);
     await console.log(result);
     await setModalShow(true);
-  }
-
-  function getProgressSSE() {
-    const url = `${config.apiUrl}/SSE/subscribe/${userId}`;
-
-    const eventSource = new EventSourcePolyfill(url, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    eventSource.addEventListener("sse", (event) => {
-      console.log(event);
-
-      if (!event.data.includes("EventStream Created")) {
-        setProgress(Number(event.data));
-      }
-    });
   }
 
   function MyVerticallyCenteredModalDispatchInData(props) {
@@ -3048,15 +3025,19 @@ function App() {
 
       lineIndex = 0;
 
-      // isSingleRoute가 true일 때 직원 위치로 중심점 설정
-      if (firstResult.isSingleRoute && firstResult.homeAddress) {
-        const employeePosition = new kakao.maps.LatLng(
-          firstResult.homeAddress.latitude,
-          firstResult.homeAddress.longitude
-        );
+      if (props.data && props.data.length > 0) {
+        const firstResult = dispatchData?.[0];
 
-        map.setCenter(employeePosition);
-        map.setLevel(3); // 적절한 줌 레벨 설정
+        // isSingleRoute가 true일 때 직원 위치로 중심점 설정
+        if (firstResult.isSingleRoute && firstResult.homeAddress) {
+          const employeePosition = new kakao.maps.LatLng(
+            firstResult.homeAddress.latitude,
+            firstResult.homeAddress.longitude
+          );
+
+          map.setCenter(employeePosition);
+          map.setLevel(3); // 적절한 줌 레벨 설정
+        }
       }
 
       const data = await getCarDirection();
