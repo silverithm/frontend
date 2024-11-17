@@ -2714,7 +2714,7 @@ function App() {
   }
 
   function getProgressSSE() {
-    const url = `${config.apiUrl}/SSE/subscribe/${userId}`;
+    const url = `${config.dispatchUrl}/SSE/subscribe/${userId}`;
 
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
