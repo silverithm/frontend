@@ -2789,7 +2789,6 @@ function App() {
   }
 
   async function dispatchOut(dispatchType) {
-    // Early validation
     if (jwt === "") {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
@@ -2800,9 +2799,6 @@ function App() {
       setLoading(true);
       toast("퇴근 차량배치가 시작되었습니다.");
 
-      // SSE 연결 설정
-
-      // Request data preparation
       const selectedEmployeesInfos = employees.filter((employeeInfo) =>
         selectedEmployeeIds.includes(employeeInfo.id)
       );
@@ -2824,10 +2820,6 @@ function App() {
           ? baseRequestData
           : { ...baseRequestData, fixedAssignments };
 
-      // Request configuration with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1800000); // 10분 timeout
-
       console.log(requestData);
 
       const response = await axios.post(
@@ -2842,34 +2834,24 @@ function App() {
         }
       );
 
-      clearTimeout(timeoutId);
+      console.log(response);
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-
-      // Success handling
       toast("퇴근 차량배치가 완료되었습니다.");
-      setDispatchResult(result);
+      setDispatchResult(response.data);
       setModalShow(true);
 
-      return result;
+      return response.data;
     } catch (error) {
-      // Error handling
-      if (error.name === "AbortError") {
-        toast("요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
-      } else {
-        toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
-        console.error("Dispatch error:", error);
-      }
-
+      console.error("Dispatch error:", error);
+      toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
       setDispatchResult(null);
       throw error;
     } finally {
       setLoading(false);
-      // SSE 연결 종료 처리
       if (eventSource) {
         eventSource.close();
       }
@@ -2922,8 +2904,6 @@ function App() {
           ? baseRequestData
           : { ...baseRequestData, fixedAssignments };
 
-      // Request configuration with timeout
-
       console.log(requestData);
 
       const response = await axios.post(
@@ -2937,28 +2917,21 @@ function App() {
           timeout: 1800000, // 30 minutes
         }
       );
+      console.log(response);
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-
       // Success handling
       toast("출근 차량배치가 완료되었습니다.");
-      setDispatchResult(result);
+      setDispatchResult(response.data);
       setModalShow(true);
 
-      return result;
+      return response.data;
     } catch (error) {
-      // Error handling
-      if (error.name === "AbortError") {
-        toast("요청 시간이 초과되었습니다(30분). 잠시 후 다시 시도해주세요.");
-      } else {
-        toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
-        console.error("Dispatch error:", error);
-      }
-
+      console.error("Dispatch error:", error);
+      toast("요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       setDispatchResult(null);
       throw error;
     } finally {
