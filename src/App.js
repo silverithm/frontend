@@ -2706,10 +2706,66 @@ function App() {
   }
 
   async function checkDispatchInData() {
+    // 선택된 직원들의 총 최대 수용 인원 계산
+    const totalEmployeeCapacity = employees
+      .filter((emp) => selectedEmployeeIds.includes(emp.id))
+      .reduce((sum, emp) => sum + emp.maxCapacity, 0);
+
+    // 선택된 어르신 수
+    const selectedEldersCount = selectedElderIds.length;
+    const selectedEmployeeCount = selectedEmployeeIds.length;
+
+    if (selectedEmployeeCount > selectedEldersCount) {
+      toast.error("선택된 어르신 수는 직원들의 수보다 적을 수 없습니다.");
+      return;
+    }
+
+    // 체크 로직
+    if (selectedEldersCount > totalEmployeeCapacity) {
+      toast.error("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
+      return;
+    }
+
+    if (selectedEmployeeIds.length === 0) {
+      toast.error("직원을 선택해주세요.");
+      return;
+    }
+
+    if (selectedElderIds.length === 0) {
+      toast.error("어르신을 선택해주세요.");
+      return;
+    }
+
+    // 모든 조건을 통과하면 모달 표시
     setBeforeInModalShow(true);
   }
 
   async function checkDispatchOutData() {
+    // 선택된 직원들의 총 최대 수용 인원 계산
+    const totalEmployeeCapacity = employees
+      .filter((emp) => selectedEmployeeIds.includes(emp.id))
+      .reduce((sum, emp) => sum + emp.maxCapacity, 0);
+
+    // 선택된 어르신 수
+    const selectedEldersCount = selectedElderIds.length;
+
+    // 체크 로직
+    if (selectedEldersCount > totalEmployeeCapacity) {
+      toast.error("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
+      return;
+    }
+
+    if (selectedEmployeeIds.length === 0) {
+      toast.error("직원을 선택해주세요.");
+      return;
+    }
+
+    if (selectedElderIds.length === 0) {
+      toast.error("어르신을 선택해주세요.");
+      return;
+    }
+
+    // 모든 조건을 통과하면 모달 표시
     setBeforeOutModalShow(true);
   }
 
