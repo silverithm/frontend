@@ -2722,7 +2722,7 @@ function App() {
 
     // 체크 로직
     if (selectedEldersCount > totalEmployeeCapacity) {
-      toast.error("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
+      toast.error("선택된 어르신 수가 직원들의 최대 배차 인원을 초과했습니다.");
       return;
     }
 
