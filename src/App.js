@@ -13,6 +13,7 @@ import { styled } from "styled-components";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { Form } from "react-bootstrap";
+import axios from "axios";
 import {
   DragDropContext,
   Droppable,
@@ -2829,15 +2830,17 @@ function App() {
 
       console.log(requestData);
 
-      const response = await fetch(`${config.dispatchUrl}/dispatch`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify(requestData),
-        signal: controller.signal,
-      });
+      const response = await axios.post(
+        `${config.dispatchUrl}/dispatch`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          timeout: 1800000, // 30 minutes
+        }
+      );
 
       clearTimeout(timeoutId);
 
@@ -2920,22 +2923,20 @@ function App() {
           : { ...baseRequestData, fixedAssignments };
 
       // Request configuration with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1800000); // 30분 timeout
 
       console.log(requestData);
 
-      const response = await fetch(`${config.dispatchUrl}/dispatch`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify(requestData),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
+      const response = await axios.post(
+        `${config.dispatchUrl}/dispatch`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          timeout: 1800000, // 30 minutes
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
