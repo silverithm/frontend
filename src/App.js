@@ -2732,186 +2732,184 @@ function App() {
   }
 
   async function dispatchOut(dispatchType) {
+    // Early validation
     if (jwt === "") {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
+    const eventSource = getProgressSSE();
 
-    getProgressSSE();
+    try {
+      setLoading(true);
+      toast("퇴근 차량배치가 시작되었습니다.");
 
-    toast("퇴근 차량배치가 시작되었습니다.");
-    await setLoading(true);
+      // SSE 연결 설정
 
-    const selectedEmployeesInfos = employees.filter((employeeInfo) =>
-      selectedEmployeeIds.includes(employeeInfo.id)
-    );
-    const selectedElderlysInfos = elders.filter((elderlyInfo) =>
-      selectedElderIds.includes(elderlyInfo.id)
-    );
-
-    const requestJson1 = {
-      elderlys: selectedElderlysInfos,
-      couples: transformToCoupleRequestDTO(couples),
-      employees: selectedEmployeesInfos,
-      company: { companyAddress: company.address },
-      dispatchType: dispatchType,
-      userName: userId,
-    };
-    const requestJson2 = {
-      elderlys: selectedElderlysInfos,
-      couples: transformToCoupleRequestDTO(couples),
-      employees: selectedEmployeesInfos,
-      company: { companyAddress: company.address },
-      fixedAssignments: fixedAssignments,
-      dispatchType: dispatchType,
-      userName: userId,
-    };
-
-    if (fixedAssignments.length === 0) {
-      console.log(JSON.stringify(requestJson1));
-    } else {
-      console.log(JSON.stringify(requestJson2));
-    }
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", "Bearer " + jwt);
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body:
-        fixedAssignments.length === 0
-          ? JSON.stringify(requestJson1)
-          : JSON.stringify(requestJson2),
-      redirect: "follow",
-    };
-
-    let flag = false;
-    const result = await fetch(`${config.dispatchUrl}/dispatch`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          flag = true;
-        }
-
-        return response.json();
-      })
-      .catch((error) => console.error(error));
-
-    if (flag) {
-      toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
-      setLoading(false);
-      return;
-    }
-    toast("퇴근 차량배치가 완료되었습니다.");
-
-    await setLoading(false);
-    await setDispatchResult(result);
-    await console.log(result);
-    await setModalShow(true);
-  }
-
-  async function dispatchIn(dispatchType) {
-    console.log(employees);
-
-    if (jwt === "") {
-      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
-      return;
-    }
-    getProgressSSE();
-
-    toast("출근 차량배치가 시작되었습니다.");
-
-    await setLoading(true);
-
-    let selectedEmployeesInfos = employees.filter((employeeInfo) =>
-      selectedEmployeeIds.includes(employeeInfo.id)
-    );
-
-    // 새로운 배열 생성
-    let updatedEmployeesInfos = [];
-
-    selectedEmployeesInfos.forEach((employeeInfo) => {
-      // repeat 속성이 없거나 1 이하인 경우, 기본적으로 한 번만 추가
-      let repeatCount = employeeInfo.repeat || 1;
-
-      // repeat 횟수 만큼 반복하여 삽입
-      for (let i = 0; i < repeatCount; i++) {
-        updatedEmployeesInfos.push({ ...employeeInfo, repeat: 1 }); // 스프레드 연산자를 사용해 객체 복사 후, repeat 속성 초기화
-      }
-    });
-
-    // 원래 배열에 새 배열을 할당
-    selectedEmployeesInfos = updatedEmployeesInfos;
-
-    console.log(selectedEmployeesInfos);
-
-    const selectedElderlysInfos = elders.filter((elderlyInfo) =>
-      selectedElderIds.includes(elderlyInfo.id)
-    );
-
-    const requestJson1 = {
-      elderlys: selectedElderlysInfos,
-      couples: transformToCoupleRequestDTO(couples),
-      employees: selectedEmployeesInfos,
-      company: { companyAddress: company.address },
-      dispatchType: dispatchType,
-      userName: userId,
-    };
-    const requestJson2 = {
-      elderlys: selectedElderlysInfos,
-      couples: transformToCoupleRequestDTO(couples),
-      employees: selectedEmployeesInfos,
-      company: { companyAddress: company.address },
-      fixedAssignments: fixedAssignments,
-      dispatchType: dispatchType,
-      userName: userId,
-    };
-
-    if (fixedAssignments.length === 0) {
-      console.log(JSON.stringify(requestJson1));
-    } else {
-      console.log(JSON.stringify(requestJson2));
-    }
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", "Bearer " + jwt);
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body:
-        fixedAssignments.length === 0
-          ? JSON.stringify(requestJson1)
-          : JSON.stringify(requestJson2),
-      redirect: "follow",
-    };
-
-    let flag = false;
-    const result = await fetch(`${config.dispatchUrl}/dispatch`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          flag = true;
-        }
-
-        return response.json();
-      })
-      .catch((error) => console.error(error));
-
-    if (flag) {
-      toast(
-        "차량 배치에 실패하였습니다. 로그인이나 데이터를 다시 확인해 주세요."
+      // Request data preparation
+      const selectedEmployeesInfos = employees.filter((employeeInfo) =>
+        selectedEmployeeIds.includes(employeeInfo.id)
       );
+      const selectedElderlysInfos = elders.filter((elderlyInfo) =>
+        selectedElderIds.includes(elderlyInfo.id)
+      );
+
+      const baseRequestData = {
+        elderlys: selectedElderlysInfos,
+        couples: transformToCoupleRequestDTO(couples),
+        employees: selectedEmployeesInfos,
+        company: { companyAddress: company.address },
+        dispatchType: dispatchType,
+        userName: userId,
+      };
+
+      const requestData =
+        fixedAssignments.length === 0
+          ? baseRequestData
+          : { ...baseRequestData, fixedAssignments };
+
+      // Request configuration with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1800000); // 10분 timeout
+
+      console.log(requestData);
+
+      const response = await fetch(`${config.dispatchUrl}/dispatch`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify(requestData),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Success handling
+      toast("퇴근 차량배치가 완료되었습니다.");
+      setDispatchResult(result);
+      setModalShow(true);
+
+      return result;
+    } catch (error) {
+      // Error handling
+      if (error.name === "AbortError") {
+        toast("요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
+      } else {
+        toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
+        console.error("Dispatch error:", error);
+      }
+
+      setDispatchResult(null);
+      throw error;
+    } finally {
       setLoading(false);
+      // SSE 연결 종료 처리
+      if (eventSource) {
+        eventSource.close();
+      }
+    }
+  }
+  async function dispatchIn(dispatchType) {
+    if (jwt === "") {
+      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
-    toast("출근 차량배치가 완료되었습니다.");
+    const eventSource = getProgressSSE();
 
-    await setLoading(false);
-    await setDispatchResult(result);
-    await console.log(result);
-    await setModalShow(true);
+    try {
+      setLoading(true);
+      toast("출근 차량배치가 시작되었습니다.");
+
+      // Request data preparation with repeat handling
+      let selectedEmployeesInfos = employees.filter((employeeInfo) =>
+        selectedEmployeeIds.includes(employeeInfo.id)
+      );
+
+      // Handle employee repeats
+      const updatedEmployeesInfos = selectedEmployeesInfos.flatMap(
+        (employeeInfo) => {
+          const repeatCount = employeeInfo.repeat || 1;
+          return Array(repeatCount)
+            .fill(null)
+            .map(() => ({
+              ...employeeInfo,
+              repeat: 1,
+            }));
+        }
+      );
+
+      const selectedElderlysInfos = elders.filter((elderlyInfo) =>
+        selectedElderIds.includes(elderlyInfo.id)
+      );
+
+      const baseRequestData = {
+        elderlys: selectedElderlysInfos,
+        couples: transformToCoupleRequestDTO(couples),
+        employees: updatedEmployeesInfos,
+        company: { companyAddress: company.address },
+        dispatchType: dispatchType,
+        userName: userId,
+      };
+
+      const requestData =
+        !fixedAssignments || fixedAssignments.length === 0
+          ? baseRequestData
+          : { ...baseRequestData, fixedAssignments };
+
+      // Request configuration with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1800000); // 30분 timeout
+
+      console.log(requestData);
+
+      const response = await fetch(`${config.dispatchUrl}/dispatch`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify(requestData),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Success handling
+      toast("출근 차량배치가 완료되었습니다.");
+      setDispatchResult(result);
+      setModalShow(true);
+
+      return result;
+    } catch (error) {
+      // Error handling
+      if (error.name === "AbortError") {
+        toast("요청 시간이 초과되었습니다(30분). 잠시 후 다시 시도해주세요.");
+      } else {
+        toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
+        console.error("Dispatch error:", error);
+      }
+
+      setDispatchResult(null);
+      throw error;
+    } finally {
+      setLoading(false);
+      if (eventSource) {
+        eventSource.close();
+      }
+    }
   }
 
   function MyVerticallyCenteredModalDispatchInData(props) {
