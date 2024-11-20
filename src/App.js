@@ -2786,6 +2786,31 @@ function App() {
         setProgress(Number(event.data));
       }
     });
+
+    eventSource.addEventListener("dispatch", (event) => {
+      console.log("Dispatch Result Event:", event);
+
+      try {
+        const dispatchResult = JSON.parse(event.data);
+        setDispatchResult(dispatchResult);
+        setModalShow(true);
+        toast("배차가 완료되었습니다.");
+        setLoading(false);
+        eventSource.close();
+      } catch (error) {
+        console.error("Dispatch result parsing error:", error);
+        toast.error("결과 처리 중 오류가 발생했습니다.");
+        setLoading(false);
+        eventSource.close();
+      }
+    });
+
+    eventSource.onerror = (error) => {
+      console.error("SSE Error:", error);
+      toast.error("연결이 끊어졌습니다. 다시 시도해주세요.");
+      setLoading(false);
+      eventSource.close();
+    };
   }
 
   async function dispatchOut(dispatchType) {
@@ -2793,153 +2818,107 @@ function App() {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
-    const eventSource = getProgressSSE();
+    getProgressSSE();
+
+    setLoading(true);
+    toast("퇴근 차량배치가 시작되었습니다.");
+
+    const selectedEmployeesInfos = employees.filter((employeeInfo) =>
+      selectedEmployeeIds.includes(employeeInfo.id)
+    );
+    const selectedElderlysInfos = elders.filter((elderlyInfo) =>
+      selectedElderIds.includes(elderlyInfo.id)
+    );
+
+    const baseRequestData = {
+      elderlys: selectedElderlysInfos,
+      couples: transformToCoupleRequestDTO(couples),
+      employees: selectedEmployeesInfos,
+      company: { companyAddress: company.address },
+      dispatchType: dispatchType,
+      userName: userId,
+    };
+
+    const requestData =
+      fixedAssignments.length === 0
+        ? baseRequestData
+        : { ...baseRequestData, fixedAssignments };
+
+    console.log(requestData);
 
     try {
-      setLoading(true);
-      toast("퇴근 차량배치가 시작되었습니다.");
-
-      const selectedEmployeesInfos = employees.filter((employeeInfo) =>
-        selectedEmployeeIds.includes(employeeInfo.id)
-      );
-      const selectedElderlysInfos = elders.filter((elderlyInfo) =>
-        selectedElderIds.includes(elderlyInfo.id)
-      );
-
-      const baseRequestData = {
-        elderlys: selectedElderlysInfos,
-        couples: transformToCoupleRequestDTO(couples),
-        employees: selectedEmployeesInfos,
-        company: { companyAddress: company.address },
-        dispatchType: dispatchType,
-        userName: userId,
-      };
-
-      const requestData =
-        fixedAssignments.length === 0
-          ? baseRequestData
-          : { ...baseRequestData, fixedAssignments };
-
-      console.log(requestData);
-
-      const response = await axios.post(
-        `${config.dispatchUrl}/dispatch`,
-        requestData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          timeout: 1800000, // 30 minutes
-        }
-      );
-
-      console.log(response);
-
-      if (response.status !== 200) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      toast("퇴근 차량배치가 완료되었습니다.");
-      setDispatchResult(response.data);
-      setModalShow(true);
-
-      return response.data;
-    } catch (error) {
-      console.error("Dispatch error:", error);
-      toast("차량 배치에 실패하였습니다. 데이터를 다시 확인해 주세요.");
-      setDispatchResult(null);
-      throw error;
-    } finally {
-      setLoading(false);
-      if (eventSource) {
-        eventSource.close();
-      }
-    }
+      axios.post(`${config.dispatchUrl}/dispatch`, requestData, {
+        validateStatus: function (status) {
+          return true;
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        timeout: 1800000, // 30 minutes
+      });
+    } catch {}
   }
   async function dispatchIn(dispatchType) {
     if (jwt === "") {
       toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
-    const eventSource = getProgressSSE();
+    getProgressSSE();
+
+    setLoading(true);
+    toast("출근 차량배치가 시작되었습니다.");
+
+    // Request data preparation with repeat handling
+    let selectedEmployeesInfos = employees.filter((employeeInfo) =>
+      selectedEmployeeIds.includes(employeeInfo.id)
+    );
+
+    // Handle employee repeats
+    const updatedEmployeesInfos = selectedEmployeesInfos.flatMap(
+      (employeeInfo) => {
+        const repeatCount = employeeInfo.repeat || 1;
+        return Array(repeatCount)
+          .fill(null)
+          .map(() => ({
+            ...employeeInfo,
+            repeat: 1,
+          }));
+      }
+    );
+
+    const selectedElderlysInfos = elders.filter((elderlyInfo) =>
+      selectedElderIds.includes(elderlyInfo.id)
+    );
+
+    const baseRequestData = {
+      elderlys: selectedElderlysInfos,
+      couples: transformToCoupleRequestDTO(couples),
+      employees: updatedEmployeesInfos,
+      company: { companyAddress: company.address },
+      dispatchType: dispatchType,
+      userName: userId,
+    };
+
+    const requestData =
+      !fixedAssignments || fixedAssignments.length === 0
+        ? baseRequestData
+        : { ...baseRequestData, fixedAssignments };
+
+    console.log(requestData);
 
     try {
-      setLoading(true);
-      toast("출근 차량배치가 시작되었습니다.");
-
-      // Request data preparation with repeat handling
-      let selectedEmployeesInfos = employees.filter((employeeInfo) =>
-        selectedEmployeeIds.includes(employeeInfo.id)
-      );
-
-      // Handle employee repeats
-      const updatedEmployeesInfos = selectedEmployeesInfos.flatMap(
-        (employeeInfo) => {
-          const repeatCount = employeeInfo.repeat || 1;
-          return Array(repeatCount)
-            .fill(null)
-            .map(() => ({
-              ...employeeInfo,
-              repeat: 1,
-            }));
-        }
-      );
-
-      const selectedElderlysInfos = elders.filter((elderlyInfo) =>
-        selectedElderIds.includes(elderlyInfo.id)
-      );
-
-      const baseRequestData = {
-        elderlys: selectedElderlysInfos,
-        couples: transformToCoupleRequestDTO(couples),
-        employees: updatedEmployeesInfos,
-        company: { companyAddress: company.address },
-        dispatchType: dispatchType,
-        userName: userId,
-      };
-
-      const requestData =
-        !fixedAssignments || fixedAssignments.length === 0
-          ? baseRequestData
-          : { ...baseRequestData, fixedAssignments };
-
-      console.log(requestData);
-
-      const response = await axios.post(
-        `${config.dispatchUrl}/dispatch`,
-        requestData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          timeout: 1800000, // 30 minutes
-        }
-      );
-      console.log(response);
-
-      if (response.status !== 200) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Success handling
-      toast("출근 차량배치가 완료되었습니다.");
-      setDispatchResult(response.data);
-      setModalShow(true);
-
-      return response.data;
-    } catch (error) {
-      console.error("Dispatch error:", error);
-      toast("요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-      setDispatchResult(null);
-      throw error;
-    } finally {
-      setLoading(false);
-      if (eventSource) {
-        eventSource.close();
-      }
-    }
+      axios.post(`${config.dispatchUrl}/dispatch`, requestData, {
+        validateStatus: function (status) {
+          return true;
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        timeout: 1800000, // 30 minutes
+      });
+    } catch (error) {}
   }
 
   function MyVerticallyCenteredModalDispatchInData(props) {
