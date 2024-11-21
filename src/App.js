@@ -149,7 +149,7 @@ function App() {
       const errorData = await response.json();
       throw new Error(errorData.message || "Something went wrong");
     }
-    await toast("직원 수정에 성공하였습니다.");
+    await toast.success("직원 수정에 성공하였습니다.");
     await setLoadingSpinner(false);
 
     return response;
@@ -179,7 +179,7 @@ function App() {
       throw new Error(errorData.message || "Something went wrong");
     }
 
-    await toast("어르신 수정에 성공하였습니다.");
+    await toast.success("어르신 수정에 성공하였습니다.");
     await setLoadingSpinner(false);
 
     return response;
@@ -208,7 +208,7 @@ function App() {
       throw new Error(errorData.message || "Something went wrong");
     }
 
-    await toast("부부 어르신 수정에 성공하였습니다.");
+    await toast.success("부부 어르신 수정에 성공하였습니다.");
     await setLoadingSpinner(false);
 
     return response;
@@ -592,7 +592,7 @@ function App() {
         selectedEmployeeIds.filter((employeeId) => employeeId !== id)
       );
     }
-    await toast("직원 삭제에 성공하였습니다.");
+    await toast.success("직원 삭제에 성공하였습니다.");
     await setLoadingSpinner(false);
   };
 
@@ -618,7 +618,7 @@ function App() {
       setSelectedElderIds(selectedElderIds.filter((elderId) => elderId !== id));
     }
 
-    await toast("어르신 삭제에 성공하였습니다.");
+    await toast.success("어르신 삭제에 성공하였습니다.");
     await setLoadingSpinner(false);
   };
   const handleDeleteCouple = async (id) => {
@@ -644,7 +644,7 @@ function App() {
       prevCouples.filter((couple) => couple.coupleId !== id)
     );
 
-    await toast("부부 어르신 삭제에 성공하였습니다.");
+    await toast.success("부부 어르신 삭제에 성공하였습니다.");
     await setLoadingSpinner(false);
   };
   const handleSignin = () => {
@@ -827,7 +827,7 @@ function App() {
       }
 
       setEmployees(await fetchEmployees());
-      await toast("직원 추가에 성공하였습니다.");
+      await toast.success("직원 추가에 성공하였습니다.");
       setFormData({
         name: "",
         workPlace: company.addressName,
@@ -867,7 +867,7 @@ function App() {
           throw new Error("Network response was not ok");
         }
 
-        await toast("부부 어르신 추가에 성공하였습니다.");
+        await toast.success("부부 어르신 추가에 성공하였습니다.");
         setCouples(await fetchCouples());
         setCoupleFormData({
           elderId1: "",
@@ -905,7 +905,7 @@ function App() {
       }
 
       setElders(await fetchElders());
-      await toast("어르신 추가에 성공하였습니다.");
+      await toast.success("어르신 추가에 성공하였습니다.");
 
       await setElderFormData({
         name: "",
@@ -1810,11 +1810,11 @@ function App() {
         const maxCapacity = selectedEmployeeForSingle?.maximumCapacity || 0;
         const handleSingleRouteDispatch = async () => {
           if (!selectedEmployeeForSingle) {
-            toast("직원을 선택해주세요.");
+            toast.warn("직원을 선택해주세요.");
             return;
           }
           if (selectedEldersForSingle.length === 0) {
-            toast("어르신을 선택해주세요.");
+            toast.warn("어르신을 선택해주세요.");
             return;
           }
 
@@ -1845,7 +1845,7 @@ function App() {
             setModalShow(true);
           } catch (error) {
             console.error("Error in single route dispatch:", error);
-            toast("배치 처리 중 오류가 발생했습니다.");
+            toast.error("배치 처리 중 오류가 발생했습니다.");
           } finally {
             setLoadingSpinner(false);
           }
@@ -1970,7 +1970,7 @@ function App() {
                                     elder.id,
                                   ]);
                                 } else {
-                                  toast(
+                                  toast.warn(
                                     `최대 ${maxCapacity}명까지 선택 가능합니다.`
                                   );
                                 }
@@ -2123,7 +2123,7 @@ function App() {
       newSelections[employeeId] &&
       Object.values(newSelections[employeeId]).includes(elderId)
     ) {
-      toast("같은 직원에게 중복된 어르신을 고정할 수 없습니다.");
+      toast.warn("같은 직원에게 중복된 어르신을 고정할 수 없습니다.");
       await setLoadingSpinner(false);
 
       return;
@@ -2717,23 +2717,23 @@ function App() {
     const selectedEmployeeCount = selectedEmployeeIds.length;
 
     if (selectedEmployeeCount > selectedEldersCount) {
-      toast.error("선택된 어르신 수는 직원들의 수보다 적을 수 없습니다.");
+      toast.warn("선택된 어르신 수는 직원들의 수보다 적을 수 없습니다.");
       return;
     }
 
     // 체크 로직
     if (selectedEldersCount > totalEmployeeCapacity) {
-      toast.error("선택된 어르신 수가 직원들의 최대 배차 인원을 초과했습니다.");
+      toast.warn("선택된 어르신 수가 직원들의 최대 배차 인원을 초과했습니다.");
       return;
     }
 
     if (selectedEmployeeIds.length === 0) {
-      toast.error("직원을 선택해주세요.");
+      toast.warn("직원을 선택해주세요.");
       return;
     }
 
     if (selectedElderIds.length === 0) {
-      toast.error("어르신을 선택해주세요.");
+      toast.warn("어르신을 선택해주세요.");
       return;
     }
 
@@ -2752,17 +2752,17 @@ function App() {
 
     // 체크 로직
     if (selectedEldersCount > totalEmployeeCapacity) {
-      toast.error("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
+      toast.warn("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
       return;
     }
 
     if (selectedEmployeeIds.length === 0) {
-      toast.error("직원을 선택해주세요.");
+      toast.warn("직원을 선택해주세요.");
       return;
     }
 
     if (selectedElderIds.length === 0) {
-      toast.error("어르신을 선택해주세요.");
+      toast.warn("어르신을 선택해주세요.");
       return;
     }
 
@@ -2796,7 +2796,7 @@ function App() {
         const dispatchResult = JSON.parse(event.data);
         setDispatchResult(dispatchResult);
         setModalShow(true);
-        toast("배차가 완료되었습니다.");
+        toast.info("배차가 완료되었습니다.");
         setLoading(false);
         eventSource.close();
       } catch (error) {
@@ -2824,13 +2824,13 @@ function App() {
 
   async function dispatchOut(dispatchType) {
     if (jwt === "") {
-      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
+      toast.warn("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
     getProgressSSE();
 
     setLoading(true);
-    toast("퇴근 차량배치가 시작되었습니다.");
+    toast.info("퇴근 차량배치가 시작되었습니다.");
 
     const selectedEmployeesInfos = employees.filter((employeeInfo) =>
       selectedEmployeeIds.includes(employeeInfo.id)
@@ -2870,13 +2870,13 @@ function App() {
   }
   async function dispatchIn(dispatchType) {
     if (jwt === "") {
-      toast("차량 배치를 진행하려면 먼저 로그인해 주세요.");
+      toast.warn("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
     getProgressSSE();
 
     setLoading(true);
-    toast("출근 차량배치가 시작되었습니다.");
+    toast.info("출근 차량배치가 시작되었습니다.");
 
     // Request data preparation with repeat handling
     let selectedEmployeesInfos = employees.filter((employeeInfo) =>
@@ -3080,7 +3080,7 @@ function App() {
 
       // 이동 후 소스 그룹에 남을 어르신 수가 1명 이하인 경우
       if (sourceElders.length <= 1 && sourceDroppableId !== destDroppableId) {
-        toast.warning("최소 1명의 어르신이 배정되어야 합니다.", {
+        toast.warn("최소 1명의 어르신이 배정되어야 합니다.", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: false,
