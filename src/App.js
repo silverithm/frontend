@@ -2781,7 +2781,7 @@ function App() {
         toast.error("시간 초과로 연결이 종료되었습니다.");
         setLoading(false);
       }
-    }, 10 * 60 * 1000); // 10분
+    }, 5 * 60 * 1000); // 10분
 
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
