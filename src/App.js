@@ -2773,6 +2773,8 @@ function App() {
   function getProgressSSE() {
     const url = `${config.dispatchUrl}/SSE/subscribe/${userId}`;
 
+    setProgress(0);
+
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
         Authorization: `Bearer ${jwt}`,
