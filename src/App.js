@@ -2805,12 +2805,19 @@ function App() {
       }
     });
 
-    eventSource.onerror = (error) => {
+    eventSource.addEventListener("dispatch-error", (error) => {
       console.error("SSE Error:", error);
       toast.error("연결이 끊어졌습니다. 다시 시도해주세요.");
       setLoading(false);
       eventSource.close();
-    };
+    });
+
+    // eventSource.onerror = (error) => {
+    //   console.error("SSE Error:", error);
+    //   toast.error("연결이 끊어졌습니다. 다시 시도해주세요.");
+    //   setLoading(false);
+    //   eventSource.close();
+    // };
   }
 
   async function dispatchOut(dispatchType) {
@@ -2847,7 +2854,7 @@ function App() {
     console.log(requestData);
 
     try {
-      axios.post(`${config.dispatchUrl}/dispatch`, requestData, {
+      axios.post(`${config.apiUrl}/dispatch`, requestData, {
         validateStatus: function (status) {
           return true;
         },
@@ -2908,7 +2915,7 @@ function App() {
     console.log(requestData);
 
     try {
-      axios.post(`${config.dispatchUrl}/dispatch`, requestData, {
+      axios.post(`${config.apiUrl}/dispatch`, requestData, {
         validateStatus: function (status) {
           return true;
         },
