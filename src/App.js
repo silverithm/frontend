@@ -2775,6 +2775,14 @@ function App() {
 
     setProgress(0);
 
+    const timeout = setTimeout(() => {
+      if (eventSource) {
+        eventSource.close();
+        toast.error("시간 초과로 연결이 종료되었습니다.");
+        setLoading(false);
+      }
+    }, 10 * 60 * 1000); // 10분
+
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -2783,6 +2791,7 @@ function App() {
 
     eventSource.addEventListener("sse", (event) => {
       console.log(event);
+      clearTimeout(timeout);
 
       if (!event.data.includes("EventStream Created")) {
         setProgress(Number(event.data));
@@ -2791,6 +2800,7 @@ function App() {
 
     eventSource.addEventListener("dispatch", (event) => {
       console.log("Dispatch Result Event:", event);
+      clearTimeout(timeout);
 
       try {
         const dispatchResult = JSON.parse(event.data);
@@ -2808,6 +2818,8 @@ function App() {
     });
 
     eventSource.addEventListener("dispatch-error", (error) => {
+      clearTimeout(timeout);
+
       console.error("SSE Error:", error);
       toast.error("연결이 끊어졌습니다. 다시 시도해주세요.");
       setLoading(false);
