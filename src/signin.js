@@ -86,6 +86,7 @@ function Signin() {
       })
       .catch((error) => {
         console.error(error);
+        setLoadingSpinner(false);
       });
   };
 
