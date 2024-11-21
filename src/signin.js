@@ -71,7 +71,7 @@ function Signin() {
           await setIsSignin(true);
         } else {
           toast.error(
-            "로그인 실패하였습니다. 이메일 또는 비밀번호를 다시 확인해 주세요.",
+            "로그인에 실패하였습니다. 이메일 또는 비밀번호를 다시 확인해 주세요.",
             {
               onClose: () => {
                 setLoadingSpinner(false);
@@ -85,6 +85,12 @@ function Signin() {
         return result;
       })
       .catch((error) => {
+        toast.error("로그인에 실패하였습니다. 잠시 후 다시 시도해 주세요", {
+          onClose: () => {
+            setLoadingSpinner(false);
+          },
+          autoClose: 1000,
+        });
         console.error(error);
         setLoadingSpinner(false);
       });
