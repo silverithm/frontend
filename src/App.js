@@ -2248,10 +2248,9 @@ function App() {
     }
 
     return (
-      <>
-        <div id="map" style={{ width: "100%", height: "100%" }} />
-        <div style={{ display: "flex", gap: "10px" }}></div>
-      </>
+      <div className="w-full h-full relative">
+        <div id="map" className="w-full h-full absolute inset-0" />
+      </div>
     );
   };
   const navigationItems = [
@@ -2781,7 +2780,7 @@ function App() {
         toast.error("시간 초과로 연결이 종료되었습니다.");
         setLoading(false);
       }
-    }, 5 * 60 * 1000); // 10분
+    }, 1 * 60 * 1000); // 10분
 
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
@@ -3514,7 +3513,56 @@ function App() {
       setActiveEmployeeId(null); // 선택된 직원 상태 초기화
       props.onHide(); // 기존 모달 닫기 함수 호출
     };
+    const formatDispatchResult = (dispatchData, durations) => {
+      if (
+        !dispatchData ||
+        !Array.isArray(dispatchData) ||
+        dispatchData.length === 0
+      ) {
+        return "배차 결과가 없습니다.";
+      }
 
+      const firstDispatch = dispatchData[0];
+      const isInbound = firstDispatch?.dispatchType?.includes("IN") ?? false;
+      const header = `[${isInbound ? "출근" : "퇴근"} 배차 결과]\n\n`;
+
+      const body = dispatchData
+        .map((result, index) => {
+          if (!result || !result.employeeName) {
+            return "데이터 오류\n\n";
+          }
+
+          let formattedText = `-${result.employeeName}\n`;
+
+          // 어르신 목록 처리
+          const elders = result.assignmentElders || [];
+          if (elders.length > 0) {
+            formattedText += elders.map((elder) => elder.name).join(" ") + "\n";
+          }
+
+          return formattedText + "\n";
+        })
+        .join("");
+
+      return header + body;
+    };
+
+    const handleCopyResult = async () => {
+      try {
+        // dispatchData와 durations가 모두 존재하는지 확인
+        if (!dispatchData || !durations) {
+          toast.error("배차 결과가 아직 준비되지 않았습니다.");
+          return;
+        }
+
+        const formattedText = formatDispatchResult(dispatchData, durations);
+        await navigator.clipboard.writeText(formattedText);
+        toast.success("결과가 클립보드에 복사되었습니다.");
+      } catch (err) {
+        console.error("클립보드 복사 실패:", err);
+        toast.error("클립보드 복사에 실패했습니다.");
+      }
+    };
     return (
       <Modal
         {...props}
@@ -3593,15 +3641,15 @@ function App() {
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Left Side - Map */}
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="h-[400px]">
+                  <div className="w-full h-full rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="h-[450px]">
                       <Map
                         setMap={setMap}
                         map={map}
                         isSingleRoute={isSingleRoute}
                         employeeLongitude={firstResult?.homeAddress?.longitude}
                         employeeLatitude={firstResult?.homeAddress?.latitude}
-                      />{" "}
+                      />
                     </div>
                   </div>
 
@@ -3722,6 +3770,25 @@ function App() {
             {/* Footer */}
             <div className="bg-white border-t border-gray-200 p-4">
               <div className="flex justify-end">
+                <button
+                  onClick={handleCopyResult}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center"
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                    />
+                  </svg>
+                  결과 복사
+                </button>
                 <button
                   onClick={handleModalClose}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
