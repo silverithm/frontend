@@ -3563,6 +3563,9 @@ function App() {
         toast.error("클립보드 복사에 실패했습니다.");
       }
     };
+
+    const isInbound = dispatchData[0]?.dispatchType?.includes('IN') ?? false;
+
     return (
       <Modal
         {...props}
@@ -3578,7 +3581,7 @@ function App() {
               <div className="px-6 py-4 flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-800">
-                    차량 배치 결과
+                    차량 배치 결과 {isInbound ? '- 출근' : '- 퇴근'}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
                     {currentTime} 기준
