@@ -2,28 +2,105 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../store/useStore";
 import { toast } from "react-toastify";
+import axios from "axios";
+import config from "../config";
+import { ToastContainer } from "react-toastify";
 
 const MyProfile = () => {
   const navigate = useNavigate();
-  const { userName, userEmail, company } = useStore();
+  const { userName, userEmail, company, jwt } = useStore();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [passwordErrors, setPasswordErrors] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+      return "비밀번호는 최소 8자 이상이어야 합니다";
+    }
+    return "";
+  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error("새 비밀번호가 일치하지 않습니다.");
+
+    // 비밀번호 유효성 검사
+    const newPasswordError = validatePassword(passwordForm.newPassword);
+    if (newPasswordError) {
+      setPasswordErrors((prev) => ({ ...prev, newPassword: newPasswordError }));
       return;
     }
-    // API 호출 로직...
+
+    // 비밀번호 일치 검사
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordErrors((prev) => ({
+        ...prev,
+        confirmPassword: "새 비밀번호가 일치하지 않습니다",
+      }));
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}/change/password`,
+        {
+          email: userEmail,
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("비밀번호가 성공적으로 변경되었습니다");
+        setIsChangingPassword(false);
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setPasswordErrors({
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "비밀번호 변경에 실패했습니다"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* 프로필 헤더 */}
@@ -85,78 +162,139 @@ const MyProfile = () => {
             </div>
 
             {/* 비밀번호 변경 */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  비밀번호 변경
-                </h2>
+            <div className="px-8 py-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    비밀번호 변경
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    주기적인 비밀번호 변경을 통해 계정을 안전하게 보호하세요
+                  </p>
+                </div>
                 <button
-                  onClick={() => setIsChangingPassword(!isChangingPassword)}
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  onClick={() => {
+                    setIsChangingPassword(!isChangingPassword);
+                    setPasswordForm({
+                      currentPassword: "",
+                      newPassword: "",
+                      confirmPassword: "",
+                    });
+                    setPasswordErrors({
+                      newPassword: "",
+                      confirmPassword: "",
+                    });
+                  }}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    isChangingPassword
+                      ? "text-gray-700 bg-gray-100 hover:bg-gray-200"
+                      : "text-white bg-blue-600 hover:bg-blue-700"
+                  }`}
+                  disabled={isLoading}
                 >
-                  {isChangingPassword ? "취소" : "변경하기"}
+                  {isChangingPassword ? "취소" : "비밀번호 변경"}
                 </button>
               </div>
 
               {isChangingPassword && (
-                <form
-                  onSubmit={handlePasswordChange}
-                  className="bg-gray-50 rounded-lg p-4 space-y-4"
-                >
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      현재 비밀번호
-                    </label>
-                    <input
-                      type="password"
-                      value={passwordForm.currentPassword}
-                      onChange={(e) =>
-                        setPasswordForm((prev) => ({
-                          ...prev,
-                          currentPassword: e.target.value,
-                        }))
-                      }
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
+                <form onSubmit={handlePasswordChange} className="space-y-6">
+                  <div className="space-y-4">
+                    {/* 현재 비밀번호 입력 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        현재 비밀번호
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordForm.currentPassword}
+                        onChange={(e) =>
+                          setPasswordForm((prev) => ({
+                            ...prev,
+                            currentPassword: e.target.value,
+                          }))
+                        }
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="현재 비밀번호를 입력하세요"
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    {/* 새 비밀번호 입력 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        새 비밀번호
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordForm.newPassword}
+                        onChange={(e) => {
+                          setPasswordForm((prev) => ({
+                            ...prev,
+                            newPassword: e.target.value,
+                          }));
+                          setPasswordErrors((prev) => ({
+                            ...prev,
+                            newPassword: validatePassword(e.target.value),
+                          }));
+                        }}
+                        className={`w-full px-4 py-3 rounded-lg border transition-all ${
+                          passwordErrors.newPassword
+                            ? "border-red-300 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-blue-500"
+                        } focus:ring-2 focus:border-transparent`}
+                        placeholder="새 비밀번호를 입력하세요"
+                        disabled={isLoading}
+                      />
+                      {passwordErrors.newPassword && (
+                        <p className="mt-2 text-sm text-red-600">
+                          {passwordErrors.newPassword}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* 새 비밀번호 확인 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        새 비밀번호 확인
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordForm((prev) => ({
+                            ...prev,
+                            confirmPassword: e.target.value,
+                          }))
+                        }
+                        className={`w-full px-4 py-3 rounded-lg border transition-all ${
+                          passwordErrors.confirmPassword
+                            ? "border-red-300 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-blue-500"
+                        } focus:ring-2 focus:border-transparent`}
+                        placeholder="새 비밀번호를 다시 입력하세요"
+                        disabled={isLoading}
+                      />
+                      {passwordErrors.confirmPassword && (
+                        <p className="mt-2 text-sm text-red-600">
+                          {passwordErrors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      새 비밀번호
-                    </label>
-                    <input
-                      type="password"
-                      value={passwordForm.newPassword}
-                      onChange={(e) =>
-                        setPasswordForm((prev) => ({
-                          ...prev,
-                          newPassword: e.target.value,
-                        }))
-                      }
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      새 비밀번호 확인
-                    </label>
-                    <input
-                      type="password"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) =>
-                        setPasswordForm((prev) => ({
-                          ...prev,
-                          confirmPassword: e.target.value,
-                        }))
-                      }
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
+
+                  {/* 변경하기 버튼 */}
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:bg-gray-400"
+                      disabled={
+                        isLoading ||
+                        !passwordForm.currentPassword ||
+                        !passwordForm.newPassword ||
+                        !passwordForm.confirmPassword
+                      }
                     >
-                      변경 완료
+                      {isLoading ? "변경 중..." : "변경하기"}
                     </button>
                   </div>
                 </form>

@@ -11,7 +11,7 @@ const overlayStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  zIndex: 1050, // 다른 콘텐츠보다 위에 표시
+  zIndex: 9999,
 };
 
 const spinnerStyle = {

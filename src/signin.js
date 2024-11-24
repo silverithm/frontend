@@ -5,6 +5,7 @@ import useStore from "./store/useStore";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
 import FindModal from "./components/FindModal";
+import axios from "axios";
 
 import config from "./config";
 function Signin() {
@@ -33,6 +34,48 @@ function Signin() {
     navigate("/");
   }
 
+  const sendTemporaryPassword = async (email) => {
+    setLoadingSpinner(true);
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}/find/password?email=${email}`,
+        null,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("임시 비밀번호가 이메일로 발송되었습니다.", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        setLoadingSpinner(false);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      setLoadingSpinner(false);
+      toast.error(
+        error.response?.data?.message || "임시 비밀번호 발송에 실패했습니다.",
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+      return false;
+    }
+  };
   // 모달 닫기 함수
   const handleCloseModal = () => {
     setShowFindModal(false);
@@ -158,41 +201,6 @@ function Signin() {
     }
   };
 
-  // 인증번호 확인
-  const verifyCode = async () => {
-    if (!modalState.verificationCode) {
-      toast.error("인증번호를 입력해주세요.");
-      return;
-    }
-
-    setLoadingSpinner(true);
-    try {
-      const response = await fetch(`${config.apiUrl}/auth/verify-code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: modalState.email,
-          code: modalState.verificationCode,
-        }),
-      });
-
-      if (response.ok) {
-        toast.success(
-          "인증이 완료되었습니다. 임시 비밀번호가 이메일로 전송되었습니다."
-        );
-        resetModalForm();
-      } else {
-        toast.error("인증번호가 일치하지 않습니다.");
-      }
-    } catch (error) {
-      toast.error("서버 오류가 발생했습니다.");
-    } finally {
-      setLoadingSpinner(false);
-    }
-  };
-
   return (
     <div className="bg-gradient-to-r from-sky-950 to-blue-900 min-h-screen">
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 ">
@@ -286,7 +294,7 @@ function Signin() {
         setModalState={setModalState}
         resetModalForm={resetModalForm}
         requestVerificationCode={requestVerificationCode}
-        verifyCode={verifyCode}
+        sendTemporaryPassword={sendTemporaryPassword}
       />
     </div>
   );
