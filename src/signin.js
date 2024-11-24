@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import useStore from "./store/useStore";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
+import FindModal from "./components/FindModal";
 
 import config from "./config";
 function Signin() {
@@ -12,6 +13,12 @@ function Signin() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [showFindModal, setShowFindModal] = useState(false);
+  const [findType, setFindType] = useState("email");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [findEmail, setFindEmail] = useState("");
 
   const {
     setCompany,
@@ -26,6 +33,11 @@ function Signin() {
     navigate("/");
   }
 
+  // 모달 닫기 함수
+  const handleCloseModal = () => {
+    setShowFindModal(false);
+    resetModalForm();
+  };
   const handleSignin = async (event) => {
     await setLoadingSpinner(true);
     console.log("submit!!!");
@@ -95,6 +107,91 @@ function Signin() {
         setLoadingSpinner(false);
       });
   };
+  const [modalState, setModalState] = useState({
+    show: false,
+    email: "",
+    verificationCode: "",
+    isCodeSent: false,
+    isVerified: false,
+  });
+
+  // 모달 초기화 함수
+  const resetModalForm = () => {
+    setModalState({
+      show: false,
+      email: "",
+      verificationCode: "",
+      isCodeSent: false,
+      isVerified: false,
+    });
+  };
+
+  // 인증번호 요청
+  const requestVerificationCode = async () => {
+    if (!modalState.email) {
+      toast.error("이메일을 입력해주세요.");
+      return;
+    }
+
+    setLoadingSpinner(true);
+    try {
+      const response = await fetch(`${config.apiUrl}/auth/send-verification`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: modalState.email,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("인증번호가 이메일로 전송되었습니다.");
+        setModalState((prev) => ({ ...prev, isCodeSent: true }));
+      } else {
+        toast.error("인증번호 전송에 실패했습니다.");
+      }
+    } catch (error) {
+      toast.error("서버 오류가 발생했습니다.");
+    } finally {
+      setLoadingSpinner(false);
+    }
+  };
+
+  // 인증번호 확인
+  const verifyCode = async () => {
+    if (!modalState.verificationCode) {
+      toast.error("인증번호를 입력해주세요.");
+      return;
+    }
+
+    setLoadingSpinner(true);
+    try {
+      const response = await fetch(`${config.apiUrl}/auth/verify-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: modalState.email,
+          code: modalState.verificationCode,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success(
+          "인증이 완료되었습니다. 임시 비밀번호가 이메일로 전송되었습니다."
+        );
+        resetModalForm();
+      } else {
+        toast.error("인증번호가 일치하지 않습니다.");
+      }
+    } catch (error) {
+      toast.error("서버 오류가 발생했습니다.");
+    } finally {
+      setLoadingSpinner(false);
+    }
+  };
 
   return (
     <div className="bg-gradient-to-r from-sky-950 to-blue-900 min-h-screen">
@@ -135,13 +232,16 @@ function Signin() {
                 >
                   Password
                 </label>
+
                 <div className="text-sm">
-                  <a
-                    href="#"
+                  <button
+                    onClick={() =>
+                      setModalState((prev) => ({ ...prev, show: true }))
+                    }
                     className="font-semibold text-gray-100 hover:text-indigo-500"
                   >
                     비밀번호를 잊으셨나요?
-                  </a>
+                  </button>
                 </div>
               </div>
               <div className="mt-2">
@@ -180,6 +280,13 @@ function Signin() {
           </p>
         </div>
       </div>
+      <FindModal
+        modalState={modalState}
+        setModalState={setModalState}
+        resetModalForm={resetModalForm}
+        requestVerificationCode={requestVerificationCode}
+        verifyCode={verifyCode}
+      />
     </div>
   );
 }
