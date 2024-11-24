@@ -60,6 +60,8 @@ function App() {
   const [couples, setCouples] = useState([]);
   const [employees, setEmployees] = useState([]);
 
+  const [showUserMenu, setShowUserMenu] = useState(false); // 추가
+
   const [allEmployeeSelected, setAllEmployeeSelected] = useState(true);
   const [allElderSelected, setAllElderSelected] = useState(true);
 
@@ -2189,6 +2191,7 @@ function App() {
   const handleSignout = async () => {
     await setLoadingSpinner(true);
 
+    navigate("/");
     setJwt("");
     setUserId("");
     setUserEmail("");
@@ -2275,38 +2278,55 @@ function App() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-6">
-              <div className="text-sky-100 font-medium">
-                {isSignin ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sky-200">👤</span>
+              {isSignin && (
+                <div className="flex items-center gap-4">
+                  {/* 사용자 정보 */}
+                  <div className="flex items-center gap-2 text-sky-100">
+                    <div className="w-8 h-8 bg-sky-700 rounded-full flex items-center justify-center">
+                      <span className="text-sky-100 font-medium">
+                        {userName?.charAt(0)}
+                      </span>
+                    </div>
                     <span>
                       {userName}님 ({company.name})
                     </span>
                   </div>
-                ) : (
-                  <span className="text-gray-300">로그인이 필요합니다</span>
-                )}
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={isSignin ? handleSignout : handleSignin}
-                  className="px-3 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
-                >
-                  {isSignin ? "로그아웃" : "로그인"}
-                </button>
-                {!isSignin && (
-                  <>
-                    <span className="text-gray-400">|</span>
-                    <button
-                      onClick={handleSignUp}
-                      className="px-3 py-1.5 text-sm  text-white rounded-full hover:bg-sky-600 transition-all"
-                    >
-                      회원가입
-                    </button>
-                  </>
-                )}
-              </div>
+                  {/* 내 정보 버튼 */}
+                  <button
+                    onClick={() => navigate("/my-profile")}
+                    className="px-1.5 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
+                  >
+                    내 정보
+                  </button>
+
+                  {/* 로그아웃 버튼 */}
+                  <button
+                    onClick={handleSignout}
+                    className="px-1.5 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              )}
+
+              {!isSignin && (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleSignin}
+                    className="px-3 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
+                  >
+                    로그인
+                  </button>
+                  <span className="text-gray-400">|</span>
+                  <button
+                    onClick={handleSignUp}
+                    className="px-3 py-1.5 text-sm text-white rounded-full hover:bg-sky-600 transition-all"
+                  >
+                    회원가입
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
