@@ -235,6 +235,7 @@ function Signin() {
 
                 <div className="text-sm">
                   <button
+                    type="button"
                     onClick={() =>
                       setModalState((prev) => ({ ...prev, show: true }))
                     }
