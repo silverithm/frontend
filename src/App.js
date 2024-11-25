@@ -36,6 +36,7 @@ function App() {
     useState(null);
   const [selectedEldersForSingle, setSelectedEldersForSingle] = useState([]);
   const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const [view, setView] = useState("current"); // 'current' or 'previous'
   const [isEmployeeCollapsed, setIsEmployeeCollapsed] = useState(true);
@@ -2189,6 +2190,7 @@ function App() {
   }
 
   const handleSignout = async () => {
+    setShowLogoutModal(false); // 모달 닫기
     await setLoadingSpinner(true);
 
     navigate("/");
@@ -2211,7 +2213,6 @@ function App() {
 
     await setLoadingSpinner(false);
   };
-
   const Map = ({
     setMap,
     map,
@@ -2302,11 +2303,41 @@ function App() {
 
                   {/* 로그아웃 버튼 */}
                   <button
-                    onClick={handleSignout}
+                    onClick={() => setShowLogoutModal(true)}
                     className="px-1.5 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
                   >
                     로그아웃
                   </button>
+                  <Modal
+                    show={showLogoutModal}
+                    onHide={() => setShowLogoutModal(false)}
+                    centered
+                  >
+                    <div className="bg-white rounded-lg overflow-hidden">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          로그아웃
+                        </h3>
+                        <p className="text-gray-600">
+                          정말 로그아웃 하시겠습니까?
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3">
+                        <button
+                          onClick={() => setShowLogoutModal(false)}
+                          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                        >
+                          취소
+                        </button>
+                        <button
+                          onClick={handleSignout}
+                          className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          로그아웃
+                        </button>
+                      </div>
+                    </div>
+                  </Modal>
                 </div>
               )}
 
