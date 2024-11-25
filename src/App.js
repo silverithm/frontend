@@ -2820,8 +2820,8 @@ function App() {
     setBeforeOutModalShow(true);
   }
 
-  function getProgressSSE() {
-    const url = `${config.dispatchUrl}/SSE/subscribe/${userId}`;
+  function getProgressSSE(jobId) {
+    const url = `${config.dispatchUrl}/SSE/subscribe/${jobId}`;
 
     setProgress(0);
 
@@ -2889,7 +2889,6 @@ function App() {
       toast.warn("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
-    getProgressSSE();
 
     setLoading(true);
     toast.info("퇴근 차량배치가 시작되었습니다.");
@@ -2918,7 +2917,7 @@ function App() {
     console.log(requestData);
 
     try {
-      axios.post(`${config.apiUrl}/dispatch`, requestData, {
+      var result = await axios.post(`${config.apiUrl}/dispatch`, requestData, {
         validateStatus: function (status) {
           return true;
         },
@@ -2928,6 +2927,8 @@ function App() {
         },
         timeout: 1800000, // 30 minutes
       });
+      console.log(result.data);
+      getProgressSSE(result.data);
     } catch {}
   }
   async function dispatchIn(dispatchType) {
@@ -2935,7 +2936,6 @@ function App() {
       toast.warn("차량 배치를 진행하려면 먼저 로그인해 주세요.");
       return;
     }
-    getProgressSSE();
 
     setLoading(true);
     toast.info("출근 차량배치가 시작되었습니다.");
@@ -2979,7 +2979,7 @@ function App() {
     console.log(requestData);
 
     try {
-      axios.post(`${config.apiUrl}/dispatch`, requestData, {
+      var result = await axios.post(`${config.apiUrl}/dispatch`, requestData, {
         validateStatus: function (status) {
           return true;
         },
@@ -2989,6 +2989,9 @@ function App() {
         },
         timeout: 1800000, // 30 minutes
       });
+
+      getProgressSSE(result.data);
+      console.log(result.data);
     } catch (error) {}
   }
 
