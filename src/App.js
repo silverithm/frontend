@@ -1207,11 +1207,11 @@ function App() {
     switch (view) {
       case "current":
         return (
-          <div>
-            <div>
+          <div className="p-4 md:p-8">
+            <div className="mb-6">
               <div className="flex flex-row items-center justify-between py-4">
                 <div className="flex flex-row items-center">
-                  <text className="text-lg font-bold">직원 목록</text>
+                  <h2 className="text-2xl font-bold">직원 목록</h2>
                   <div className="w-6"></div>
                   <button className="text-sm hover:underline">
                     현재 선택 인원 {selectedEmployeeIds.length}명 +
@@ -1379,7 +1379,7 @@ function App() {
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
                 <div className="flex flex-row items-center">
-                  <text className="text-lg font-bold">어르신 목록</text>
+                  <text className="text-2xl font-bold">어르신 목록</text>
                   <div className="w-6"></div>
                   <button className="text-sm hover:underline">
                     현재 선택 인원 {selectedElderIds.length}명 +
@@ -1564,12 +1564,7 @@ function App() {
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
                 <div className="flex flex-row items-center">
-                  <text className="text-lg font-bold">부부 어르신 목록</text>
-                  <div className="w-6"></div>
-
-                  <div className="w-6"></div>
-
-                  <div className="w-4"></div>
+                  <text className="text-2xl font-bold">부부 어르신 목록</text>
                 </div>
 
                 <div className="flex flex-row mr-1">
@@ -1685,7 +1680,7 @@ function App() {
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
                 <div className="flex flex-row items-center">
-                  <text className="text-lg font-bold">배치 고정</text>
+                  <text className="text-2xl font-bold">배치 고정</text>
                   <div className="w-6"></div>
 
                   <button
@@ -1708,7 +1703,6 @@ function App() {
                   >
                     {isFixCollapsed ? "늘리기" : "접기"}
                   </button>
-                  <div className="w-4"></div>
                 </div>
               </div>
 

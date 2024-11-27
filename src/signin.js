@@ -31,7 +31,7 @@ function Signin() {
   } = useStore();
 
   function handleBack() {
-    navigate("/");
+    navigate("/main");
   }
 
   const sendTemporaryPassword = async (email) => {
