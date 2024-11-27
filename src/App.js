@@ -88,10 +88,8 @@ function App() {
 
     if (setLoading && progress === 0) {
       timer = setTimeout(() => {
-        // 1분 후 에러 메시지 표시
-        toast.error("에러: 진행 상황이 없습니다. 다시 시도해 주세요.");
-        // 필요한 경우 추가적인 에러 처리 로직을 여기에 추가
-      }, 60000); // 1분 = 60000 밀리초
+        toast.error("연결이 끊어졌습니다. 잠시 후 다시 시도해 주세요.");
+      }, 30000);
     }
 
     return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
@@ -2925,7 +2923,7 @@ function App() {
       clearTimeout(timeout);
 
       console.error("SSE Error:", error);
-      toast.error("연결이 끊어졌습니다. 다시 시도해주세요.");
+      toast.error("연결이 끊어졌습니다. 잠시 후 다시 시도해 주세요.");
       setLoading(false);
       eventSource.close();
     });
