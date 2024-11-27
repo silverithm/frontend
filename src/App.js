@@ -1233,20 +1233,30 @@ function App() {
 
                 <div className="flex flex-row mr-1">
                   <button
+                    disabled={!jwt}
                     onClick={() =>
                       employees.length > 5
                         ? setIsEmployeeCollapsed(!isEmployeeCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     {isEmployeeCollapsed ? "늘리기" : "접기"}
                   </button>
                   <div className="w-4"></div>
 
                   <button
+                    disabled={!jwt}
                     onClick={openAddEmployeeModal}
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500"
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     직원 추가
                   </button>
@@ -1416,20 +1426,30 @@ function App() {
 
                 <div className="flex flex-row mr-1">
                   <button
+                    disabled={!jwt}
                     onClick={() =>
                       elders.length > 5
                         ? setIsElderCollapsed(!isElderCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     {isElderCollapsed ? "늘리기" : "접기"}
                   </button>
                   <div className="w-4"></div>
 
                   <button
+                    disabled={!jwt}
                     onClick={openAddElderModal}
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     어르신 추가
                   </button>
@@ -1569,12 +1589,17 @@ function App() {
 
                 <div className="flex flex-row mr-1">
                   <button
+                    disabled={!jwt}
                     onClick={() =>
                       couples.length > 5
                         ? setIsCoupleCollapsed(!isCoupleCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     {isCoupleCollapsed ? "늘리기" : "접기"}
                   </button>
@@ -1582,7 +1607,11 @@ function App() {
 
                   <button
                     onClick={openAddCoupleModal}
-                    className="text-sm bg-sky-950 text-white w-32 h-8 rounded hover:bg-sky-500 "
+                    className={`text-sm w-32 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     부부 어르신 추가
                   </button>
@@ -1694,12 +1723,17 @@ function App() {
 
                 <div className="flex flex-row mr-1">
                   <button
+                    disabled={!jwt}
                     onClick={() =>
                       employees.length > 5
                         ? setIsFixCollapsed(!isFixCollapsed)
                         : null
                     }
-                    className="text-sm bg-sky-950 text-white w-20 h-8 rounded hover:bg-sky-500 "
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
                     {isFixCollapsed ? "늘리기" : "접기"}
                   </button>
@@ -1768,15 +1802,25 @@ function App() {
             <div className="h-10"></div>
             <div className="flex flex-row items-center justify-center">
               <button
+                disabled={!jwt}
                 onClick={checkDispatchInData}
-                className="text-szm bg-sky-950 text-white w-60 h-12 rounded-lg hover:bg-sky-500"
+                className={`text-sm w-60 h-12 rounded ${
+                  jwt
+                    ? "bg-sky-950 text-white hover:bg-sky-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
                 출근 차량 배치
               </button>
               <div className="w-4"></div>
               <button
+                disabled={!jwt}
                 onClick={checkDispatchOutData}
-                className="text-sm bg-sky-950 text-white w-60 h-12 rounded-lg hover:bg-sky-500"
+                className={`text-sm w-60 h-12 rounded ${
+                  jwt
+                    ? "bg-sky-950 text-white hover:bg-sky-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
                 퇴근 차량 배치
               </button>
@@ -1863,9 +1907,11 @@ function App() {
                 </div>
                 <div className="flex gap-3">
                   <button
+                    disabled={!jwt}
                     className={`
                       px-6 py-2 text-sm font-medium rounded-lg transition-colors
                       ${
+                        jwt &&
                         selectedEmployeeForSingle &&
                         selectedEldersForSingle.length > 0
                           ? "bg-sky-600 text-white hover:bg-sky-500"
