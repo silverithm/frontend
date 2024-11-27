@@ -89,6 +89,7 @@ function App() {
     if (setLoading && progress === 0) {
       timer = setTimeout(() => {
         toast.error("연결이 끊어졌습니다. 잠시 후 다시 시도해 주세요.");
+        setLoading(false);
       }, 30000);
     }
 
