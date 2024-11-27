@@ -3,7 +3,14 @@
   to = "https://silverithm.netlify.app/:splat"
   status = 200
   force = true
-  
+
+[[redirects]]
+  from = "https://silverithm.site/api/v1/*"
+  to = "https://silverithm.co.kr/:splat"
+  status = 200
+  force = true
+
+
 [[redirects]]
   from = "https://silverithm-dispatch.store/api/v1/*"
   to = "https://silverithm.netlify.app/:splat"
