@@ -6,13 +6,6 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const sections = [
     {
-      title: "미래를 선도하는 AI 물류 혁신",
-      subtitle: "Silverithm이 만드는 새로운 물류의 기준",
-      icon: Globe,
-      description:
-        "세계 최고 수준의 AI 기술로 물류의 새로운 패러다임을 제시합니다.",
-    },
-    {
       title: "인공지능 차량 배치 시스템",
       subtitle: "최적화된 경로, 최소화된 비용",
       icon: Zap,
@@ -25,6 +18,13 @@ const LandingPage = () => {
       icon: Users,
       description:
         "복잡한 차량 배치를 손쉽게. 누구나 전문가처럼 운영할 수 있습니다.",
+    },
+    {
+      title: "미래를 선도하는 AI 물류 혁신",
+      subtitle: "Silverithm이 만드는 새로운 물류의 기준",
+      icon: Globe,
+      description:
+        "세계 최고 수준의 AI 기술로 물류의 새로운 패러다임을 제시합니다.",
     },
   ];
 
