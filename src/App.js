@@ -2222,7 +2222,10 @@ function App() {
   };
 
   function updateProgressStatus(progress) {
-    if (progress >= 0 && progress <= 5) {
+    if (progress === 0) {
+      return <div>연결 중 . . .</div>;
+    }
+    if (progress >= 1 && progress <= 5) {
       return <div>거리 행렬 생성 중 ...</div>;
     } else if (progress > 5 && progress <= 79) {
       if (progress % 3 <= 0 && progress % 3 <= 1) {
