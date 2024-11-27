@@ -83,6 +83,20 @@ function App() {
 
   const [activeEmployeeId, setActiveEmployeeId] = useState(null);
 
+  useEffect(() => {
+    let timer;
+
+    if (setLoading && progress === 0) {
+      timer = setTimeout(() => {
+        // 1분 후 에러 메시지 표시
+        toast.error("에러: 진행 상황이 없습니다. 다시 시도해 주세요.");
+        // 필요한 경우 추가적인 에러 처리 로직을 여기에 추가
+      }, 60000); // 1분 = 60000 밀리초
+    }
+
+    return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
+  }, [setLoading, progress]);
+
   const handleEmployeeSelect = (employeeId) => {
     if (activeEmployeeId === employeeId) {
       setActiveEmployeeId(null);
@@ -2969,6 +2983,8 @@ function App() {
       });
       console.log(result.data);
       getProgressSSE(result.data);
+
+      console.log(result);
     } catch {}
   }
   async function dispatchIn(dispatchType) {
