@@ -6,18 +6,18 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const sections = [
     {
-      title: "인공지능 차량 배치 시스템",
+      title: "인공지능 차량 경로 최적화 서비스 silverithm",
       subtitle: "최적화된 경로, 최소화된 비용",
       icon: Zap,
       description:
-        "딥러닝 기반의 실시간 최적화 알고리즘으로 효율적인 차량 운영을 실현합니다.",
+        "딥러닝 기반의 실시간 최적화 알고리즘으로 효율적인 요양기관 차량 운영을 실현합니다.",
     },
     {
       title: "혁신적인 사용자 경험",
       subtitle: "직관적인 인터페이스로 손쉬운 관리",
       icon: Users,
       description:
-        "복잡한 차량 배치를 손쉽게. 누구나 전문가처럼 운영할 수 있습니다.",
+        "복잡한 차량 시간표를 손쉽게. 누구나 전문가처럼 작성할 수 있습니다.",
     },
     {
       title: "미래를 선도하는 AI 물류 혁신",
