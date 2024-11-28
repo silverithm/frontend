@@ -3,7 +3,7 @@ import App from "./App";
 import Signin from "./signin";
 import Signup from "./components/SignUp";
 import MyProfile from "./components/MyProfile";
-import LandingPage from "./components/\bLandingPage";
+import LandingPage from "./components/LandingPage";
 
 import React from "react";
 
