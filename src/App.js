@@ -1277,7 +1277,7 @@ function App() {
               </div>
 
               <div
-                className={`relative overflow-x-auto shadow-md ${
+                className={`relative overflow-x-auto shadow-md rounded-xl ${
                   isEmployeeCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
@@ -1470,7 +1470,7 @@ function App() {
               </div>
 
               <div
-                className={`relative overflow-x-auto shadow-md ${
+                className={`relative overflow-x-auto shadow-md rounded-xl ${
                   isElderCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
@@ -1632,7 +1632,7 @@ function App() {
               </div>
 
               <div
-                className={`relative overflow-x-auto shadow-md ${
+                className={`relative overflow-x-auto shadow-md rounded-xl ${
                   isCoupleCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
@@ -1754,7 +1754,7 @@ function App() {
               </div>
 
               <div
-                className={`relative overflow-x-auto shadow-md ${
+                className={`relative overflow-x-auto shadow-md rounded-xl ${
                   isFixCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
