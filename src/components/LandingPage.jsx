@@ -155,9 +155,20 @@ const LandingPage = () => {
       </div>
     );
   };
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
+  const handleScroll = (e) => {
+    const bottom =
+      Math.abs(
+        e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight
+      ) < 1;
+    setIsAtBottom(bottom);
+  };
   return (
-    <main className="snap-y snap-mandatory h-screen overflow-y-auto">
+    <main
+      className="snap-y snap-mandatory h-screen overflow-y-auto "
+      onScroll={handleScroll}
+    >
       {sections.map((section, index) => (
         <SectionComponent key={index} section={section} index={index} />
       ))}
@@ -233,12 +244,16 @@ const LandingPage = () => {
       </div>
 
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
-        <button
-          onClick={() => navigate("/main")}
-          className="px-8 py-3 bg-white text-blue-600 rounded-full font-bold shadow-lg hover:bg-gray-100 transition-colors"
-        >
-          시작하기
-        </button>
+        {isAtBottom ? (
+          <button
+            onClick={() => navigate("/main")}
+            className="px-8 py-3 bg-white text-blue-600 rounded-full font-bold shadow-lg hover:bg-gray-100 transition-colors"
+          >
+            시작하기
+          </button>
+        ) : (
+          <ChevronDown className="w-14 h-14 animate-bounce text-blue-800" />
+        )}
       </div>
     </main>
   );
