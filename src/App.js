@@ -1779,6 +1779,7 @@ function App() {
                             { length: employee.maximumCapacity },
                             (_, index) => (
                               <select
+                                className="rounded h-8"
                                 key={index}
                                 style={{
                                   textAlign: "center",
@@ -2184,6 +2185,7 @@ function App() {
 
       return;
     }
+
     handleSelect(employeeId, elderId, position);
 
     if (elderId === "없음") {
@@ -2201,6 +2203,7 @@ function App() {
           newSelections[employeeId] = restPositions;
         }
       }
+      await setLoadingSpinner(false);
     } else {
       // elderId가 "없음"이 아닌 경우, 새로운 선택을 추가
       newSelections = {
