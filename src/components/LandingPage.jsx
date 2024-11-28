@@ -17,7 +17,7 @@ const LandingPage = () => {
       subtitle: "직관적인 인터페이스로 손쉬운 관리",
       icon: Users,
       description:
-        "복잡한 차량 시간표를 손쉽게. 누구나 전문가처럼 작성할 수 있습니다.",
+        "복잡한 차량 시간표를 손쉽게, 누구나 전문가처럼 작성할 수 있습니다.",
     },
     {
       title: "미래를 선도하는 AI 물류 혁신",
@@ -227,7 +227,7 @@ const LandingPage = () => {
             <h3 className="text-2xl font-bold mb-4 flex items-center">
               연간 구독
               <span className="ml-2 text-red-500 font-bold text-sm">
-                23% 특별 할인
+                특별 23% 할인
               </span>
             </h3>
             <div className="relative mb-6">
