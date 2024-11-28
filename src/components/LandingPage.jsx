@@ -174,6 +174,64 @@ const LandingPage = () => {
           <FeatureSection key={index} feature={feature} index={index} />
         ))}
       </div>
+      <div className="bg-gray-50 py-24 px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            요금제
+          </h2>
+          <p className="text-xl text-gray-600">
+            비즈니스 규모에 맞는 최적의 요금제를 선택하세요
+          </p>
+        </div>
+
+        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+          <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <h3 className="text-2xl font-bold mb-4">무료 체험판</h3>
+            <p className="text-4xl font-bold mb-6">
+              ₩0<span className="text-lg text-gray-500 font-normal">/월</span>
+            </p>
+            <ul className="space-y-3 mb-8">
+              <li>• 일간 경로 최적화 기능 1회 </li>
+              <li>• 일간 단일 경로 찾기 5회</li>
+              <li>• 직원 최대 10명 관리</li>
+              <li>• 어르신 최대 30명 관리</li>
+            </ul>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-2xl shadow-lg text-white transform scale-105">
+            <h3 className="text-2xl font-bold mb-4">월간 프리미엄 </h3>
+            <p className="text-4xl font-bold mb-6">
+              ₩12,900
+              <span className="text-lg opacity-75 font-normal">/월</span>
+            </p>
+            <ul className="space-y-3 mb-8">
+              <li>• 무제한 경로 최적화</li>
+              <li>• 무제한 단일 경로 찾기</li>
+              <li>• 인원 추가 무제한</li>
+              <li>• 이전 배치 보기 대시보드</li>
+            </ul>
+          </div>
+
+          <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <h3 className="text-2xl font-bold mb-4 flex items-center">
+              연간 구독
+              <span className="ml-2 text-red-500 font-bold text-sm">
+                23% 특별 할인
+              </span>
+            </h3>
+            <div className="relative mb-6">
+              <p className="text-4xl font-bold">
+                ₩99,000
+                <span className="text-lg text-gray-500 font-normal">/년</span>
+              </p>
+            </div>
+            <ul className="space-y-3 mb-8">
+              <li>• 월간 프리미엄의 모든 기능</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => navigate("/main")}
