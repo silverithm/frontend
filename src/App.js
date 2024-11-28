@@ -2331,7 +2331,10 @@ function App() {
           <div className="h-16 px-6 flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <h1 className="text-white text-xl font-bold tracking-wider hover:text-sky-200 transition-colors cursor-pointer">
+              <h1
+                className="text-white text-xl font-bold tracking-wider hover:text-sky-200 transition-colors cursor-pointer"
+                onClick={() => navigate("/")}
+              >
                 SILVERITHM
               </h1>
             </div>
