@@ -2321,6 +2321,8 @@ function App() {
     { id: "one", label: "단일 경로 길 찾기", icon: "🛣️" },
     { id: "previous", label: "이전 배치 보기", icon: "📋" },
   ];
+
+  var subscriptionType = "monthly";
   return (
     <div className="App">
       <ToastContainer />
@@ -2355,12 +2357,36 @@ function App() {
                     </span>
                   </div>
 
+                  {/* 구독 뱃지 */}
+                  {subscriptionType === "free" && (
+                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full">
+                      무료 체험
+                    </span>
+                  )}
+                  {subscriptionType === "monthly" && (
+                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full">
+                      월간 Premium 👑
+                    </span>
+                  )}
+                  {subscriptionType === "yearly" && (
+                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full">
+                      연간 Premium 👑
+                    </span>
+                  )}
+
                   {/* 내 정보 버튼 */}
                   <button
                     onClick={() => navigate("/my-profile")}
                     className="px-1.5 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
                   >
                     내 정보
+                  </button>
+
+                  <button
+                    onClick={() => navigate("/my-profile")}
+                    className="px-1.5 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
+                  >
+                    도움말
                   </button>
 
                   {/* 로그아웃 버튼 */}
