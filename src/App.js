@@ -2322,7 +2322,7 @@ function App() {
     { id: "previous", label: "이전 배치 보기", icon: "📋" },
   ];
 
-  var subscriptionType = "monthly";
+  var subscriptionType = "yearly";
   return (
     <div className="App">
       <ToastContainer />
@@ -2383,7 +2383,7 @@ function App() {
                   </button>
 
                   <button
-                    onClick={() => navigate("/my-profile")}
+                    onClick={() => navigate("/help")}
                     className="px-1.5 py-1.5 text-sm text-sky-100 hover:text-white rounded-full hover:bg-sky-600 transition-colors"
                   >
                     도움말
