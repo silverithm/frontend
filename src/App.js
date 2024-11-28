@@ -1255,7 +1255,7 @@ function App() {
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {isEmployeeCollapsed ? "늘리기" : "접기"}
@@ -1268,7 +1268,7 @@ function App() {
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     직원 추가
@@ -1448,7 +1448,7 @@ function App() {
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {isElderCollapsed ? "늘리기" : "접기"}
@@ -1461,7 +1461,7 @@ function App() {
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     어르신 추가
@@ -1611,7 +1611,7 @@ function App() {
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {isCoupleCollapsed ? "늘리기" : "접기"}
@@ -1623,7 +1623,7 @@ function App() {
                     className={`text-sm w-32 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     부부 어르신 추가
@@ -1745,7 +1745,7 @@ function App() {
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
                         ? "bg-sky-950 text-white hover:bg-sky-500"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {isFixCollapsed ? "늘리기" : "접기"}
@@ -1820,7 +1820,7 @@ function App() {
                 className={`text-sm w-60 h-12 rounded ${
                   jwt
                     ? "bg-sky-950 text-white hover:bg-sky-500"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 출근 차량 배치
@@ -1832,7 +1832,7 @@ function App() {
                 className={`text-sm w-60 h-12 rounded ${
                   jwt
                     ? "bg-sky-950 text-white hover:bg-sky-500"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 퇴근 차량 배치
