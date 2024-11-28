@@ -1226,11 +1226,11 @@ function App() {
                 <div className="flex flex-row items-center">
                   <h2 className="text-2xl font-bold">직원 목록</h2>
                   <div className="w-6"></div>
-                  <button className="text-sm hover:underline">
+                  <button className="text-sm hover:underline text-gray-400">
                     현재 선택 인원 {selectedEmployeeIds.length}명 +
                   </button>
                   <div className="w-6"></div>
-                  <text className="text-sm">
+                  <text className="text-sm text-gray-400">
                     최대 배차 인원 &nbsp;
                     {employees
                       .filter((employee) =>
@@ -1404,11 +1404,11 @@ function App() {
                 <div className="flex flex-row items-center">
                   <text className="text-2xl font-bold">어르신 목록</text>
                   <div className="w-6"></div>
-                  <button className="text-sm hover:underline">
+                  <button className="text-sm hover:underline text-gray-400">
                     현재 선택 인원 {selectedElderIds.length}명 +
                   </button>
                   <div className="w-6"></div>
-                  <text className="text-sm">
+                  <text className="text-sm text-gray-400">
                     최대 배차 인원 &nbsp;
                     {employees
                       .filter((employee) =>
@@ -1727,7 +1727,7 @@ function App() {
 
                   <button
                     onClick={() => console.log(fixedAssignments)}
-                    className="text-sm hover:underline"
+                    className="text-sm hover:underline text-gray-400"
                   >
                     현재 고정 인원 {fixedAssignments.length}명 +
                   </button>
