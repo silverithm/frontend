@@ -172,19 +172,6 @@ const LandingPage = () => {
       {sections.map((section, index) => (
         <SectionComponent key={index} section={section} index={index} />
       ))}
-      <div className="bg-white min-h-screen">
-        <div className="pt-20 pb-8 text-center">
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            강력한 기능을 경험해보세요
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Silverithm의 혁신적인 기능으로 물류 운영의 새로운 차원을 경험하세요
-          </p>
-        </div>
-        {features.map((feature, index) => (
-          <FeatureSection key={index} feature={feature} index={index} />
-        ))}
-      </div>
       <div className="bg-gray-50 py-24 px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -196,7 +183,7 @@ const LandingPage = () => {
         </div>
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl shadow-lg">
+          <div className="bg-white p-8 rounded-2xl shadow-lg transform hover:scale-105 transition-transform">
             <h3 className="text-2xl font-bold mb-4">무료 체험판</h3>
             <p className="text-4xl font-bold mb-6">
               ₩0<span className="text-lg text-gray-500 font-normal">/월</span>
@@ -209,7 +196,7 @@ const LandingPage = () => {
             </ul>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-2xl shadow-lg text-white transform scale-105">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-2xl shadow-lg text-white transform hover:scale-105 transition-transform">
             <h3 className="text-2xl font-bold mb-4">월간 프리미엄 </h3>
             <p className="text-4xl font-bold mb-6">
               ₩12,900
@@ -223,19 +210,17 @@ const LandingPage = () => {
             </ul>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl shadow-lg">
+          <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-orange-400 p-8 rounded-2xl shadow-lg text-white transform hover:scale-105 transition-transform">
             <h3 className="text-2xl font-bold mb-4 flex items-center">
               연간 구독
-              <span className="ml-2 text-red-500 font-bold text-sm">
+              <span className="ml-2 text-white font-bold text-sm">
                 특별 23% 할인
               </span>
             </h3>
-            <div className="relative mb-6">
-              <p className="text-4xl font-bold">
-                ₩99,000
-                <span className="text-lg text-gray-500 font-normal">/년</span>
-              </p>
-            </div>
+            <p className="text-4xl font-bold mb-6">
+              ₩99,000
+              <span className="text-lg opacity-75 font-normal">/년</span>
+            </p>
             <ul className="space-y-3 mb-8">
               <li>• 월간 프리미엄의 모든 기능</li>
             </ul>
