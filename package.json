@@ -47,7 +47,7 @@
     "start:dev": "env-cmd -f .env.development react-scripts start",
     "start:prod": "env-cmd -f .env.production react-scripts start",
     "start": "react-scripts start",
-    "build": "react-scripts build && yarn sentry:sourcemaps",
+    "build": "react-scripts build && yarn sentry:sourcemaps && yarn sentry:sourcemaps",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org silverithm --project javascript ./build && sentry-cli sourcemaps upload --org silverithm --project javascript ./build"
