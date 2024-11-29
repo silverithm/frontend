@@ -31,6 +31,9 @@ const AGREEMENT_LINKS = {
   termsOfService:
     " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
 };
+
+const directionsCache = {};
+
 function App() {
   const [selectedEmployeeForSingle, setSelectedEmployeeForSingle] =
     useState(null);
@@ -3388,7 +3391,6 @@ function App() {
         opacity: 0.85,
       };
     }
-    const directionsCache = {};
 
     async function getCarDirection() {
       if (!map || !dispatchData.length) return [];
