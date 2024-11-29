@@ -3886,12 +3886,25 @@ function App() {
                                   <span className="font-medium ml-1">
                                     {activeEmployeeId &&
                                     activeEmployeeId !== item.employeeId
-                                      ? "" // 다른 직원이 선택되었을 때는 빈 문자열
-                                      : isNaN(durations[dispatchIndex])
-                                      ? "계산중..."
-                                      : `약 ${(
-                                          durations[dispatchIndex] / 60
-                                        ).toFixed(0)}분`}
+                                      ? ""
+                                      : (() => {
+                                          const cacheKey = `${
+                                            item.employeeId
+                                          }-${item.assignmentElders
+                                            .map((e) => e.id)
+                                            .join("-")}`;
+                                          return directionsCache[cacheKey]
+                                            ? `약 ${(
+                                                directionsCache[cacheKey]
+                                                  .routes[0].summary.duration /
+                                                60
+                                              ).toFixed(0)}분 (캐시)`
+                                            : isNaN(durations[dispatchIndex])
+                                            ? "계산중..."
+                                            : `약 ${(
+                                                durations[dispatchIndex] / 60
+                                              ).toFixed(0)}분`;
+                                        })()}
                                   </span>
                                 </div>
                               </div>
