@@ -2228,9 +2228,9 @@ function App() {
     if (progress === 0) {
       return <div>연결 중 . . .</div>;
     }
-    if (progress >= 1 && progress <= 5) {
+    if (progress >= 1 && progress <= 10) {
       return <div>거리 행렬 생성 중 ...</div>;
-    } else if (progress > 5 && progress <= 79) {
+    } else if (progress > 10 && progress < 95) {
       if (progress % 3 <= 0 && progress % 3 <= 1) {
         return <div>유전 알고리즘 계산 중 . </div>;
       }
@@ -2243,7 +2243,7 @@ function App() {
         return <div>유전 알고리즘 계산 중 . . .</div>;
       }
       return <div>유전 알고리즘 계산 중 </div>;
-    } else if (progress >= 79) {
+    } else if (progress >= 95) {
       return <div>최종 결과 생성 중 . . .</div>;
     }
   }
