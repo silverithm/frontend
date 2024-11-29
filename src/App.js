@@ -3388,35 +3388,34 @@ function App() {
         opacity: 0.85,
       };
     }
+    const directionsCache = {};
+
     async function getCarDirection() {
       if (!map || !dispatchData.length) return [];
-
       const dur = [];
       const newRandomColors = [];
 
-      // 기존 오버레이 제거
       mapOverlays.forEach((overlay) => {
         overlay.setMap(null);
       });
       setMapOverlays([]);
 
-      console.log(dispatchData);
-
-      // dispatchData를 사용하도록 수정
       for (const [index, result] of dispatchData.entries()) {
-        console.log(result);
-        console.log(activeEmployeeId);
         if (
           activeEmployeeId === null ||
           activeEmployeeId === result.employeeId
         ) {
-          let origin;
-          let destination;
-          let waypoints = [];
+          // 캐시 키 생성
+          const cacheKey = `${result.employeeId}-${result.assignmentElders
+            .map((e) => e.id)
+            .join("-")}`;
           const lineStyle = getLineStyle(index);
           newRandomColors.push(lineStyle.color);
 
-          // 경로 유형에 따른 origin, destination, waypoints 설정
+          let origin,
+            destination,
+            waypoints = [];
+
           if (result.isSingleRoute) {
             origin = {
               x: result.homeAddress.longitude,
@@ -3435,7 +3434,7 @@ function App() {
             };
 
             for (let i = 0; i < result.assignmentElders.length - 1; i++) {
-              let currentElder = result.assignmentElders[i];
+              const currentElder = result.assignmentElders[i];
               waypoints.push({
                 x: currentElder.homeAddress.longitude,
                 y: currentElder.homeAddress.latitude,
@@ -3455,7 +3454,7 @@ function App() {
             };
 
             for (let i = 0; i < result.assignmentElders.length; i++) {
-              let currentElder = result.assignmentElders[i];
+              const currentElder = result.assignmentElders[i];
               waypoints.push({
                 x: currentElder.homeAddress.longitude,
                 y: currentElder.homeAddress.latitude,
@@ -3482,7 +3481,7 @@ function App() {
             };
 
             for (let i = 0; i < result.assignmentElders.length; i++) {
-              let currentElder = result.assignmentElders[i];
+              const currentElder = result.assignmentElders[i];
               waypoints.push({
                 x: currentElder.homeAddress.longitude,
                 y: currentElder.homeAddress.latitude,
@@ -3499,132 +3498,134 @@ function App() {
             };
           }
 
-          const headers = {
-            Authorization: `KakaoAK ${REST_API_KEY}`,
-            "Content-Type": "application/json",
-          };
-
-          const body = JSON.stringify({
-            origin: origin,
-            destination: destination,
-            waypoints: waypoints,
-            priority: "RECOMMEND",
-            car_fuel: "GASOLINE",
-            car_hipass: false,
-            alternatives: true,
-            road_details: false,
-          });
-
-          try {
-            const response = await fetch(url, {
-              method: "POST",
-              headers: headers,
-              body: body,
-            });
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const duration = await data.routes[0].summary.duration;
-            dur[index] = duration;
-
-            data.routes[0].sections.forEach(async (section) => {
-              const linePath = [];
-
-              await section.roads.forEach((road) => {
-                for (let i = 0; i < road.vertexes.length; i += 2) {
-                  const latLng = new kakao.maps.LatLng(
-                    road.vertexes[i + 1],
-                    road.vertexes[i]
-                  );
-                  linePath.push(latLng);
-                }
+          // 캐시된 데이터 확인
+          let data;
+          if (directionsCache[cacheKey]) {
+            data = directionsCache[cacheKey];
+            dur[index] = data.routes[0].summary.duration;
+          } else {
+            try {
+              const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                  Authorization: `KakaoAK ${REST_API_KEY}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  origin,
+                  destination,
+                  waypoints,
+                  priority: "RECOMMEND",
+                  car_fuel: "GASOLINE",
+                  car_hipass: false,
+                  alternatives: true,
+                  road_details: false,
+                }),
               });
 
-              // ... 마커 및 경로선 그리기 로직 유지
-              const createMarkerContent = (point, index = "") => {
-                const typeLabel = {
-                  출발: "출발",
-                  경유: index,
-                  도착: "도착",
-                };
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
 
-                return `
-                          <div style="
-                              padding: 4px 8px;
-                              color: ${lineStyle.color};
-                              background-color: white;
-                              border: 2px solid ${lineStyle.color};
-                              border-radius: 12px;
-                              font-size: 12px;
-                              font-weight: bold;
-                              box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                              white-space: nowrap;
-                          ">
-                              ${point.name} 
-                              <span style="
-                                  font-weight: normal;
-                                  opacity: 0.7;
-                                  margin-left: 2px;
-                                  font-size: 10px;
-                              ">
-                                  ${typeLabel[point.type]}
-                              </span>
-                          </div>
-                      `;
+              data = await response.json();
+              directionsCache[cacheKey] = data;
+              dur[index] = data.routes[0].summary.duration;
+            } catch (error) {
+              console.error("Error:", error);
+              continue;
+            }
+          }
+
+          data.routes[0].sections.forEach(async (section) => {
+            const linePath = [];
+
+            section.roads.forEach((road) => {
+              for (let i = 0; i < road.vertexes.length; i += 2) {
+                const latLng = new kakao.maps.LatLng(
+                  road.vertexes[i + 1],
+                  road.vertexes[i]
+                );
+                linePath.push(latLng);
+              }
+            });
+
+            const createMarkerContent = (point, index = "") => {
+              const typeLabel = {
+                출발: "출발",
+                경유: index,
+                도착: "도착",
               };
 
-              // 마커와 경로선을 생성하고 mapOverlays에 추가
-              const startOverlay = new kakao.maps.CustomOverlay({
-                position: new kakao.maps.LatLng(origin.y, origin.x),
-                content: createMarkerContent(origin),
-                map: map,
-              });
-              setMapOverlays((prev) => [...prev, startOverlay]);
+              return `
+                <div style="
+                    padding: 4px 8px;
+                    color: ${lineStyle.color};
+                    background-color: white;
+                    border: 2px solid ${lineStyle.color};
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                    white-space: nowrap;
+                ">
+                    ${point.name} 
+                    <span style="
+                        font-weight: normal;
+                        opacity: 0.7;
+                        margin-left: 2px;
+                        font-size: 10px;
+                    ">
+                        ${typeLabel[point.type]}
+                    </span>
+                </div>
+              `;
+            };
 
-              waypoints.forEach((point, idx) => {
-                const waypointOverlay = new kakao.maps.CustomOverlay({
-                  position: new kakao.maps.LatLng(point.y, point.x),
-                  content: createMarkerContent(point, (idx + 1).toString()),
-                  map: map,
-                });
-                setMapOverlays((prev) => [...prev, waypointOverlay]);
-              });
-
-              const endOverlay = new kakao.maps.CustomOverlay({
-                position: new kakao.maps.LatLng(destination.y, destination.x),
-                content: createMarkerContent(destination),
-                map: map,
-              });
-              setMapOverlays((prev) => [...prev, endOverlay]);
-
-              const newPolyline = await OffsetPolyline(linePath);
-
-              const backgroundPolyline = new kakao.maps.Polyline({
-                path: newPolyline,
-                strokeWeight: lineStyle.strokeWidth + 4,
-                strokeColor: "#FFFFFF",
-                strokeOpacity: 0.9,
-                strokeStyle: "solid",
-                map: map,
-              });
-              setMapOverlays((prev) => [...prev, backgroundPolyline]);
-
-              const mainPolyline = new kakao.maps.Polyline({
-                path: newPolyline,
-                strokeWeight: lineStyle.strokeWidth,
-                strokeColor: lineStyle.color,
-                strokeOpacity: lineStyle.opacity,
-                strokeStyle: "solid",
-                map: map,
-              });
-              setMapOverlays((prev) => [...prev, mainPolyline]);
+            const startOverlay = new kakao.maps.CustomOverlay({
+              position: new kakao.maps.LatLng(origin.y, origin.x),
+              content: createMarkerContent(origin),
+              map: map,
             });
-          } catch (error) {
-            console.error("Error:", error);
-          }
+            setMapOverlays((prev) => [...prev, startOverlay]);
+
+            waypoints.forEach((point, idx) => {
+              const waypointOverlay = new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(point.y, point.x),
+                content: createMarkerContent(point, (idx + 1).toString()),
+                map: map,
+              });
+              setMapOverlays((prev) => [...prev, waypointOverlay]);
+            });
+
+            const endOverlay = new kakao.maps.CustomOverlay({
+              position: new kakao.maps.LatLng(destination.y, destination.x),
+              content: createMarkerContent(destination),
+              map: map,
+            });
+            setMapOverlays((prev) => [...prev, endOverlay]);
+
+            const newPolyline = await OffsetPolyline(linePath);
+
+            const backgroundPolyline = new kakao.maps.Polyline({
+              path: newPolyline,
+              strokeWeight: lineStyle.strokeWidth + 4,
+              strokeColor: "#FFFFFF",
+              strokeOpacity: 0.9,
+              strokeStyle: "solid",
+              map: map,
+            });
+            setMapOverlays((prev) => [...prev, backgroundPolyline]);
+
+            const mainPolyline = new kakao.maps.Polyline({
+              path: newPolyline,
+              strokeWeight: lineStyle.strokeWidth,
+              strokeColor: lineStyle.color,
+              strokeOpacity: lineStyle.opacity,
+              strokeStyle: "solid",
+              map: map,
+            });
+            setMapOverlays((prev) => [...prev, mainPolyline]);
+          });
         }
       }
 
