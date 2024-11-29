@@ -2546,28 +2546,27 @@ function App() {
         </div>
       </footer>
       {loading && (
-        <LoadingOverlay>
-          <ScaleLoader color="skyblue" loading={loading} size={50} />
-          <div style={{ height: 10 }}></div>
-          <div
-            style={{
-              color: "#082F49",
-            }}
-          >
-            {updateProgressStatus(progress)}
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-10 flex flex-col items-center animate-fadeIn">
+            <ScaleLoader color="#0EA5E9" loading={loading} size={60} />
+
+            <div className="mt-8 text-xl font-medium text-slate-900">
+              {updateProgressStatus(progress)}
+            </div>
+
+            <div className="w-[600px] mt-8">
+              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-sky-400 to-blue-500 transition-all duration-500 ease-out rounded-full"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <div className="mt-2 text-right text-sm font-medium text-slate-600">
+                {progress}%
+              </div>
+            </div>
           </div>
-          <div style={{ height: 10 }}></div>
-          <ProgressBar
-            variant="info"
-            style={{
-              width: 1000,
-              height: 50,
-              color: "#082F49",
-            }}
-            now={progress}
-            label={`${progress}%`}
-          />
-        </LoadingOverlay>
+        </div>
       )}
 
       <MyVerticallyCenteredModal
