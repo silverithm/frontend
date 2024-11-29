@@ -3501,7 +3501,7 @@ function App() {
 
           // 캐시된 데이터 확인
           let data;
-          if (directionsCache[cacheKey]) {
+          if (directionsCache[cacheKey] && !isSingleRoute) {
             data = directionsCache[cacheKey];
             dur[index] = data.routes[0].summary.duration;
           } else {
