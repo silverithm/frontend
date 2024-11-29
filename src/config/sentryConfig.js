@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
-
+import ReactDOM from "react-dom/client";
+import App from "../App";
 Sentry.init({
   dsn: "https://072d0e3c7b64a25a408bfa4296976dc2@o4508382052220928.ingest.us.sentry.io/4508382082564096",
   integrations: [
@@ -15,6 +16,6 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
 });
 
-const container = document.getElementById(“app”);
-const root = createRoot(container);
+const container = document.getElementById("app");
+const root = ReactDOM.createRoot(container);
 root.render(<App />);
