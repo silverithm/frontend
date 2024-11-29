@@ -3716,12 +3716,12 @@ function App() {
         size="xl"
         centered
         aria-labelledby="dispatch-result-modal"
-        dialogClassName="!max-w-[1200px] !w-[90vw]"
+        dialogClassName="!max-w-[1200px] !w-[90vw] rounded-xl"
       >
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="max-h-[80vh] bg-gray-50">
+        <DragDropContext onDragEnd={handleDragEnd} className="rounded-xl">
+          <div className="max-h-[80vh] bg-gray-50 rounded-xl">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10 rounded-xl">
               <div className="px-6 py-4 flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-800">
@@ -3915,7 +3915,7 @@ function App() {
             </div>
 
             {/* Footer */}
-            <div className="bg-white border-t border-gray-200 p-4">
+            <div className="bg-white border-t border-gray-200 p-4 rounded-xl">
               <div className="flex justify-end">
                 <button
                   onClick={handleCopyResult}

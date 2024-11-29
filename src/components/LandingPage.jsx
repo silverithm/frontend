@@ -17,7 +17,7 @@ const LandingPage = () => {
       subtitle: "직관적인 인터페이스로 손쉬운 관리",
       icon: Users,
       description:
-        "복잡한 차량 시간표를 손쉽게, 누구나 전문가처럼 작성할 수 있습니다.",
+        "복잡한 차량 운행표를 손쉽게, 누구나 전문가처럼 작성할 수 있습니다.",
     },
     {
       title: "미래를 선도하는 AI 물류 혁신",
@@ -46,7 +46,7 @@ const LandingPage = () => {
     {
       title: "단일 경로 길 찾기",
       description:
-        "간편하게 단일 차량 운행 경로를 생성하고 관리할 수 있습니다. 지도에 일일이 입력하지 말고 경로와 시간을 빠르게 확인하세요.",
+        "간편하게 단일 차량 운행 경로를 생성하고 관리할 수 있습니다. 지도에 일일이 입력하지 말고 경로와 소요 시간을 빠르게 확인하세요.",
       gifSrc: `${process.env.PUBLIC_URL}/feature2.gif`,
       align: "right",
     },
