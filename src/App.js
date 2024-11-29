@@ -3884,27 +3884,34 @@ function App() {
                                   </svg>
                                   예상 소요시간 :
                                   <span className="font-medium ml-1">
-                                    {activeEmployeeId &&
-                                    activeEmployeeId !== item.employeeId
-                                      ? ""
-                                      : (() => {
-                                          const cacheKey = `${
-                                            item.employeeId
-                                          }-${item.assignmentElders
-                                            .map((e) => e.id)
-                                            .join("-")}`;
-                                          return directionsCache[cacheKey]
-                                            ? `약 ${(
-                                                directionsCache[cacheKey]
-                                                  .routes[0].summary.duration /
-                                                60
-                                              ).toFixed(0)}분 (캐시)`
-                                            : isNaN(durations[dispatchIndex])
-                                            ? "계산중..."
-                                            : `약 ${(
-                                                durations[dispatchIndex] / 60
-                                              ).toFixed(0)}분`;
-                                        })()}
+                                    {(() => {
+                                      const cacheKey = `${
+                                        item.employeeId
+                                      }-${item.assignmentElders
+                                        .map((e) => e.id)
+                                        .join("-")}`;
+                                      if (
+                                        activeEmployeeId &&
+                                        activeEmployeeId !== item.employeeId
+                                      ) {
+                                        return directionsCache[cacheKey]
+                                          ? `약 ${(
+                                              directionsCache[cacheKey]
+                                                .routes[0].summary.duration / 60
+                                            ).toFixed(0)}분`
+                                          : "";
+                                      }
+                                      return directionsCache[cacheKey]
+                                        ? `약 ${(
+                                            directionsCache[cacheKey].routes[0]
+                                              .summary.duration / 60
+                                          ).toFixed(0)}분`
+                                        : isNaN(durations[dispatchIndex])
+                                        ? "계산중..."
+                                        : `약 ${(
+                                            durations[dispatchIndex] / 60
+                                          ).toFixed(0)}분`;
+                                    })()}
                                   </span>
                                 </div>
                               </div>
