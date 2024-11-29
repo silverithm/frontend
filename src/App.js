@@ -3812,12 +3812,15 @@ function App() {
                             >
                               <div
                                 key={item.employeeId}
-                                className={`flex-shrink-0 font-medium w-24 employee-card `}
+                                className={`flex-shrink-0 font-medium w-24 employee-card`}
                                 style={{
                                   color:
-                                    randomColors[
-                                      dispatchIndex % randomColors.length
-                                    ],
+                                    activeEmployeeId &&
+                                    activeEmployeeId !== item.employeeId
+                                      ? "#D1D5DB" // text-gray-400 색상 값
+                                      : randomColors[
+                                          dispatchIndex % randomColors.length
+                                        ],
                                 }}
                               >
                                 {item.employeeName}
@@ -3869,50 +3872,47 @@ function App() {
                                 </Droppable>
 
                                 <div className="flex items-center text-sm text-gray-600">
-                                  <svg
-                                    className="w-4 h-4 mr-1 flex-shrink-0"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                  </svg>
-                                  예상 소요시간 :
-                                  <span className="font-medium ml-1">
-                                    {(() => {
-                                      const cacheKey = `${
-                                        item.employeeId
-                                      }-${item.assignmentElders
-                                        .map((e) => e.id)
-                                        .join("-")}`;
-                                      if (
-                                        activeEmployeeId &&
-                                        activeEmployeeId !== item.employeeId
-                                      ) {
-                                        return directionsCache[cacheKey]
-                                          ? `약 ${(
-                                              directionsCache[cacheKey]
-                                                .routes[0].summary.duration / 60
-                                            ).toFixed(0)}분`
-                                          : "";
-                                      }
-                                      return directionsCache[cacheKey]
-                                        ? `약 ${(
-                                            directionsCache[cacheKey].routes[0]
-                                              .summary.duration / 60
-                                          ).toFixed(0)}분`
-                                        : isNaN(durations[dispatchIndex])
-                                        ? "계산중..."
-                                        : `약 ${(
-                                            durations[dispatchIndex] / 60
-                                          ).toFixed(0)}분`;
-                                    })()}
-                                  </span>
+                                  {!(
+                                    activeEmployeeId &&
+                                    activeEmployeeId !== item.employeeId
+                                  ) && (
+                                    <>
+                                      <svg
+                                        className="w-4 h-4 mr-1 flex-shrink-0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                      </svg>
+                                      예상 소요시간 :
+                                      <span className="font-medium ml-1">
+                                        {(() => {
+                                          const cacheKey = `${
+                                            item.employeeId
+                                          }-${item.assignmentElders
+                                            .map((e) => e.id)
+                                            .join("-")}`;
+                                          return directionsCache[cacheKey]
+                                            ? `약 ${(
+                                                directionsCache[cacheKey]
+                                                  .routes[0].summary.duration /
+                                                60
+                                              ).toFixed(0)}분`
+                                            : isNaN(durations[dispatchIndex])
+                                            ? "계산중..."
+                                            : `약 ${(
+                                                durations[dispatchIndex] / 60
+                                              ).toFixed(0)}분`;
+                                        })()}
+                                      </span>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
