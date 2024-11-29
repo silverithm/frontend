@@ -191,7 +191,15 @@ function SignUp() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-r from-sky-950 to-blue-900">
       {LoadingSpinner && <LoadingSpinnerOverlay />}
-
+      return{" "}
+      <button
+        onClick={() => {
+          throw new Error("This is your first error!");
+        }}
+      >
+        Break the world
+      </button>
+      ;
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -209,7 +217,6 @@ function SignUp() {
           회원가입
         </h2>
       </div>
-
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSignUp}>
