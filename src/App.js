@@ -90,7 +90,7 @@ function App() {
       timer = setTimeout(() => {
         toast.error("연결이 끊어졌습니다. 잠시 후 다시 시도해 주세요.");
         setLoading(false);
-      }, 30000);
+      }, 30000 * 5);
     }
 
     return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
@@ -2913,14 +2913,6 @@ function App() {
 
     setProgress(0);
 
-    const timeout = setTimeout(() => {
-      if (eventSource) {
-        eventSource.close();
-        toast.error("시간 초과로 연결이 종료되었습니다.");
-        setLoading(false);
-      }
-    }, 1 * 60 * 1000); // 10분
-
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -2929,7 +2921,6 @@ function App() {
 
     eventSource.addEventListener("sse", (event) => {
       console.log(event);
-      clearTimeout(timeout);
 
       if (!event.data.includes("EventStream Created")) {
         setProgress(Number(event.data));
@@ -2938,7 +2929,6 @@ function App() {
 
     eventSource.addEventListener("dispatch", (event) => {
       console.log("Dispatch Result Event:", event);
-      clearTimeout(timeout);
 
       try {
         const dispatchResult = JSON.parse(event.data);
@@ -2956,8 +2946,6 @@ function App() {
     });
 
     eventSource.addEventListener("dispatch-error", (error) => {
-      clearTimeout(timeout);
-
       console.error("SSE Error:", error);
       toast.error("연결이 끊어졌습니다. 잠시 후 다시 시도해 주세요.");
       setLoading(false);
