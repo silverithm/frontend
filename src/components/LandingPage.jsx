@@ -172,6 +172,11 @@ const LandingPage = () => {
       {sections.map((section, index) => (
         <SectionComponent key={index} section={section} index={index} />
       ))}
+
+      {features.map((feature, index) => (
+        <FeatureSection key={index} feature={feature} index={index} />
+      ))}
+
       <div className="bg-gray-50 py-24 px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -223,6 +228,9 @@ const LandingPage = () => {
             </p>
             <ul className="space-y-3 mb-8">
               <li>• 월간 프리미엄의 모든 기능</li>
+              <li>&nbsp;</li>
+              <li>&nbsp;</li>
+              <li>&nbsp;</li>
             </ul>
           </div>
         </div>
