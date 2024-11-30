@@ -218,7 +218,7 @@ const LandingPage = () => {
           <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-orange-400 p-8 rounded-2xl shadow-lg text-white transform hover:scale-105 transition-transform">
             <h3 className="text-2xl font-bold mb-4 flex items-center">
               연간 구독
-              <span className="ml-2 text-white font-bold text-sm">
+              <span className="ml-2 text-red-500 font-bold text-sm">
                 특별 23% 할인
               </span>
             </h3>
