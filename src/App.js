@@ -84,8 +84,6 @@ function App() {
 
   const [LoadingSpinner, setLoadingSpinner] = useState(false);
 
-  const [activeEmployeeId, setActiveEmployeeId] = useState(null);
-
   useEffect(() => {
     let timer;
 
@@ -3145,14 +3143,15 @@ function App() {
     const [randomColors, setRandomColors] = useState([]); // 색상을 state로 관리
     var lineIndex = 0;
     // props.data가 변경될 때만 dispatchData 초기화
+
     const [activeEmployeeId, setActiveEmployeeId] = useState(null);
 
     const handleEmployeeSelect = (employeeId) => {
-      if (activeEmployeeId === employeeId) {
-        setActiveEmployeeId(null);
-      } else {
-        setActiveEmployeeId(employeeId);
-      }
+      setActiveEmployeeId((prev) => {
+        const newId = prev === employeeId ? null : employeeId;
+        console.log("New activeEmployeeId:", newId); // 업데이트 된 값 확인
+        return newId;
+      });
     };
 
     // 초기 데이터 설정
@@ -3167,7 +3166,7 @@ function App() {
       if (map) {
         updateMapDisplay();
       }
-    }, [map, dispatchData]); // dispatchData가 변경될 때마다 지도 업데이트
+    }, [map, dispatchData, activeEmployeeId]); // dispatchData가 변경될 때마다 지도 업데이트
 
     // 지도 표시 업데이트 함수
     const updateMapDisplay = useCallback(async () => {
@@ -3205,7 +3204,7 @@ function App() {
 
       const data = await getCarDirection();
       setDurations(data);
-    }, [map, dispatchData]);
+    }, [map, dispatchData, activeEmployeeId]);
 
     const firstResult = dispatchData?.[0];
     const isSingleRoute = firstResult?.isSingleRoute || false;
@@ -3403,6 +3402,9 @@ function App() {
         overlay.setMap(null);
       });
       setMapOverlays([]);
+
+      console.log("active??");
+      console.log(activeEmployeeId);
 
       for (const [index, result] of dispatchData.entries()) {
         if (
