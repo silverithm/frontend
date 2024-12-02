@@ -99,13 +99,6 @@ function App() {
     return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
   }, [setLoading, progress]);
 
-  const handleEmployeeSelect = (employeeId) => {
-    if (activeEmployeeId === employeeId) {
-      setActiveEmployeeId(null);
-    } else {
-      setActiveEmployeeId(employeeId);
-    }
-  };
   const openAgreement = (url) => {
     window.open(url, "_blank");
   };
@@ -3152,6 +3145,15 @@ function App() {
     const [randomColors, setRandomColors] = useState([]); // 색상을 state로 관리
     var lineIndex = 0;
     // props.data가 변경될 때만 dispatchData 초기화
+    const [activeEmployeeId, setActiveEmployeeId] = useState(null);
+
+    const handleEmployeeSelect = (employeeId) => {
+      if (activeEmployeeId === employeeId) {
+        setActiveEmployeeId(null);
+      } else {
+        setActiveEmployeeId(employeeId);
+      }
+    };
 
     // 초기 데이터 설정
     useEffect(() => {
@@ -3217,7 +3219,7 @@ function App() {
       const destDroppableId = parseInt(destination.droppableId);
 
       // 깊은 복사로 새로운 배열 생성
-      const newDispatchResult = JSON.parse(JSON.stringify(dispatchResult));
+      const newDispatchResult = JSON.parse(JSON.stringify(dispatchData));
 
       // 소스 그룹의 현재 어르신 수 확인
       const sourceElders =
@@ -3260,8 +3262,9 @@ function App() {
         newDispatchResult[destDroppableId].assignmentElders = destElders;
       }
 
-      // 상태 업데이트
-      setDispatchResult(newDispatchResult);
+      // // 상태 업데이트
+      // setDispatchResult(newDispatchResult);
+      setDispatchData(newDispatchResult);
 
       // 지도의 기존 오버레이 제거
       if (map) {
