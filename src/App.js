@@ -3271,9 +3271,6 @@ function App() {
           overlay.setMap(null);
         });
         setMapOverlays([]);
-
-        // 새로운 경로 계산 및 그리기
-        await getCarDirection();
       }
     };
 
@@ -3448,6 +3445,8 @@ function App() {
                 type: "경유",
               });
             }
+            console.log(result);
+            console.log("this is single route");
           } else if (
             result.dispatchType === "DISTANCE_IN" ||
             result.dispatchType === "DURATION_IN"
