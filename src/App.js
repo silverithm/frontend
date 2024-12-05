@@ -29,7 +29,7 @@ const AGREEMENT_LINKS = {
   privacyPolicy:
     "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html", // 개인정보처리방침 URL
   termsOfService:
-    " https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
+    "https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d", // 서비스 이용약관 URL
 };
 
 const directionsCache = {};
@@ -98,6 +98,7 @@ function App() {
   }, [setLoading, progress]);
 
   const openAgreement = (url) => {
+    console.log(url);
     window.open(url, "_blank");
   };
 
@@ -673,7 +674,9 @@ function App() {
       }
       if (data.buildingName !== "") {
         extraAddress +=
-          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+          extraAddress !== ""
+            ? `, ${data.buildingName}`
+            : data.buildingName;
       }
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
@@ -1076,7 +1079,7 @@ function App() {
         <h2 className="text-2xl font-bold mb-6 text-gray-800 flex-none">
           이전 배치 목록
         </h2>
-        <div className="flex-1 min-h-0 overflow-auto">
+        <div className="flex-1 overflow-auto">
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 content-start pb-4">
             {histories?.map((history) => {
               const dispatchTypeText = getDispatchTypeText(
@@ -2480,47 +2483,60 @@ function App() {
         {renderContent()}
       </main>
       <footer className="bg-gradient-to-r from-sky-950 to-blue-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="space-y-2">
-            {/* Headers */}
-            <div className="flex justify-between">
-              <h3 className="text-xs font-semibold text-sky-100">회사 정보</h3>
-              <h3 className="text-xs font-semibold text-sky-100">법적 고지</h3>
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Company Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">회사 정보</h3>
+              <div className="space-y-2">
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">회사명</span>
+                  <span className="text-gray-300">silverithm</span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">대표자</span>
+                  <span className="text-gray-300">김준형</span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">사업자등록번호</span>
+                  <span className="text-gray-300">107-21-26475</span>
+                </div>
+                
+              </div>
             </div>
 
-            {/* Content */}
-            <div className="flex justify-between">
-              {/* Company Info */}
-              <div className="text-xs text-gray-300 flex gap-6">
-                <div className="flex items-center space-x-1.5">
-                  <span className="text-sky-300">회사명</span>
-                  <span className="text-gray-400 text-xs">|</span>
-                  <span>silverithm</span>
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">연락처</h3>
+              <div className="space-y-2">
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">주소</span>
+                  <span className="text-gray-300">서울특별시 신림동 1547-10</span>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="text-sky-300">주소</span>
-                  <span className="text-gray-400 text-xs">|</span>
-                  <span>서울특별시 신림동 1547-10</span>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">이메일</span>
+                  <span className="text-gray-300">ggprgrkjh@naver.com</span>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="text-sky-300">이메일</span>
-                  <span className="text-gray-400 text-xs">|</span>
-                  <span>ggprgrkjh2@gmail.com</span>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">전화번호</span>
+                  <span className="text-gray-300">010-4549-2094</span>
                 </div>
               </div>
+            </div>
 
-              {/* Legal Links */}
-              <div className="flex items-center space-x-4 text-xs text-gray-300">
+            {/* Legal Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">법적 고지</h3>
+              <div className="flex flex-col space-y-2">
                 <a
                   onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
-                  className="text-white hover:text-sky-300  duration-200 cursor-pointer"
+                  className="text-gray-300 hover:text-sky-300 duration-200 cursor-pointer text-xs"
                 >
                   개인정보 처리방침
                 </a>
-                <span className="text-gray-600">|</span>
                 <a
                   onClick={() => openAgreement(AGREEMENT_LINKS.termsOfService)}
-                  className="text-white hover:text-sky-300  duration-200 cursor-pointer"
+                  className="text-gray-300 hover:text-sky-300 duration-200 cursor-pointer text-xs"
                 >
                   서비스 이용약관
                 </a>
@@ -2529,7 +2545,7 @@ function App() {
           </div>
 
           {/* Copyright */}
-          <div className="mt-2">
+          <div className="mt-6 pt-4 border-t border-sky-800/30">
             <p className="text-center text-xs text-gray-400">
               &copy; {new Date().getFullYear()} silverithm. All rights reserved.
             </p>
@@ -3097,7 +3113,7 @@ function App() {
                 ))}
             </div>
           </div>
-          <div style={{ marginBottom: "20px" }}>
+          <div>
             <h5>어르신 목록:</h5>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               {elders

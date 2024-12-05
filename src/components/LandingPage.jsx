@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, Globe, Zap, Users } from "lucide-react";
+import { ScaleLoader } from "react-spinners";
+
+const AGREEMENT_LINKS = {
+  privacyPolicy: "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html",
+  termsOfService: "https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d",
+};
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -164,6 +170,11 @@ const LandingPage = () => {
       ) < 1;
     setIsAtBottom(bottom);
   };
+
+  const openAgreement = (url) => {
+    window.open(url, "_blank");
+  };
+
   return (
     <main
       className="snap-y snap-mandatory h-screen overflow-y-auto "
@@ -235,6 +246,77 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gradient-to-r from-sky-950 to-blue-900 text-white">
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Company Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">회사 정보</h3>
+              <div className="space-y-2">
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">회사명</span>
+                  <span className="text-gray-300">silverithm</span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">대표자</span>
+                  <span className="text-gray-300">김준형</span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">사업자등록번호</span>
+                  <span className="text-gray-300">107-21-26475</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">연락처</h3>
+              <div className="space-y-2">
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">주소</span>
+                  <span className="text-gray-300">서울특별시 신림동 1547-10</span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">이메일</span>
+                  <span className="text-gray-300">ggprgrkjh@naver.com</span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <span className="text-sky-300 w-20">전화번호</span>
+                  <span className="text-gray-300">010-4549-2094</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Legal Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">법적 고지</h3>
+              <div className="flex flex-col space-y-2">
+                <a
+                  onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
+                  className="text-gray-300 hover:text-sky-300 duration-200 cursor-pointer text-xs"
+                >
+                  개인정보 처리방침
+                </a>
+                <a
+                  onClick={() => openAgreement(AGREEMENT_LINKS.termsOfService)}
+                  className="text-gray-300 hover:text-sky-300 duration-200 cursor-pointer text-xs"
+                >
+                  서비스 이용약관
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="mt-6 pt-4 border-t border-sky-800/30">
+            <p className="text-center text-xs text-gray-400">
+              &copy; {new Date().getFullYear()} silverithm. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
         {isAtBottom ? (
