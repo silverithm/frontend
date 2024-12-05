@@ -14,6 +14,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { Form } from "react-bootstrap";
 import axios from "axios";
+import SubscriptionBadges from "./components/PricingModal";
 import {
   DragDropContext,
   Droppable,
@@ -674,9 +675,7 @@ function App() {
       }
       if (data.buildingName !== "") {
         extraAddress +=
-          extraAddress !== ""
-            ? `, ${data.buildingName}`
-            : data.buildingName;
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
       }
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
@@ -2319,10 +2318,22 @@ function App() {
     { id: "previous", label: "이전 배치 보기", icon: "📋" },
   ];
 
-  var subscriptionType = "yearly";
+  var subscriptionType = "premiumYearly";
   return (
     <div className="App">
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       {LoadingSpinner && <LoadingSpinnerOverlay />}
       <header className="bg-gradient-to-r from-sky-950 to-blue-900 shadow-lg">
         {/* Top Bar */}
@@ -2356,19 +2367,19 @@ function App() {
 
                   {/* 구독 뱃지 */}
                   {subscriptionType === "free" && (
-                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full">
-                      무료 체험
-                    </span>
+                    <SubscriptionBadges subscriptionType="free" /> // 무료 체험
                   )}
-                  {subscriptionType === "monthly" && (
-                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full">
-                      월간 Premium 👑
-                    </span>
+                  {subscriptionType === "basicMonthly" && (
+                    <SubscriptionBadges subscriptionType="basicMonthly" /> // 월간 Basic
                   )}
-                  {subscriptionType === "yearly" && (
-                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full">
-                      연간 Premium 👑
-                    </span>
+                  {subscriptionType === "basicYearly" && (
+                    <SubscriptionBadges subscriptionType="basicYearly" /> // 연간 Basic
+                  )}
+                  {subscriptionType === "premiumMonthly" && (
+                    <SubscriptionBadges subscriptionType="premiumMonthly" /> // 월간 Premium
+                  )}
+                  {subscriptionType === "premiumYearly" && (
+                    <SubscriptionBadges subscriptionType="premiumYearly" /> // 연간 Premium
                   )}
 
                   {/* 내 정보 버튼 */}
@@ -2487,7 +2498,9 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Company Info */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-sky-100 mb-4">회사 정보</h3>
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">
+                회사 정보
+              </h3>
               <div className="space-y-2">
                 <div className="flex items-center text-xs">
                   <span className="text-sky-300 w-20">회사명</span>
@@ -2501,17 +2514,20 @@ function App() {
                   <span className="text-sky-300 w-20">사업자등록번호</span>
                   <span className="text-gray-300">107-21-26475</span>
                 </div>
-                
               </div>
             </div>
 
             {/* Contact Info */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-sky-100 mb-4">연락처</h3>
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">
+                연락처
+              </h3>
               <div className="space-y-2">
                 <div className="flex items-center text-xs">
                   <span className="text-sky-300 w-20">주소</span>
-                  <span className="text-gray-300">서울특별시 신림동 1547-10</span>
+                  <span className="text-gray-300">
+                    서울특별시 신림동 1547-10
+                  </span>
                 </div>
                 <div className="flex items-center text-xs">
                   <span className="text-sky-300 w-20">이메일</span>
@@ -2526,7 +2542,9 @@ function App() {
 
             {/* Legal Info */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-sky-100 mb-4">법적 고지</h3>
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">
+                법적 고지
+              </h3>
               <div className="flex flex-col space-y-2">
                 <a
                   onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
@@ -2589,6 +2607,7 @@ function App() {
         show={beforeOutModalShow}
         onHide={() => setBeforeOutModalShow(false)}
       />
+
       <Modal show={addCoupleModalIsOpen} onHide={closeAddCoupleModal}>
         <Modal.Header closeButton>
           <Modal.Title>부부 어르신 추가</Modal.Title>
@@ -2856,8 +2875,8 @@ function App() {
   async function checkDispatchInData() {
     // 선택된 직원들의 총 최대 수용 인원 계산
     const totalEmployeeCapacity = employees
-      .filter((emp) => selectedEmployeeIds.includes(emp.id))
-      .reduce((sum, emp) => sum + emp.maxCapacity, 0);
+      .filter((employee) => selectedEmployeeIds.includes(employee.id))
+      .reduce((sum, employee) => sum + employee.maxCapacity, 0);
 
     // 선택된 어르신 수
     const selectedEldersCount = selectedElderIds.length;
@@ -2891,8 +2910,8 @@ function App() {
   async function checkDispatchOutData() {
     // 선택된 직원들의 총 최대 수용 인원 계산
     const totalEmployeeCapacity = employees
-      .filter((emp) => selectedEmployeeIds.includes(emp.id))
-      .reduce((sum, emp) => sum + emp.maxCapacity, 0);
+      .filter((employee) => selectedEmployeeIds.includes(employee.id))
+      .reduce((sum, employee) => sum + employee.maxCapacity, 0);
 
     // 선택된 어르신 수
     const selectedEldersCount = selectedElderIds.length;

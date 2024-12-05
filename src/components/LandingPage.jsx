@@ -2,14 +2,131 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, Globe, Zap, Users } from "lucide-react";
 import { ScaleLoader } from "react-spinners";
+import { toast } from "react-toastify";
+import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 
+import useStore from "../store/useStore";
+const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
+const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
 const AGREEMENT_LINKS = {
-  privacyPolicy: "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html",
-  termsOfService: "https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d",
+  privacyPolicy:
+    "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html",
+  termsOfService:
+    "https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d",
+};
+
+export const PRICE_PLANS = {
+  free: {
+    name: "무료 체험판",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    features: [
+      "일간 경로 최적화 기능 1회",
+      "일간 단일 경로 찾기 5회",
+      "직원 최대 10명 관리",
+      "어르신 최대 30명 관리",
+    ],
+  },
+  basic: {
+    name: "Basic",
+    monthlyPrice: 13000,
+    yearlyPrice: 124800, // 13,000 * 12 * 0.8 = 124,800
+    features: [
+      "무제한 경로 최적화",
+      "무제한 단일 경로 찾기",
+      "직원 최대 10명 관리",
+      "어르신 최대 30명 관리",
+      "이전 배치 보기 대시보드",
+    ],
+  },
+  enterprise: {
+    name: "Enterprise",
+    monthlyPrice: 24900,
+    yearlyPrice: 239040, // 24,900 * 12 * 0.8 = 239,040
+    features: [
+      "모든 Basic 기능 포함",
+      "무제한 직원 등록",
+      "무제한 어르신 등록",
+      "이전 배치 보기 대시보드",
+    ],
+  },
 };
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { isSignin } = useStore();
+  const [selectedBilling, setSelectedBilling] = useState("monthly");
+  const [loading, setLoading] = useState(false);
+  const [payment, setPayment] = useState(null);
+  useEffect(() => {
+    async function fetchPayment() {
+      try {
+        const tossPayments = await loadTossPayments(clientKey);
+        // 회원 결제
+        // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
+        const payment = tossPayments.payment({
+          customerKey,
+        });
+        // 비회원 결제
+        // const payment = tossPayments.payment({ customerKey: ANONYMOUS });
+        setPayment(payment);
+      } catch (error) {
+        console.error("Error fetching payment:", error);
+      }
+    }
+    fetchPayment();
+  }, [clientKey, customerKey]);
+  // ------ '카드 등록하기' 버튼 누르면 결제창 띄우기 ------
+  // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
+  async function requestBillingAuth() {
+    // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
+    // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
+    await payment.requestBillingAuth({
+      method: "CARD", // 자동결제(빌링)는 카드만 지원합니다
+      successUrl: window.location.origin + "/success", // 요청이 성공하면 리다이렉트되는 URL
+      failUrl: window.location.origin + "/fail", // 요청이 실패하면 리다이렉트되는 URL
+      customerEmail: "customer123@gmail.com",
+      customerName: "김토스",
+    });
+  }
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("ko-KR").format(price);
+  };
+
+  const handleSubscription = async (planType) => {
+    if (!isSignin) {
+      toast.info("로그인이 필요한 서비스입니다.");
+      navigate("/signin");
+      return;
+    }
+
+    const plan = PRICE_PLANS[planType];
+    const price =
+      selectedBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+
+    try {
+      setLoading(true);
+      // 결제 요청 로직 (주석 처리된 부분)
+      // const response = await fetch(...);
+      // const data = await response.json();
+      // 결제 처리 로직
+      requestBillingAuth();
+    } catch (error) {
+      console.error("Payment initiation failed:", error);
+      toast.error("결제 초기화 중 오류가 발생했습니다. 다시 시도해 주세요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFreeStart = () => {
+    if (isSignin) {
+      navigate("/main");
+    } else {
+      navigate("/signin");
+    }
+  };
+
   const sections = [
     {
       title: "인공지능 차량 경로 최적화 서비스 silverithm",
@@ -193,56 +310,199 @@ const LandingPage = () => {
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             요금제
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-600 mb-8">
             비즈니스 규모에 맞는 최적의 요금제를 선택하세요
           </p>
+
+          {/* Billing Toggle */}
+          <div className="flex justify-center items-center gap-4 mb-8">
+            <span
+              className={`text-sm ${
+                selectedBilling === "monthly"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-500"
+              }`}
+            >
+              월간 구독
+            </span>
+            <button
+              onClick={() =>
+                setSelectedBilling((prev) =>
+                  prev === "monthly" ? "yearly" : "monthly"
+                )
+              }
+              className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  selectedBilling === "yearly"
+                    ? "translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+            <span
+              className={`text-sm ${
+                selectedBilling === "yearly"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-500"
+              }`}
+            >
+              연간 구독
+              <span className="ml-1 text-xs text-green-500 font-medium">
+                (20% 할인)
+              </span>
+            </span>
+          </div>
         </div>
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl shadow-lg transform hover:scale-105 transition-transform">
-            <h3 className="text-2xl font-bold mb-4">무료 체험판</h3>
-            <p className="text-4xl font-bold mb-6">
-              ₩0<span className="text-lg text-gray-500 font-normal">/월</span>
-            </p>
-            <ul className="space-y-3 mb-8">
-              <li>• 일간 경로 최적화 기능 1회 </li>
-              <li>• 일간 단일 경로 찾기 5회</li>
-              <li>• 직원 최대 10명 관리</li>
-              <li>• 어르신 최대 30명 관리</li>
-            </ul>
-          </div>
-
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-2xl shadow-lg text-white transform hover:scale-105 transition-transform">
-            <h3 className="text-2xl font-bold mb-4">월간 프리미엄 </h3>
-            <p className="text-4xl font-bold mb-6">
-              ₩12,900
-              <span className="text-lg opacity-75 font-normal">/월</span>
-            </p>
-            <ul className="space-y-3 mb-8">
-              <li>• 무제한 경로 최적화</li>
-              <li>• 무제한 단일 경로 찾기</li>
-              <li>• 인원 추가 무제한</li>
-              <li>• 이전 배치 보기 대시보드</li>
-            </ul>
-          </div>
-
-          <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-orange-400 p-8 rounded-2xl shadow-lg text-white transform hover:scale-105 transition-transform">
-            <h3 className="text-2xl font-bold mb-4 flex items-center">
-              연간 구독
-              <span className="ml-2 text-red-500 font-bold text-sm">
-                특별 23% 할인
-              </span>
+          {/* Free Plan */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              {PRICE_PLANS.free.name}
             </h3>
-            <p className="text-4xl font-bold mb-6">
-              ₩99,000
-              <span className="text-lg opacity-75 font-normal">/년</span>
-            </p>
-            <ul className="space-y-3 mb-8">
-              <li>• 월간 프리미엄의 모든 기능</li>
-              <li>&nbsp;</li>
-              <li>&nbsp;</li>
-              <li>&nbsp;</li>
+            <div className="mb-6">
+              <span className="text-4xl font-bold">₩0</span>
+              <span className="text-gray-500">/월</span>
+            </div>
+            <ul className="mb-8 space-y-4 flex-grow">
+              {PRICE_PLANS.free.features.map((feature, index) => (
+                <li key={index} className="flex items-center text-gray-600">
+                  <svg
+                    className="w-5 h-5 text-green-500 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  {feature}
+                </li>
+              ))}
             </ul>
+            <button
+              onClick={handleFreeStart}
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
+            >
+              무료로 시작하기
+            </button>
+          </div>
+
+          {/* Basic Plan */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              {PRICE_PLANS.basic.name}
+            </h3>
+            <div className="mb-6">
+              <span className="text-4xl font-bold">
+                ₩
+                {formatPrice(
+                  selectedBilling === "monthly"
+                    ? PRICE_PLANS.basic.monthlyPrice
+                    : PRICE_PLANS.basic.yearlyPrice
+                )}
+              </span>
+              <span className="text-gray-500">
+                /{selectedBilling === "monthly" ? "월" : "년"}
+              </span>
+              {selectedBilling === "yearly" && (
+                <span className="ml-2 text-sm text-green-500">(20% 할인)</span>
+              )}
+            </div>
+            <ul className="mb-8 space-y-4 flex-grow">
+              {PRICE_PLANS.basic.features.map((feature, index) => (
+                <li key={index} className="flex items-center text-gray-600">
+                  <svg
+                    className="w-5 h-5 text-green-500 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => handleSubscription("basic")}
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
+              disabled={loading}
+            >
+              {loading ? (
+                <ScaleLoader color="#ffffff" height={15} />
+              ) : (
+                "구독 시작하기"
+              )}
+            </button>
+          </div>
+
+          {/* Enterprise Plan */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-blue-500 flex flex-col relative transform scale-105">
+            <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-xl">
+              인기
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              {PRICE_PLANS.enterprise.name}
+            </h3>
+            <div className="mb-6">
+              <span className="text-4xl font-bold">
+                ₩
+                {formatPrice(
+                  selectedBilling === "monthly"
+                    ? PRICE_PLANS.enterprise.monthlyPrice
+                    : PRICE_PLANS.enterprise.yearlyPrice
+                )}
+              </span>
+              <span className="text-gray-500">
+                /{selectedBilling === "monthly" ? "월" : "년"}
+              </span>
+              {selectedBilling === "yearly" && (
+                <span className="ml-2 text-sm text-green-500">(20% 할인)</span>
+              )}
+            </div>
+            <ul className="mb-8 space-y-4 flex-grow">
+              {PRICE_PLANS.enterprise.features.map((feature, index) => (
+                <li key={index} className="flex items-center text-gray-600">
+                  <svg
+                    className="w-5 h-5 text-green-500 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => handleSubscription("enterprise")}
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
+              disabled={loading}
+            >
+              {loading ? (
+                <ScaleLoader color="#ffffff" height={15} />
+              ) : (
+                "구독 시작하기"
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -253,7 +513,9 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Company Info */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-sky-100 mb-4">회사 정보</h3>
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">
+                회사 정보
+              </h3>
               <div className="space-y-2">
                 <div className="flex items-center text-xs">
                   <span className="text-sky-300 w-20">회사명</span>
@@ -272,11 +534,15 @@ const LandingPage = () => {
 
             {/* Contact Info */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-sky-100 mb-4">연락처</h3>
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">
+                연락처
+              </h3>
               <div className="space-y-2">
                 <div className="flex items-center text-xs">
                   <span className="text-sky-300 w-20">주소</span>
-                  <span className="text-gray-300">서울특별시 신림동 1547-10</span>
+                  <span className="text-gray-300">
+                    서울특별시 신림동 1547-10
+                  </span>
                 </div>
                 <div className="flex items-center text-xs">
                   <span className="text-sky-300 w-20">이메일</span>
@@ -291,7 +557,9 @@ const LandingPage = () => {
 
             {/* Legal Info */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-sky-100 mb-4">법적 고지</h3>
+              <h3 className="text-sm font-semibold text-sky-100 mb-4">
+                법적 고지
+              </h3>
               <div className="flex flex-col space-y-2">
                 <a
                   onClick={() => openAgreement(AGREEMENT_LINKS.privacyPolicy)}
