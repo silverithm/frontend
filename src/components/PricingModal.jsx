@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-
+import RefundPolicyModal from "./RefundPolicyModal";
 import useStore from "../store/useStore";
 const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
 const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
@@ -46,7 +46,8 @@ const PRICE_PLANS = {
 };
 const SubscriptionBadges = ({ subscriptionType }) => {
   const [show, setShow] = useState(false);
-
+  const [isRefundPolicyOpen, setIsRefundPolicyOpen] = useState(false);
+  const [selectedPlanType, setSelectedPlanType] = useState(""); // 선택된 요금제 타입
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const navigate = useNavigate();
@@ -92,11 +93,19 @@ const SubscriptionBadges = ({ subscriptionType }) => {
   const handleSubscription = async (planType) => {
     if (!isSignin) {
       toast.info("로그인이 필요한 서비스입니다.");
-      navigate("/signin");
+      navigate("/signin", { state: { from: "/" } }); // 로그인 후 돌아올 경로 설정
       return;
     }
 
-    const plan = PRICE_PLANS[planType];
+    setSelectedPlanType(planType);
+
+    setIsRefundPolicyOpen(true);
+  };
+
+  const handleAgree = async () => {
+    setIsRefundPolicyOpen(false);
+
+    const plan = PRICE_PLANS[selectedPlanType];
     const price =
       selectedBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
 
@@ -176,6 +185,12 @@ const SubscriptionBadges = ({ subscriptionType }) => {
         centered
         className="rounded-2xl"
       >
+        <RefundPolicyModal
+          isOpen={isRefundPolicyOpen}
+          onClose={() => setIsRefundPolicyOpen(false)}
+          onAgree={handleAgree}
+          planType={selectedPlanType} // 선택된 요금제 타입 전달
+        />{" "}
         <div className="bg-gray-50 py-12 px-4 md:px-6 lg:px-8 relative rounded-2xl">
           <button
             onClick={handleClose}
