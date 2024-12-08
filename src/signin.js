@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import useStore from "./store/useStore";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,8 +9,11 @@ import axios from "axios";
 
 import config from "./config";
 function Signin() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [LoadingSpinner, setLoadingSpinner] = useState(false);
+
+  const from = location.state?.from === "/" ? "/" : "/main";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +34,9 @@ function Signin() {
   } = useStore();
 
   function handleBack() {
-    navigate("/main");
+    console.log(location.state?.from);
+    console.log(from);
+    navigate(from);
   }
 
   const sendTemporaryPassword = async (email) => {

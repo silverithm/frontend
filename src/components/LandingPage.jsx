@@ -96,7 +96,7 @@ const LandingPage = () => {
   const handleSubscription = async (planType) => {
     if (!isSignin) {
       toast.info("로그인이 필요한 서비스입니다.");
-      navigate("/signin");
+      navigate("/signin", { state: { from: "/" } }); // 로그인 후 돌아올 경로 설정
       return;
     }
 
