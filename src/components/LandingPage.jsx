@@ -4,6 +4,7 @@ import { ChevronDown, Globe, Zap, Users } from "lucide-react";
 import { ScaleLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
+import RefundPolicyModal from "./RefundPolicyModal"; // 환불 정책 모달 가져오기
 
 import useStore from "../store/useStore";
 const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
@@ -58,6 +59,9 @@ const LandingPage = () => {
   const [selectedBilling, setSelectedBilling] = useState("monthly");
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState(null);
+  const [isRefundPolicyOpen, setIsRefundPolicyOpen] = useState(false);
+  const [selectedPlanType, setSelectedPlanType] = useState(""); // 선택된 요금제 타입
+
   useEffect(() => {
     async function fetchPayment() {
       try {
@@ -100,7 +104,15 @@ const LandingPage = () => {
       return;
     }
 
-    const plan = PRICE_PLANS[planType];
+    setSelectedPlanType(planType);
+
+    setIsRefundPolicyOpen(true);
+  };
+
+  const handleAgree = async () => {
+    setIsRefundPolicyOpen(false);
+
+    const plan = PRICE_PLANS[selectedPlanType];
     const price =
       selectedBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
 
@@ -297,6 +309,11 @@ const LandingPage = () => {
       className="snap-y snap-mandatory h-screen overflow-y-auto "
       onScroll={handleScroll}
     >
+      <RefundPolicyModal
+        isOpen={isRefundPolicyOpen}
+        onClose={() => setIsRefundPolicyOpen(false)}
+        onAgree={handleAgree}
+      />
       {sections.map((section, index) => (
         <SectionComponent key={index} section={section} index={index} />
       ))}
