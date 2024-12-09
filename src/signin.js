@@ -31,6 +31,7 @@ function Signin() {
     setIsSignin,
     setUserEmail,
     setUserName,
+    setSubscriptionType,
   } = useStore();
 
   function handleBack() {
@@ -119,6 +120,7 @@ function Signin() {
             autoClose: 500, // 2초 후 자동으로 닫힘
           });
           await setJwt(result["tokenInfo"]["accessToken"]);
+          await setSubscriptionType(result["subscriptionType"]);
           await setCompany(
             result["companyName"],
             result["companyAddress"],

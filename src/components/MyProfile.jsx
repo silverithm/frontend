@@ -5,11 +5,16 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import config from "../config";
 import { ToastContainer } from "react-toastify";
+import SubscriptionBadges from "./PricingModal";
+import { AlertCircle } from "lucide-react";
 
 const MyProfile = () => {
   const navigate = useNavigate();
   const { userName, userEmail, company, jwt } = useStore();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const subscriptionType = "premiumYearly";
 
   const [isLoading, setIsLoading] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
@@ -87,6 +92,36 @@ const MyProfile = () => {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}/cancel/subscription`,
+        {
+          email: userEmail,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("구독이 성공적으로 취소되었습니다.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "구독 취소에 실패했습니다");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onCancelSubscription = () => {
+    // setShowConfirmModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <ToastContainer
@@ -160,9 +195,81 @@ const MyProfile = () => {
                 </div>
               </div>
             </div>
+            {/* 현재 구독 정보 */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <span>현재 구독</span>
+                {subscriptionType && (
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                    활성
+                  </span>
+                )}
+              </h2>
 
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-900 mt-1">
+                      {(
+                        <SubscriptionBadges subscriptionType="premiumYearly" /> // 연간 Premium
+                      ) ||
+                        "구독이 없습니다"}
+                    </p>
+                  </div>
+                  {subscriptionType && (
+                    <button
+                      onClick={handleCancelSubscription}
+                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200 flex items-center gap-1.5"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      구독 관리
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 구독 취소 확인 모달 */}
+            {showConfirmModal && (
+              <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div
+                  className="absolute inset-0 bg-black bg-opacity-50"
+                  onClick={() => setShowConfirmModal(false)}
+                />
+                <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                  <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-100">
+                    <AlertCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-center mb-2">
+                    구독을 취소하시겠습니까?
+                  </h3>
+                  <p className="text-gray-500 text-sm text-center mb-6">
+                    구독 취소 시 현재 구독 기간이 종료될 때까지 서비스를
+                    이용하실 수 있습니다. 기간 종료 후에는 서비스 이용이
+                    제한됩니다.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowConfirmModal(false)}
+                      className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      돌아가기
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleCancelSubscription();
+                        setShowConfirmModal(false);
+                      }}
+                      className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      구독 취소
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* 비밀번호 변경 */}
-            <div className="px-8 py-6">
+            <div className="">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">

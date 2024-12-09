@@ -96,7 +96,7 @@ const TermsPolicyModal = ({ isOpen, onClose, onAgree }) => {
               <p className="text-gray-600 text-sm leading-relaxed">
                 구독자는 구독 시작일 이후 정기 구독 서비스를 1회라도 사용했거나
                 구독 시작일 이후 7일이 지난 경우 구독을 철회할 수 없습니다.
-                (구독 철회는 고객센터 또는 홈페이지 내 구독 관리 페이지에서
+                (구독 환불은 고객센터, 취소는 홈페이지 내 구독 관리 페이지에서
                 가능합니다.)
               </p>
             </div>

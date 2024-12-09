@@ -7,12 +7,13 @@ const useStore = create((set) => ({
   isSignin: false,
   userEmail: "",
   userName: "",
-
+  subscriptionType: "",
   selectedElderIds: [],
   selectedEmployeeIds: [],
   employees: [],
   elders: [],
   durationTimes: [],
+
   setUserName: (name) => set({ userName: name }),
   setEmployees: (employees) => set({ employees: employees }),
   setElders: (elders) => set({ elders: elders }),
@@ -29,6 +30,7 @@ const useStore = create((set) => ({
     }),
   setIsSignin: (isSignin) => set({ isSignin: isSignin }),
   setUserEmail: (email) => set({ userEmail: email }),
+  setSubscriptionType: (type) => set({ subscriptionType: type }),
 }));
 
 export default useStore;

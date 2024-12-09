@@ -118,6 +118,7 @@ function App() {
     setCompany,
     setSelectedElderIds,
     setSelectedEmployeeIds,
+    setSubscriptionType,
   } = useStore();
 
   const {
@@ -2250,6 +2251,7 @@ function App() {
 
     navigate("/");
     setJwt("");
+    setSubscriptionType("");
     setUserId("");
     setUserEmail("");
     setUserName("");
