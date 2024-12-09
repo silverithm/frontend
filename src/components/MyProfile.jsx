@@ -623,6 +623,16 @@ const MyProfile = () => {
                       </div>
                     </div>
                   </div>
+                  {/* 구독 취소 버튼 추가 */}
+                  <div className="pt-4 mt-6 border-t border-gray-200">
+                    <button
+                      onClick={handleCancelSubscription}
+                      className="w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200 flex items-center justify-center gap-2"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      구독 취소
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
