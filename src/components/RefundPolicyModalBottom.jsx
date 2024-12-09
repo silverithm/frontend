@@ -91,7 +91,7 @@ const TermsPolicyModalBottom = ({ isOpen, onClose, onAgree }) => {
 
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                제6조 (구독 철회)
+                제6조 (구독 철회 및 환불)
               </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
                 구독자는 구독 시작일 이후 정기 구독 서비스를 1회라도 사용했거나

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import config from "../config";
 import { ToastContainer } from "react-toastify";
-import SubscriptionBadges from "./PricingModal";
+import SubscriptionBadgesProfile from "./PricingModalProfile";
 import { AlertCircle } from "lucide-react";
 
 const MyProfile = () => {
@@ -27,34 +27,6 @@ const MyProfile = () => {
     newPassword: "",
     confirmPassword: "",
   });
-
-  const badges = {
-    free: (
-      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full cursor-pointer hover:bg-gray-200 transition-colors">
-        무료 체험
-      </span>
-    ),
-    basicMonthly: (
-      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
-        월간 베이직
-      </span>
-    ),
-    basicYearly: (
-      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
-        연간 베이직
-      </span>
-    ),
-    premiumMonthly: (
-      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
-        월간 프리미엄 👑
-      </span>
-    ),
-    premiumYearly: (
-      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
-        연간 프리미엄 👑
-      </span>
-    ),
-  };
 
   const validatePassword = (password) => {
     if (password.length < 8) {
@@ -386,7 +358,9 @@ const MyProfile = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-2">
-                    {badges[subscriptionType]}
+                    <SubscriptionBadgesProfile
+                      subscriptionType={subscriptionType}
+                    />
                     <p className="text-sm text-gray-500">
                       {subscriptionType.includes("premium")
                         ? "모든 프리미엄 기능 이용 가능"
