@@ -413,9 +413,14 @@ const LandingPage = () => {
 
           {/* Basic Plan */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              {PRICE_PLANS.basic.name}
-            </h3>
+            <div className="flex-row flex justify-between">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                {PRICE_PLANS.basic.name}
+              </h3>
+              <h4 className="text-red-400">
+                {selectedBilling === "monthly" ? "30일" : "365일"}
+              </h4>
+            </div>
             <div className="mb-6">
               <span className="text-4xl font-bold">
                 ₩
@@ -470,9 +475,14 @@ const LandingPage = () => {
             <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-xl">
               인기
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              {PRICE_PLANS.enterprise.name}
-            </h3>
+            <div className="flex-row flex justify-between">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                {PRICE_PLANS.enterprise.name}
+              </h3>
+              <h4 className="text-red-400">
+                {selectedBilling === "monthly" ? "30일" : "365일"}
+              </h4>
+            </div>
             <div className="mb-6">
               <span className="text-4xl font-bold">
                 ₩
