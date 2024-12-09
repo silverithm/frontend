@@ -5,6 +5,8 @@ import { ScaleLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import RefundPolicyModal from "./RefundPolicyModal";
+import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
+
 import useStore from "../store/useStore";
 const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
 const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
@@ -55,6 +57,8 @@ const SubscriptionBadges = ({ subscriptionType }) => {
   const [selectedBilling, setSelectedBilling] = useState("monthly");
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState(null);
+  const [isRefundPolicyBottomOpen, setIsRefundPolicyBottomOpen] =
+    useState(false);
   useEffect(() => {
     async function fetchPayment() {
       try {
@@ -189,9 +193,15 @@ const SubscriptionBadges = ({ subscriptionType }) => {
           isOpen={isRefundPolicyOpen}
           onClose={() => setIsRefundPolicyOpen(false)}
           onAgree={handleAgree}
-          planType={selectedPlanType} // 선택된 요금제 타입 전달
-        />{" "}
+          planType={selectedPlanType}
+        />
+        <RefundPolicyModalBottom
+          isOpen={isRefundPolicyBottomOpen}
+          onClose={() => setIsRefundPolicyBottomOpen(false)}
+          onAgree={handleAgree}
+        />
         <div className="bg-gray-50 py-12 px-4 md:px-6 lg:px-8 relative rounded-2xl">
+          {/* Close Button */}
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
@@ -211,6 +221,7 @@ const SubscriptionBadges = ({ subscriptionType }) => {
             </svg>
           </button>
 
+          {/* Header */}
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               요금제
@@ -219,6 +230,7 @@ const SubscriptionBadges = ({ subscriptionType }) => {
               비즈니스 규모에 맞는 최적의 요금제를 선택하세요
             </p>
 
+            {/* Billing Toggle */}
             <div className="flex justify-center items-center gap-3 md:gap-4">
               <span
                 className={`text-sm whitespace-nowrap min-w-[60px] ${
@@ -260,193 +272,226 @@ const SubscriptionBadges = ({ subscriptionType }) => {
             </div>
           </div>
 
-          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-            {/* Free Plan */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                {PRICE_PLANS.free.name}
-              </h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">₩0</span>
-                <span className="text-gray-500">/월</span>
+          {/* Plans Grid */}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Free Plan */}
+              <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  {PRICE_PLANS.free.name}
+                </h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">₩0</span>
+                  <span className="text-gray-500">/월</span>
+                </div>
+                <ul className="mb-8 space-y-4 flex-grow">
+                  {PRICE_PLANS.free.features.map((feature, index) => (
+                    <li key={index} className="flex items-center text-gray-600">
+                      <svg
+                        className="w-5 h-5 text-green-500 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={handleFreeStart}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
+                >
+                  {subscriptionType === "free" ? "사용 중" : "무료로 시작하기"}
+                </button>
               </div>
-              <ul className="mb-8 space-y-4 flex-grow">
-                {PRICE_PLANS.free.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-600">
-                    <svg
-                      className="w-5 h-5 text-green-500 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={handleFreeStart}
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
-              >
-                {subscriptionType === "free" ? "사용 중" : "무료로 시작하기"}
-              </button>
+
+              {/* Basic Plan */}
+              <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
+                <div className="flex-row flex justify-between">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    {PRICE_PLANS.basic.name}
+                  </h3>
+                  <h4 className="text-red-400">
+                    {selectedBilling === "monthly" ? "30일" : "365일"}
+                  </h4>
+                </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">
+                    ₩
+                    {formatPrice(
+                      selectedBilling === "monthly"
+                        ? PRICE_PLANS.basic.monthlyPrice
+                        : PRICE_PLANS.basic.yearlyPrice
+                    )}
+                  </span>
+                  <span className="text-gray-500">
+                    /{selectedBilling === "monthly" ? "월" : "년"}
+                  </span>
+                  {selectedBilling === "yearly" && (
+                    <span className="ml-2 text-xs text-green-500">
+                      (20% 할인)
+                    </span>
+                  )}
+                </div>
+                <ul className="mb-8 space-y-4 flex-grow">
+                  {PRICE_PLANS.basic.features.map((feature, index) => (
+                    <li key={index} className="flex items-center text-gray-600">
+                      <svg
+                        className="w-5 h-5 text-green-500 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleSubscription("basic")}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
+                  disabled={
+                    loading ||
+                    (subscriptionType === "basicMonthly" &&
+                      selectedBilling === "monthly") ||
+                    (subscriptionType === "basicYearly" &&
+                      selectedBilling === "yearly")
+                  }
+                >
+                  {loading ? (
+                    <ScaleLoader color="#ffffff" height={15} />
+                  ) : (subscriptionType === "basicMonthly" &&
+                      selectedBilling === "monthly") ||
+                    (subscriptionType === "basicYearly" &&
+                      selectedBilling === "yearly") ? (
+                    "구독 중"
+                  ) : (
+                    "구독 시작하기"
+                  )}
+                </button>
+              </div>
+
+              {/* Enterprise Plan */}
+              <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-blue-500 flex flex-col relative transform scale-105">
+                <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-xl">
+                  인기
+                </div>
+                <div className="flex-row flex justify-between">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    {PRICE_PLANS.enterprise.name}
+                  </h3>
+                  <h4 className="text-red-400">
+                    {selectedBilling === "monthly" ? "30일" : "365일"}
+                  </h4>
+                </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">
+                    ₩
+                    {formatPrice(
+                      selectedBilling === "monthly"
+                        ? PRICE_PLANS.enterprise.monthlyPrice
+                        : PRICE_PLANS.enterprise.yearlyPrice
+                    )}
+                  </span>
+                  <span className="text-gray-500">
+                    /{selectedBilling === "monthly" ? "월" : "년"}
+                  </span>
+                  {selectedBilling === "yearly" && (
+                    <span className="ml-2 text-xs text-green-500">
+                      (20% 할인)
+                    </span>
+                  )}
+                </div>
+                <ul className="mb-8 space-y-4 flex-grow">
+                  {PRICE_PLANS.enterprise.features.map((feature, index) => (
+                    <li key={index} className="flex items-center text-gray-600">
+                      <svg
+                        className="w-5 h-5 text-green-500 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleSubscription("enterprise")}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
+                  disabled={
+                    loading ||
+                    (subscriptionType === "premiumMonthly" &&
+                      selectedBilling === "monthly") ||
+                    (subscriptionType === "premiumYearly" &&
+                      selectedBilling === "yearly")
+                  }
+                >
+                  {loading ? (
+                    <ScaleLoader color="#ffffff" height={15} />
+                  ) : (subscriptionType === "premiumMonthly" &&
+                      selectedBilling === "monthly") ||
+                    (subscriptionType === "premiumYearly" &&
+                      selectedBilling === "yearly") ? (
+                    "구독 중"
+                  ) : (
+                    "구독 시작하기"
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Basic Plan */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col">
-              <div className="flex-row flex justify-between">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {PRICE_PLANS.basic.name}
-                </h3>
-                <h4 className="text-red-400">
-                  {selectedBilling === "monthly" ? "30일" : "365일"}
-                </h4>
-              </div>
-
-              <div className="mb-6">
-                <span className="text-4xl font-bold">
-                  ₩
-                  {formatPrice(
-                    selectedBilling === "monthly"
-                      ? PRICE_PLANS.basic.monthlyPrice
-                      : PRICE_PLANS.basic.yearlyPrice
-                  )}
-                </span>
-                <span className="text-gray-500">
-                  /{selectedBilling === "monthly" ? "월" : "년"}
-                </span>
-                {selectedBilling === "yearly" && (
-                  <span className="ml-2 text-xs text-green-500">
-                    (20% 할인)
+            {/* Footer */}
+            <div className="col-span-3 mt-8">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm text-gray-600">*</span>
+                  <span className="text-sm text-gray-600">
+                    위 상품의 최대 이용기간은 1년입니다.
                   </span>
-                )}
+                </div>
+                <button
+                  onClick={() => setIsRefundPolicyBottomOpen(true)}
+                  className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                >
+                  환불 규정 안내
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
               </div>
-              <ul className="mb-8 space-y-4 flex-grow">
-                {PRICE_PLANS.basic.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-600">
-                    <svg
-                      className="w-5 h-5 text-green-500 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleSubscription("basic")}
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
-                disabled={
-                  loading ||
-                  (subscriptionType === "basicMonthly" &&
-                    selectedBilling === "monthly") ||
-                  (subscriptionType === "basicYearly" &&
-                    selectedBilling === "yearly")
-                }
-              >
-                {loading ? (
-                  <ScaleLoader color="#ffffff" height={15} />
-                ) : (subscriptionType === "basicMonthly" &&
-                    selectedBilling === "monthly") ||
-                  (subscriptionType === "basicYearly" &&
-                    selectedBilling === "yearly") ? (
-                  "구독 중"
-                ) : (
-                  "구독 시작하기"
-                )}
-              </button>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-blue-500 flex flex-col relative transform scale-105">
-              <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-xl">
-                인기
-              </div>
-              <div className="flex-row flex justify-between">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {PRICE_PLANS.enterprise.name}
-                </h3>
-                <h4 className="text-red-400">
-                  {selectedBilling === "monthly" ? "30일" : "365일"}
-                </h4>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">
-                  ₩
-                  {formatPrice(
-                    selectedBilling === "monthly"
-                      ? PRICE_PLANS.enterprise.monthlyPrice
-                      : PRICE_PLANS.enterprise.yearlyPrice
-                  )}
-                </span>
-                <span className="text-gray-500">
-                  /{selectedBilling === "monthly" ? "월" : "년"}
-                </span>
-                {selectedBilling === "yearly" && (
-                  <span className="ml-2 text-xs text-green-500">
-                    (20% 할인)
-                  </span>
-                )}
-              </div>
-              <ul className="mb-8 space-y-4 flex-grow">
-                {PRICE_PLANS.enterprise.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-600">
-                    <svg
-                      className="w-5 h-5 text-green-500 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleSubscription("enterprise")}
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
-                disabled={
-                  loading ||
-                  (subscriptionType === "premiumMonthly" &&
-                    selectedBilling === "monthly") ||
-                  (subscriptionType === "premiumYearly" &&
-                    selectedBilling === "yearly")
-                }
-              >
-                {loading ? (
-                  <ScaleLoader color="#ffffff" height={15} />
-                ) : (subscriptionType === "premiumMonthly" &&
-                    selectedBilling === "monthly") ||
-                  (subscriptionType === "premiumYearly" &&
-                    selectedBilling === "yearly") ? (
-                  "구독 중"
-                ) : (
-                  "구독 시작하기"
-                )}
-              </button>
             </div>
           </div>
-        </div>{" "}
+        </div>
       </Modal>
     </>
   );
