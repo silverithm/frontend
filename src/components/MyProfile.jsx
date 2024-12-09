@@ -446,7 +446,7 @@ const MyProfile = () => {
                               결제 수단
                             </p>
                             <p className="text-sm text-gray-500 mt-1">
-                              신용카드 (•••• 4578)
+                              신용카드 (•••• •••• •••• 4578)
                             </p>
                           </div>
                           <button
