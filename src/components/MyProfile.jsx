@@ -12,6 +12,7 @@ const MyProfile = () => {
   const navigate = useNavigate();
   const { userName, userEmail, company, jwt } = useStore();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isManagingSubscription, setIsManagingSubscription] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const subscriptionType = "premiumYearly";
@@ -26,6 +27,34 @@ const MyProfile = () => {
     newPassword: "",
     confirmPassword: "",
   });
+
+  const badges = {
+    free: (
+      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full cursor-pointer hover:bg-gray-200 transition-colors">
+        무료 체험
+      </span>
+    ),
+    basicMonthly: (
+      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
+        월간 베이직
+      </span>
+    ),
+    basicYearly: (
+      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
+        연간 베이직
+      </span>
+    ),
+    premiumMonthly: (
+      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
+        월간 프리미엄 👑
+      </span>
+    ),
+    premiumYearly: (
+      <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full cursor-pointer hover:opacity-90 transition-opacity">
+        연간 프리미엄 👑
+      </span>
+    ),
+  };
 
   const validatePassword = (password) => {
     if (password.length < 8) {
@@ -122,6 +151,142 @@ const MyProfile = () => {
     // setShowConfirmModal(true);
   };
 
+  const handleManageSubscription = () => {
+    setIsManagingSubscription(!isManagingSubscription); // 구독 관리 상태 토글
+  };
+
+  const [isChangingPayment, setIsChangingPayment] = useState(false);
+
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvc, setCvc] = useState("");
+
+  const [error, setError] = useState("");
+  const [cardType, setCardType] = useState("");
+
+  // 카드 번호 포맷팅 및 유효성 검증
+  const formatCardNumber = (value) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+    const matches = v.match(/\d{4,16}/g);
+    const match = (matches && matches[0]) || "";
+    const parts = [];
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+
+    if (parts.length) {
+      return parts.join(" ");
+    } else {
+      return value;
+    }
+  };
+
+  // 카드 타입 감지
+  const detectCardType = (number) => {
+    const re = {
+      visa: /^4/,
+      mastercard: /^5[1-5]/,
+      amex: /^3[47]/,
+    };
+
+    for (const [type, regex] of Object.entries(re)) {
+      if (regex.test(number)) {
+        setCardType(type);
+        return;
+      }
+    }
+    setCardType("");
+  };
+
+  // 만료일 포맷팅
+  const formatExpiryDate = (value) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+    if (v.length >= 2) {
+      return `${v.slice(0, 2)}/${v.slice(2, 4)}`;
+    }
+    return v;
+  };
+
+  const handleCardNumberChange = (e) => {
+    const value = formatCardNumber(e.target.value);
+    setCardNumber(value);
+    detectCardType(value.replace(/\s+/g, ""));
+    setError("");
+  };
+
+  const handleExpiryDateChange = (e) => {
+    const value = formatExpiryDate(e.target.value);
+    if (value.length <= 5) {
+      setExpiryDate(value);
+      setError("");
+    }
+  };
+
+  const handleCvcChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    if (value.length <= 4) {
+      setCvc(value);
+      setError("");
+    }
+  };
+
+  const validateForm = () => {
+    const now = new Date();
+    const currentYear = now.getFullYear() % 100;
+    const currentMonth = now.getMonth() + 1;
+
+    if (cardNumber.replace(/\s+/g, "").length < 16) {
+      setError("올바른 카드 번호를 입력해주세요.");
+      return false;
+    }
+
+    if (expiryDate.length < 5) {
+      setError("만료일을 입력해주세요.");
+      return false;
+    }
+
+    const [month, year] = expiryDate.split("/").map((num) => parseInt(num, 10));
+
+    if (month < 1 || month > 12) {
+      setError("올바른 만료 월을 입력해주세요.");
+      return false;
+    }
+
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+      setError("만료된 카드입니다.");
+      return false;
+    }
+
+    if (cvc.length < 3) {
+      setError("올바른 CVC를 입력해주세요.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // 실제 API 호출 로직
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // 시뮬레이션
+      setIsChangingPayment(false);
+      // 성공 토스트 메시지 표시
+    } catch (err) {
+      setError("결제 수단 변경 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <ToastContainer
@@ -196,37 +361,270 @@ const MyProfile = () => {
               </div>
             </div>
             {/* 현재 구독 정보 */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
-                <span>현재 구독</span>
-                {subscriptionType && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+            <div className="space-y-4">
+              {/* 현재 구독 카드 */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">현재 구독</h2>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700">
+                    <svg
+                      className="w-3 h-3 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
                     활성
                   </span>
-                )}
-              </h2>
+                </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-900 mt-1">
-                      {(
-                        <SubscriptionBadges subscriptionType="premiumYearly" /> // 연간 Premium
-                      ) ||
-                        "구독이 없습니다"}
+                  <div className="space-y-2">
+                    {badges[subscriptionType]}
+                    <p className="text-sm text-gray-500">
+                      {subscriptionType.includes("premium")
+                        ? "모든 프리미엄 기능 이용 가능"
+                        : subscriptionType.includes("basic")
+                        ? "기본 기능 이용 가능"
+                        : "무료 기능 이용 가능"}
                     </p>
                   </div>
-                  {subscriptionType && (
-                    <button
-                      onClick={handleCancelSubscription}
-                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200 flex items-center gap-1.5"
+                  <button
+                    onClick={handleManageSubscription}
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-200"
+                  >
+                    구독 관리
+                    <svg
+                      className="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <AlertCircle className="w-4 h-4" />
-                      구독 관리
-                    </button>
-                  )}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
                 </div>
               </div>
+
+              {/* 구독 관리 상세 정보 */}
+              {isManagingSubscription && (
+                <div className="bg-gray-50 rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                    구독 상세 정보
+                  </h3>
+
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="w-5 h-5 mt-1 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                        />
+                      </svg>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              결제 수단
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              신용카드 (•••• 4578)
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setIsChangingPayment(true)}
+                            className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isLoading}
+                          >
+                            변경
+                          </button>
+                        </div>
+
+                        {isChangingPayment && (
+                          <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                            <form
+                              onSubmit={handlePaymentSubmit}
+                              className="space-y-4"
+                            >
+                              <div className="relative">
+                                <label
+                                  className="block text-sm font-medium text-gray-700 mb-1"
+                                  htmlFor="cardNumber"
+                                >
+                                  카드 번호
+                                </label>
+                                <div className="relative">
+                                  <input
+                                    id="cardNumber"
+                                    type="text"
+                                    value={cardNumber}
+                                    onChange={handleCardNumberChange}
+                                    className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0000 0000 0000 0000"
+                                    maxLength="19"
+                                    autoComplete="cc-number"
+                                    disabled={isLoading}
+                                  />
+                                  {cardType && (
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                      {cardType}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                    htmlFor="expiryDate"
+                                  >
+                                    만료일
+                                  </label>
+                                  <input
+                                    id="expiryDate"
+                                    type="text"
+                                    value={expiryDate}
+                                    onChange={handleExpiryDateChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="MM/YY"
+                                    maxLength="5"
+                                    autoComplete="cc-exp"
+                                    disabled={isLoading}
+                                  />
+                                </div>
+                                <div>
+                                  <label
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                    htmlFor="cvc"
+                                  >
+                                    CVC
+                                    <span className="ml-1 text-xs text-gray-500">
+                                      (카드 뒷면 3자리)
+                                    </span>
+                                  </label>
+                                  <input
+                                    id="cvc"
+                                    type="password"
+                                    value={cvc}
+                                    onChange={handleCvcChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="000"
+                                    maxLength="4"
+                                    autoComplete="cc-csc"
+                                    disabled={isLoading}
+                                  />
+                                </div>
+                              </div>
+
+                              {error && (
+                                <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">
+                                  {error}
+                                </div>
+                              )}
+
+                              <div className="flex justify-end space-x-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setIsChangingPayment(false)}
+                                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200 disabled:opacity-50"
+                                  disabled={isLoading}
+                                >
+                                  취소
+                                </button>
+                                <button
+                                  type="submit"
+                                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 flex items-center"
+                                  disabled={isLoading}
+                                >
+                                  {isLoading ? (
+                                    <>
+                                      <svg
+                                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <circle
+                                          className="opacity-25"
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          stroke="currentColor"
+                                          strokeWidth="4"
+                                        />
+                                        <path
+                                          className="opacity-75"
+                                          fill="currentColor"
+                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        />
+                                      </svg>
+                                      처리중...
+                                    </>
+                                  ) : (
+                                    "저장"
+                                  )}
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="w-5 h-5 mt-1 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            구독 시작일
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            2023년 1월 1일
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            다음 결제일
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            2023년 12월 1일
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 구독 취소 확인 모달 */}
