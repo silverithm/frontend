@@ -7,6 +7,7 @@ import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import RefundPolicyModal from "./RefundPolicyModal"; // 환불 정책 모달 가져오기
 import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
 import useStore from "../store/useStore";
+
 const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
 const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
 const AGREEMENT_LINKS = {
@@ -64,6 +65,8 @@ const LandingPage = () => {
     useState(false);
 
   const [selectedPlanType, setSelectedPlanType] = useState(""); // 선택된 요금제 타입
+
+  var subscriptionType = "premiumYearly";
 
   useEffect(() => {
     async function fetchPayment() {
@@ -471,10 +474,22 @@ const LandingPage = () => {
               <button
                 onClick={() => handleSubscription("basic")}
                 className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
-                disabled={loading}
+                disabled={
+                  loading ||
+                  (subscriptionType === "basicMonthly" &&
+                    selectedBilling === "monthly") ||
+                  (subscriptionType === "basicYearly" &&
+                    selectedBilling === "yearly")
+                }
               >
                 {loading ? (
                   <ScaleLoader color="#ffffff" height={15} />
+                ) : isSignin &&
+                  ((subscriptionType === "basicMonthly" &&
+                    selectedBilling === "monthly") ||
+                    (subscriptionType === "basicYearly" &&
+                      selectedBilling === "yearly")) ? (
+                  "구독 중"
                 ) : (
                   "구독 시작하기"
                 )}
@@ -535,10 +550,22 @@ const LandingPage = () => {
               <button
                 onClick={() => handleSubscription("enterprise")}
                 className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors"
-                disabled={loading}
+                disabled={
+                  loading ||
+                  (subscriptionType === "premiumMonthly" &&
+                    selectedBilling === "monthly") ||
+                  (subscriptionType === "premiumYearly" &&
+                    selectedBilling === "yearly")
+                }
               >
                 {loading ? (
                   <ScaleLoader color="#ffffff" height={15} />
+                ) : isSignin &&
+                  ((subscriptionType === "premiumMonthly" &&
+                    selectedBilling === "monthly") ||
+                    (subscriptionType === "premiumYearly" &&
+                      selectedBilling === "yearly")) ? (
+                  "구독 중"
                 ) : (
                   "구독 시작하기"
                 )}

@@ -2321,6 +2321,7 @@ function App() {
   ];
 
   var subscriptionType = "premiumYearly";
+
   return (
     <div className="App">
       <ToastContainer

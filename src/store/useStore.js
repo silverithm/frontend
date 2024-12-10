@@ -30,7 +30,8 @@ const useStore = create((set) => ({
     }),
   setIsSignin: (isSignin) => set({ isSignin: isSignin }),
   setUserEmail: (email) => set({ userEmail: email }),
-  setSubscriptionType: (type) => set({ subscriptionType: type }),
+  setSubscriptionType: (subscriptionType) =>
+    set({ subscriptionType: subscriptionType }),
 }));
 
 export default useStore;
