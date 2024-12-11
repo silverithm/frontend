@@ -139,7 +139,7 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
     free: (
       <span
         onClick={handleShow}
-        className="ml-2 px-2 py-1.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full cursor-pointer"
+        className="ml-2 px-4 py-2.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full cursor-pointer"
       >
         무료 체험
       </span>
@@ -147,7 +147,7 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
     basicMonthly: (
       <span
         onClick={handleShow}
-        className="ml-2 px-2 py-1.5 text-xs font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-full cursor-pointer"
+        className="ml-2 px-4 py-2.5 text-xs font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-full cursor-pointer"
       >
         월간 베이직
       </span>
@@ -155,7 +155,7 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
     basicYearly: (
       <span
         onClick={handleShow}
-        className="ml-2 px-2 py-1.5 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full cursor-pointer"
+        className="ml-2 px-4 py-2.5 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full cursor-pointer"
       >
         연간 베이직
       </span>
@@ -163,7 +163,7 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
     premiumMonthly: (
       <span
         onClick={handleShow}
-        className="ml-2 px-2 py-1.5 text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full cursor-pointer"
+        className="ml-2 px-4 py-2.5 text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full cursor-pointer"
       >
         월간 프리미엄 👑
       </span>
@@ -171,7 +171,7 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
     premiumYearly: (
       <span
         onClick={handleShow}
-        className="ml-2 px-2 py-1.5 text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full cursor-pointer"
+        className="ml-2 px-4 py-2.5 text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full cursor-pointer"
       >
         연간 프리미엄 👑
       </span>

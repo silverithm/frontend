@@ -361,13 +361,6 @@ const MyProfile = () => {
                     <SubscriptionBadgesProfile
                       subscriptionType={subscriptionType}
                     />
-                    <p className="text-sm text-gray-500">
-                      {subscriptionType.includes("premium")
-                        ? "모든 프리미엄 기능 이용 가능"
-                        : subscriptionType.includes("basic")
-                        ? "기본 기능 이용 가능"
-                        : "무료 기능 이용 가능"}
-                    </p>
                   </div>
                   <button
                     onClick={handleManageSubscription}
