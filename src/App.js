@@ -2944,11 +2944,6 @@ function App() {
 
     setProgress(0);
 
-
-  if (eventSource) {
-    eventSource.close();
-  }
-
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
         Authorization: `Bearer ${jwt}`,
