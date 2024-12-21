@@ -10,27 +10,16 @@ const PaymentSuccess = () => {
       const paymentKey = searchParams.get("paymentKey");
       const orderId = searchParams.get("orderId");
       const amount = searchParams.get("amount");
+      const plan = decodeURIComponent(searchParams.get("plan"));
+      const billing = decodeURIComponent(searchParams.get("billing"));
+
+      console.log(searchParams);
+      console.log(window.location.search);
 
       try {
-        // const response = await fetch(
-        //   `${process.env.REACT_APP_API_URL}/payments/success`,
-        //   {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({
-        //       paymentKey,
-        //       orderId,
-        //       amount,
-        //     }),
-        //   }
-        // );
-
-        // const data = await response.json();
-        // if (data.success) {
-        // 결제 성공 후 처리
         setTimeout(() => {
+          console.log(plan.toString());
+          console.log(billing.toString());
           navigate("/main");
         }, 3000);
         // }

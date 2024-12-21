@@ -88,13 +88,17 @@ const LandingPage = () => {
   }, [clientKey, customerKey]);
   // ------ '카드 등록하기' 버튼 누르면 결제창 띄우기 ------
   // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
-  async function requestBillingAuth() {
-    // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
-    // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
+
+  //http://localhost:3000/success?plan=%5Bobject%20Object%5D&customerKey=QbkYnhoH48ZxhTFnAHxNn&authKey=bln_WQJN41xe4ON
+  async function requestBillingAuth(plan, selectedBilling) {
     await payment.requestBillingAuth({
-      method: "CARD", // 자동결제(빌링)는 카드만 지원합니다
-      successUrl: window.location.origin + "/success", // 요청이 성공하면 리다이렉트되는 URL
-      failUrl: window.location.origin + "/fail", // 요청이 실패하면 리다이렉트되는 URL
+      method: "CARD",
+      successUrl: `${window.location.origin}/success?plan=${encodeURIComponent(
+        plan.name
+      )}&billing=${encodeURIComponent(selectedBilling)}`,
+      failUrl: `${window.location.origin}/fail?plan=${encodeURIComponent(
+        plan.name
+      )}&billing=${encodeURIComponent(selectedBilling)}`,
       customerEmail: "customer123@gmail.com",
       customerName: "김토스",
     });
@@ -128,7 +132,7 @@ const LandingPage = () => {
       // const response = await fetch(...);
       // const data = await response.json();
       // 결제 처리 로직
-      requestBillingAuth();
+      requestBillingAuth(plan, selectedBilling);
     } catch (error) {
       console.error("Payment initiation failed:", error);
       toast.error("결제 초기화 중 오류가 발생했습니다. 다시 시도해 주세요.");
