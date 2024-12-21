@@ -91,14 +91,21 @@ const LandingPage = () => {
 
   //http://localhost:3000/success?plan=%5Bobject%20Object%5D&customerKey=QbkYnhoH48ZxhTFnAHxNn&authKey=bln_WQJN41xe4ON
   async function requestBillingAuth(plan, selectedBilling) {
+    const amount =
+      selectedBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+
     await payment.requestBillingAuth({
       method: "CARD",
       successUrl: `${window.location.origin}/success?plan=${encodeURIComponent(
         plan.name
-      )}&billing=${encodeURIComponent(selectedBilling)}`,
+      )}&billing=${encodeURIComponent(
+        selectedBilling
+      )}&amount=${encodeURIComponent(amount)}`,
       failUrl: `${window.location.origin}/fail?plan=${encodeURIComponent(
         plan.name
-      )}&billing=${encodeURIComponent(selectedBilling)}`,
+      )}&billing=${encodeURIComponent(
+        selectedBilling
+      )}&amount=${encodeURIComponent(amount)}`,
       customerEmail: "customer123@gmail.com",
       customerName: "김토스",
     });

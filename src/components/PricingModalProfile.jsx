@@ -80,14 +80,21 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
   // ------ '카드 등록하기' 버튼 누르면 결제창 띄우기 ------
   // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
   async function requestBillingAuth(plan, selectedBilling) {
+    const amount =
+      selectedBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+
     await payment.requestBillingAuth({
       method: "CARD",
       successUrl: `${window.location.origin}/success?plan=${encodeURIComponent(
         plan.name
-      )}&billing=${encodeURIComponent(selectedBilling)}`,
+      )}&billing=${encodeURIComponent(
+        selectedBilling
+      )}&amount=${encodeURIComponent(amount)}`,
       failUrl: `${window.location.origin}/fail?plan=${encodeURIComponent(
         plan.name
-      )}&billing=${encodeURIComponent(selectedBilling)}`,
+      )}&billing=${encodeURIComponent(
+        selectedBilling
+      )}&amount=${encodeURIComponent(amount)}`,
       customerEmail: "customer123@gmail.com",
       customerName: "김토스",
     });

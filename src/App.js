@@ -85,6 +85,35 @@ function App() {
 
   const [LoadingSpinner, setLoadingSpinner] = useState(false);
 
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const handlePageChange = (newPage) => {
+    fetchHistories(newPage);
+  };
+
+  const fetchHistories = async (page) => {
+    try {
+      const response = await axios.get(`${config.apiUrl}/history`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+        params: {
+          page,
+          size: 9,
+          sort: "createdAt,desc",
+        },
+      });
+      console.log(response);
+
+      setDispatchHistories(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.number);
+    } catch (error) {
+      console.error("Failed to fetch histories:", error);
+    }
+  };
+
   useEffect(() => {
     let timer;
 
@@ -971,7 +1000,7 @@ function App() {
 
       console.log(data);
 
-      setDispatchHistories(data);
+      setDispatchHistories(data.content);
     } catch (error) {
       console.error("Error fetching dispatch histories:", error);
       toast.error("이전 배치 기록을 불러오는데 실패했습니다.");
@@ -1010,6 +1039,9 @@ function App() {
     histories,
     onSelectHistory,
     selectedHistoryId,
+    totalPages,
+    currentPage,
+    onPageChange,
   }) {
     const getDispatchTypeText = (type) => {
       if (!type) return "알 수 없음";
@@ -1092,19 +1124,18 @@ function App() {
                 <div
                   key={history?.id}
                   className={`
-                                  rounded-lg shadow-sm border border-gray-200
-                                  transition-all duration-200 ease-in-out cursor-pointer
-                                  hover:shadow-md hover:border-gray-300 bg-white
-                                  ${
-                                    selectedHistoryId === history?.id
-                                      ? "ring-2 ring-sky-500"
-                                      : ""
-                                  }
-                              `}
+                  rounded-lg shadow-sm border border-gray-200
+                  transition-all duration-200 ease-in-out cursor-pointer
+                  hover:shadow-md hover:border-gray-300 bg-white
+                  ${
+                    selectedHistoryId === history?.id
+                      ? "ring-2 ring-sky-500"
+                      : ""
+                  }
+                `}
                   onClick={() => onSelectHistory(history?.id)}
                 >
                   <div className="p-6">
-                    {/* 카드 내용은 이전과 동일 */}
                     <div className="flex flex-col space-y-3">
                       <div className="flex items-center text-gray-600 text-sm">
                         <svg
@@ -1179,6 +1210,47 @@ function App() {
               );
             })}
           </div>
+        </div>
+
+        {/* 페이지네이션 */}
+        <div className="flex justify-center items-center space-x-2 py-4 mt-4 border-t border-gray-200">
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 0}
+            className={`px-3 py-1 rounded-md ${
+              currentPage === 0
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+            }`}
+          >
+            이전
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => onPageChange(index)}
+              className={`px-3 py-1 rounded-md ${
+                currentPage === index
+                  ? "bg-sky-500 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages - 1}
+            className={`px-3 py-1 rounded-md ${
+              currentPage === totalPages - 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+            }`}
+          >
+            다음
+          </button>
         </div>
       </div>
     );
@@ -1849,10 +1921,63 @@ function App() {
                   histories={dispatchHistories}
                   onSelectHistory={fetchHistoryDetail}
                   selectedHistoryId={selectedHistoryId}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
                 />
               ) : (
-                <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
-                  배치 기록이 없습니다
+                <div className="h-full flex flex-col">
+                  <div className="flex-1 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
+                    배치 기록이 없습니다
+                  </div>
+                  <div className="flex justify-center items-center space-x-2 py-4 mt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={
+                        currentPage === 0 || dispatchHistories.length === 0
+                      }
+                      className={`px-3 py-1 rounded-md ${
+                        currentPage === 0 || dispatchHistories.length === 0
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                      }`}
+                    >
+                      이전
+                    </button>
+
+                    {[...Array(totalPages)].map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handlePageChange(index)}
+                        disabled={dispatchHistories.length === 0}
+                        className={`px-3 py-1 rounded-md ${
+                          dispatchHistories.length === 0
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : currentPage === index
+                            ? "bg-sky-500 text-white"
+                            : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={
+                        currentPage === totalPages - 1 ||
+                        dispatchHistories.length === 0
+                      }
+                      className={`px-3 py-1 rounded-md ${
+                        currentPage === totalPages - 1 ||
+                        dispatchHistories.length === 0
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                      }`}
+                    >
+                      다음
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

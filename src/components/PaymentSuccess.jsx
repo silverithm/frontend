@@ -9,7 +9,7 @@ const PaymentSuccess = () => {
       const searchParams = new URLSearchParams(window.location.search);
       const paymentKey = searchParams.get("paymentKey");
       const orderId = searchParams.get("orderId");
-      const amount = searchParams.get("amount");
+      const amount = decodeURIComponent(searchParams.get("amount"));
       const plan = decodeURIComponent(searchParams.get("plan"));
       const billing = decodeURIComponent(searchParams.get("billing"));
 
@@ -20,6 +20,7 @@ const PaymentSuccess = () => {
         setTimeout(() => {
           console.log(plan.toString());
           console.log(billing.toString());
+          console.log(amount.toString());
           navigate("/main");
         }, 3000);
         // }
