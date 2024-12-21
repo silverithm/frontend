@@ -1001,6 +1001,8 @@ function App() {
       console.log(data);
 
       setDispatchHistories(data.content);
+      setTotalPages(data.totalPages);
+      setCurrentPage(data.number);
     } catch (error) {
       console.error("Error fetching dispatch histories:", error);
       toast.error("이전 배치 기록을 불러오는데 실패했습니다.");
