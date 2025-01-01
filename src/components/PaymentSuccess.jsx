@@ -1,22 +1,28 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import config from "../config";
+import useStore from "../store/useStore";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
+  const { jwt } = useStore();
 
   useEffect(() => {
     const handlePaymentSuccess = async () => {
       const searchParams = new URLSearchParams(window.location.search);
-      const paymentKey = searchParams.get("paymentKey");
-      const orderId = searchParams.get("orderId");
+
       const amount = decodeURIComponent(searchParams.get("amount"));
       const plan = decodeURIComponent(searchParams.get("plan"));
       const billing = decodeURIComponent(searchParams.get("billing"));
 
       console.log(searchParams);
-      console.log(window.location.search);
+      console.log(amount);
+      console.log(plan.toUpperCase());
+      console.log(billing.toUpperCase());
 
       try {
+        await createSubscription(plan, amount, billing, jwt);
         setTimeout(() => {
           console.log(plan.toString());
           console.log(billing.toString());
@@ -31,6 +37,34 @@ const PaymentSuccess = () => {
 
     handlePaymentSuccess();
   }, [navigate]);
+
+  const createSubscription = async (plan, amount, billing, jwt) => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}/subscriptions`,
+        {
+          planName: plan.toUpperCase(),
+          billingType: billing.toUpperCase(),
+          amount: amount,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("구독 생성 중 에러 발생:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+      throw error;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center px-4">

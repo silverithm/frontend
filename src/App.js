@@ -3083,6 +3083,10 @@ function App() {
       if (!event.data.includes("EventStream Created")) {
         setProgress(Number(event.data));
       }
+
+      if (event.data.includes("일일 제한을 초과")) {
+        eventSource.close();
+      }
     });
 
     eventSource.addEventListener("dispatch", (event) => {
@@ -3159,13 +3163,22 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
-        timeout: 1800000, // 30 minutes
+        timeout: 600000,
       });
       console.log(result.data);
       getProgressSSE(result.data);
 
       console.log(result);
-    } catch {}
+      console.log(result.status);
+      if (result.status === 400) {
+        console.log(result.status);
+        toast.error(result.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error(error);
+      setLoading(false);
+    }
   }
   async function dispatchIn(dispatchType) {
     if (jwt === "") {
@@ -3223,12 +3236,22 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
-        timeout: 1800000, // 30 minutes
+        timeout: 600000,
       });
 
       getProgressSSE(result.data);
       console.log(result.data);
-    } catch (error) {}
+      console.log(result);
+      console.log(result.status);
+      if (result.status === 400) {
+        console.log(result.status);
+        toast.error(result.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error(error);
+      setLoading(false);
+    }
   }
 
   function MyVerticallyCenteredModalDispatchInData(props) {

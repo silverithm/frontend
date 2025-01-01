@@ -9,7 +9,7 @@ import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
 import useStore from "../store/useStore";
 
 const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
-const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
+const customerKey = "test_customer_key";
 const AGREEMENT_LINKS = {
   privacyPolicy:
     "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html",
@@ -72,13 +72,11 @@ const LandingPage = () => {
     async function fetchPayment() {
       try {
         const tossPayments = await loadTossPayments(clientKey);
-        // 회원 결제
-        // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
+
         const payment = tossPayments.payment({
           customerKey,
         });
-        // 비회원 결제
-        // const payment = tossPayments.payment({ customerKey: ANONYMOUS });
+
         setPayment(payment);
       } catch (error) {
         console.error("Error fetching payment:", error);
