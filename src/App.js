@@ -3914,32 +3914,24 @@ function App() {
     const isInbound = dispatchData[0]?.dispatchType?.includes("IN") ?? false;
 
     return (
-      <Modal
-        {...props}
-        size="xl"
-        centered
-        aria-labelledby="dispatch-result-modal"
-        dialogClassName="!max-w-[1200px] !w-[90vw] rounded-xl"
-      >
-        <DragDropContext onDragEnd={handleDragEnd} className="rounded-xl">
-          <div className="max-h-[80vh] bg-gray-50 rounded-xl">
+      <Modal {...props} fullscreen aria-labelledby="dispatch-result-modal">
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="h-screen flex flex-col">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-10 rounded-xl">
-              <div className="px-6 py-4 flex justify-between items-center">
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+              <div className="px-4 py-3 flex justify-between items-center">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-800">
+                  <h3 className="text-xl font-bold text-gray-800">
                     차량 배치 결과 {isInbound ? "- 출근" : "- 퇴근"}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {currentTime} 기준
-                  </p>
+                  <p className="text-sm text-gray-500">{currentTime} 기준</p>
                 </div>
                 <button
                   onClick={handleModalClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <svg
-                    className="w-6 h-6 text-gray-600"
+                    className="w-5 h-5 text-gray-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -3956,181 +3948,173 @@ function App() {
             </div>
 
             {/* Content */}
-            <div
-              className="p-6 overflow-auto"
-              style={{ maxHeight: "calc(80vh - 73px)" }}
-            >
-              <div className="max-w-6xl mx-auto space-y-6">
-                {/* Notice Box */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg py-2.5 px-4">
-                  <div className="flex items-center gap-3">
-                    <svg
-                      className="w-5 h-5 text-blue-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <div className="flex-1 text-sm">
-                      <span className="font-medium text-blue-900">
-                        카카오맵 API 기준 예상 운행시간입니다.
-                      </span>
-                      <span className="text-blue-800 ml-2">
-                        실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
-                      </span>
-                    </div>
+            <div className="flex-1 overflow-auto">
+              {/* Notice Box */}
+              <div className="bg-blue-50 border-b border-blue-200 py-2 px-4">
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 text-blue-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div className="flex-1 text-sm">
+                    <span className="font-medium text-blue-900">
+                      카카오맵 API 기준 예상 운행시간입니다.
+                    </span>
+                    <span className="text-blue-800 ml-1">
+                      실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
+                    </span>
                   </div>
                 </div>
+              </div>
 
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Left Side - Map */}
-                  <div className="w-full h-full rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="h-[450px]">
-                      <Map
-                        setMap={setMap}
-                        map={map}
-                        isSingleRoute={isSingleRoute}
-                        employeeLongitude={firstResult?.homeAddress?.longitude}
-                        employeeLatitude={firstResult?.homeAddress?.latitude}
-                      />
-                    </div>
-                  </div>
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 h-[calc(100vh-165px)]">
+                {/* Left Side - Map */}
+                <div className="h-full">
+                  <Map
+                    setMap={setMap}
+                    map={map}
+                    isSingleRoute={isSingleRoute}
+                    employeeLongitude={firstResult?.homeAddress?.longitude}
+                    employeeLatitude={firstResult?.homeAddress?.latitude}
+                  />
+                </div>
 
-                  {/* Right Side - Assignment Details */}
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="max-h-[400px] overflow-y-auto pr-2">
-                      <div className="space-y-3">
-                        {dispatchData.map((item, dispatchIndex) => (
+                {/* Right Side - Assignment Details */}
+                <div className="bg-white border-l border-gray-200 h-full flex flex-col">
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-4 space-y-2">
+                      {dispatchData.map((item, dispatchIndex) => (
+                        <div
+                          key={`dispatch-${dispatchIndex}`}
+                          className={`p-3 border rounded-lg transition-colors ${
+                            activeEmployeeId === item.employeeId
+                              ? "bg-blue-50 border-blue-200"
+                              : "border-gray-200"
+                          }`}
+                        >
                           <div
-                            key={`dispatch-${dispatchIndex}`}
-                            className={`p-4 border border-gray-100 rounded-lg transition-colors ${
-                              activeEmployeeId === item.employeeId
-                                ? "bg-blue-100"
-                                : ""
-                            }  `}
+                            className="flex items-start"
+                            onClick={() =>
+                              handleEmployeeSelect(item.employeeId)
+                            }
                           >
                             <div
-                              className={`flex items-start `}
-                              onClick={() =>
-                                handleEmployeeSelect(item.employeeId)
-                              }
+                              key={item.employeeId}
+                              className="flex-shrink-0 font-medium w-20"
+                              style={{
+                                color:
+                                  activeEmployeeId &&
+                                  activeEmployeeId !== item.employeeId
+                                    ? "#D1D5DB"
+                                    : randomColors[
+                                        dispatchIndex % randomColors.length
+                                      ],
+                              }}
                             >
-                              <div
-                                key={item.employeeId}
-                                className={`flex-shrink-0 font-medium w-24 employee-card`}
-                                style={{
-                                  color:
-                                    activeEmployeeId &&
-                                    activeEmployeeId !== item.employeeId
-                                      ? "#D1D5DB" // text-gray-400 색상 값
-                                      : randomColors[
-                                          dispatchIndex % randomColors.length
-                                        ],
-                                }}
+                              {item.employeeName}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <Droppable
+                                droppableId={`${dispatchIndex}`}
+                                direction="horizontal"
                               >
-                                {item.employeeName}
-                              </div>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.droppableProps}
+                                    className="flex flex-wrap gap-1.5 mb-2"
+                                  >
+                                    {item.assignmentElders.map(
+                                      (elder, elderIndex) => (
+                                        <Draggable
+                                          key={`elder-${
+                                            elder.id || elderIndex
+                                          }`}
+                                          draggableId={`${dispatchIndex}-${
+                                            elder.id || elderIndex
+                                          }`}
+                                          index={elderIndex}
+                                        >
+                                          {(provided, snapshot) => (
+                                            <div
+                                              ref={provided.innerRef}
+                                              {...provided.draggableProps}
+                                              {...provided.dragHandleProps}
+                                              className={`px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap cursor-move
+                                        ${
+                                          snapshot.isDragging
+                                            ? "shadow-lg bg-blue-50"
+                                            : ""
+                                        }`}
+                                            >
+                                              {elder.name}
+                                            </div>
+                                          )}
+                                        </Draggable>
+                                      )
+                                    )}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
 
-                              <div className="flex-1 min-w-0">
-                                <Droppable
-                                  droppableId={`${dispatchIndex}`}
-                                  direction="horizontal"
-                                >
-                                  {(provided) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      {...provided.droppableProps}
-                                      className="flex flex-wrap gap-2 mb-2"
+                              <div className="flex items-center text-sm text-gray-600">
+                                {!(
+                                  activeEmployeeId &&
+                                  activeEmployeeId !== item.employeeId
+                                ) && (
+                                  <>
+                                    <svg
+                                      className="w-4 h-4 mr-1 flex-shrink-0"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
                                     >
-                                      {item.assignmentElders.map(
-                                        (elder, elderIndex) => (
-                                          <Draggable
-                                            key={`elder-${
-                                              elder.id || elderIndex
-                                            }`}
-                                            draggableId={`${dispatchIndex}-${
-                                              elder.id || elderIndex
-                                            }`}
-                                            index={elderIndex}
-                                          >
-                                            {(provided, snapshot) => (
-                                              <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                className={`px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap cursor-move
-                                            ${
-                                              snapshot.isDragging
-                                                ? "shadow-lg bg-blue-50"
-                                                : ""
-                                            }`}
-                                              >
-                                                {elder.name}
-                                              </div>
-                                            )}
-                                          </Draggable>
-                                        )
-                                      )}
-                                      {provided.placeholder}
-                                    </div>
-                                  )}
-                                </Droppable>
-
-                                <div className="flex items-center text-sm text-gray-600">
-                                  {!(
-                                    activeEmployeeId &&
-                                    activeEmployeeId !== item.employeeId
-                                  ) && (
-                                    <>
-                                      <svg
-                                        className="w-4 h-4 mr-1 flex-shrink-0"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                        />
-                                      </svg>
-                                      예상 소요시간 :
-                                      <span className="font-medium ml-1">
-                                        {(() => {
-                                          const cacheKey = `${
-                                            item.employeeId
-                                          }-${item.assignmentElders
-                                            .map((e) => e.id)
-                                            .join("-")}`;
-                                          return directionsCache[cacheKey]
-                                            ? `약 ${(
-                                                directionsCache[cacheKey]
-                                                  .routes[0].summary.duration /
-                                                60
-                                              ).toFixed(0)}분`
-                                            : isNaN(durations[dispatchIndex])
-                                            ? "계산중..."
-                                            : `약 ${(
-                                                durations[dispatchIndex] / 60
-                                              ).toFixed(0)}분`;
-                                        })()}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                      />
+                                    </svg>
+                                    예상 소요시간:
+                                    <span className="font-medium ml-1">
+                                      {(() => {
+                                        const cacheKey = `${
+                                          item.employeeId
+                                        }-${item.assignmentElders
+                                          .map((e) => e.id)
+                                          .join("-")}`;
+                                        return directionsCache[cacheKey]
+                                          ? `약 ${(
+                                              directionsCache[cacheKey]
+                                                .routes[0].summary.duration / 60
+                                            ).toFixed(0)}분`
+                                          : isNaN(durations[dispatchIndex])
+                                          ? "계산중..."
+                                          : `약 ${(
+                                              durations[dispatchIndex] / 60
+                                            ).toFixed(0)}분`;
+                                      })()}
+                                    </span>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -4138,8 +4122,8 @@ function App() {
             </div>
 
             {/* Footer */}
-            <div className="bg-white border-t border-gray-200 p-4 rounded-xl">
-              <div className="flex justify-end">
+            <div className="bg-white border-t border-gray-200 p-3">
+              <div className="flex justify-end gap-2">
                 <button
                   onClick={handleCopyResult}
                   className="bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center px-4 py-2"
@@ -4159,7 +4143,6 @@ function App() {
                   </svg>
                   결과 복사
                 </button>
-                <div className="w-2"></div>
                 <button
                   onClick={handleModalClose}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
