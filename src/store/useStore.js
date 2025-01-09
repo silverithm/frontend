@@ -37,8 +37,21 @@ const useStore = create(
         set({ subscriptionType: subscriptionType }),
     }),
     {
-      name: "app-storage", // 로컬 스토리지에 저장될 키 이름
-      storage: createJSONStorage(() => localStorage), // 기본값은 localStorage
+      name: "app-storage",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        userId: state.userId,
+        company: state.company,
+        isSignin: state.isSignin,
+        userEmail: state.userEmail,
+        userName: state.userName,
+        subscriptionType: state.subscriptionType,
+        selectedElderIds: state.selectedElderIds,
+        selectedEmployeeIds: state.selectedEmployeeIds,
+        employees: state.employees,
+        elders: state.elders,
+        durationTimes: state.durationTimes,
+      }),
     }
   )
 );

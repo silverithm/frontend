@@ -3847,10 +3847,12 @@ function App() {
       ) {
         return "배차 결과가 없습니다.";
       }
-
       const firstDispatch = dispatchData[0];
       const isInbound = firstDispatch?.dispatchType?.includes("IN") ?? false;
       const header = `[${isInbound ? "출근" : "퇴근"} 배차 결과]\n\n`;
+
+      let totalDuration = 0; // 총 예상 소요 시간 초기화
+      let validDurationsCount = 0; // 유효한 예상 소요 시간의 개수
 
       const body = dispatchData
         .map((result, index) => {
@@ -3866,11 +3868,30 @@ function App() {
             formattedText += elders.map((elder) => elder.name).join(" ") + "\n";
           }
 
-          return formattedText + "\n";
+          // 예상 소요 시간 추가
+          const duration = durations[index]
+            ? (durations[index] / 60).toFixed(0)
+            : "계산중...";
+          formattedText += `예상 소요 시간: 약 ${duration}분\n\n`;
+
+          // 총 예상 소요 시간 계산
+          if (durations[index]) {
+            totalDuration += durations[index];
+            validDurationsCount++;
+          }
+
+          return formattedText;
         })
         .join("");
 
-      return header + body;
+      // 평균 예상 소요 시간 계산
+      const averageDuration =
+        validDurationsCount > 0
+          ? (totalDuration / validDurationsCount / 60).toFixed(0)
+          : 0;
+      const averageDurationText = `평균 예상 소요 시간: 약 ${averageDuration}분\n\n`;
+
+      return header + body + averageDurationText;
     };
 
     const handleCopyResult = async () => {

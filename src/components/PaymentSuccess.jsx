@@ -17,6 +17,7 @@ const PaymentSuccess = () => {
       const billing = decodeURIComponent(searchParams.get("billing"));
 
       console.log(searchParams);
+      console.log(window.location.search);
       console.log(amount);
       console.log(plan.toUpperCase());
       console.log(billing.toUpperCase());
