@@ -24,8 +24,8 @@ const PRICE_PLANS = {
   },
   basic: {
     name: "베이직",
-    monthlyPrice: 13000,
-    yearlyPrice: 124800, // 13,000 * 12 * 0.8 = 124,800
+    monthlyPrice: 9900,
+    yearlyPrice: 95040, // 9900 * 12 * 0.8 = 95040
     features: [
       "무제한 경로 최적화",
       "무제한 단일 경로 찾기",
@@ -35,9 +35,9 @@ const PRICE_PLANS = {
     ],
   },
   enterprise: {
-    name: "프리미엄",
-    monthlyPrice: 24900,
-    yearlyPrice: 239040, // 24,900 * 12 * 0.8 = 239,040
+    name: "엔터프라이즈",
+    monthlyPrice: 13000,
+    yearlyPrice: 124800, // 13000 * 12 * 0.8 = 124800
     features: [
       "모든 Basic 기능 포함",
       "무제한 직원 등록",
