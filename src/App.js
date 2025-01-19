@@ -173,7 +173,7 @@ function App() {
       workPlace: data.workPlaceName,
       homeAddress: data.homeAddressName,
       maxCapacity: data.maximumCapacity,
-      isDriver: false,
+      isDriver: data.isDriver,
     };
 
     console.log(updateData);
@@ -1373,6 +1373,9 @@ function App() {
                         이름
                       </th>
                       <th scope="col" className="px-6 py-3">
+                        유형
+                      </th>
+                      <th scope="col" className="px-6 py-3">
                         주소
                       </th>
                       <th scope="col" className="px-6 py-3">
@@ -1415,6 +1418,24 @@ function App() {
                             />
                           ) : (
                             row.name
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingEmployeeId === row.id ? (
+                            <select
+                              value={editedEmployee.isDriver}
+                              onChange={(e) =>
+                                handleEmployeeInputChange(e, "isDriver")
+                              }
+                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                            >
+                              <option value={false}>직원</option>
+                              <option value={true}>운전원</option>
+                            </select>
+                          ) : (
+                            <span className={`px-2 py-1 rounded text-sm`}>
+                              {row.isDriver ? "운전원" : "직원"}
+                            </span>
                           )}
                         </td>
                         <td className="px-6 py-4">
