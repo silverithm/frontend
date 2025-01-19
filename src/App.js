@@ -362,6 +362,8 @@ function App() {
     if (field === "maximumCapacity") {
       // 빈 문자열이거나 숫자가 아닌 경우 0으로 설정
       newValue = value === "" ? 0 : Math.max(0, parseInt(value, 10) || 0);
+    } else if (field === "isDriver") {
+      newValue = value === "true";
     } else {
       newValue = value;
     }
