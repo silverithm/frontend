@@ -3608,12 +3608,19 @@ function App() {
             waypoints = [];
 
           if (result.isSingleRoute) {
-            origin = {
-              x: result.homeAddress.longitude,
-              y: result.homeAddress.latitude,
-              name: result.employeeName,
-              type: "출발",
-            };
+            origin = result.isDriver
+              ? {
+                  x: result.workPlace.longitude,
+                  y: result.workPlace.latitude,
+                  name: result.workPlaceName,
+                  type: "출발",
+                }
+              : {
+                  x: result.homeAddress.longitude,
+                  y: result.homeAddress.latitude,
+                  name: result.employeeName,
+                  type: "출발",
+                };
 
             const lastElder =
               result.assignmentElders[result.assignmentElders.length - 1];
@@ -3639,12 +3646,19 @@ function App() {
             result.dispatchType === "DISTANCE_IN" ||
             result.dispatchType === "DURATION_IN"
           ) {
-            origin = {
-              x: result.homeAddress.longitude,
-              y: result.homeAddress.latitude,
-              name: result.employeeName,
-              type: "출발",
-            };
+            origin = result.isDriver
+              ? {
+                  x: result.workPlace.longitude,
+                  y: result.workPlace.latitude,
+                  name: "학교",
+                  type: "출발",
+                }
+              : {
+                  x: result.homeAddress.longitude,
+                  y: result.homeAddress.latitude,
+                  name: result.employeeName,
+                  type: "출발",
+                };
 
             for (let i = 0; i < result.assignmentElders.length; i++) {
               const currentElder = result.assignmentElders[i];
@@ -3683,12 +3697,19 @@ function App() {
               });
             }
 
-            destination = {
-              x: result.homeAddress.longitude,
-              y: result.homeAddress.latitude,
-              name: result.employeeName,
-              type: "도착",
-            };
+            destination = result.isDriver
+              ? {
+                  x: result.workPlace.longitude,
+                  y: result.workPlace.latitude,
+                  name: "학교",
+                  type: "도착",
+                }
+              : {
+                  x: result.homeAddress.longitude,
+                  y: result.homeAddress.latitude,
+                  name: result.employeeName,
+                  type: "도착",
+                };
           }
 
           // 캐시된 데이터 확인
