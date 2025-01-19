@@ -4043,6 +4043,11 @@ function App() {
                               }}
                             >
                               {item.employeeName}
+                              {item.isDriver && (
+                                <span className="inline-flex items-center text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
+                                  운전원
+                                </span>
+                              )}
                             </div>
 
                             <div className="flex-1 min-w-0">
