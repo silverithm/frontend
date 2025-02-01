@@ -4216,7 +4216,7 @@ function App() {
               {/* Main Content Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 h-[calc(100vh-165px)]">
                 {/* Left Side - Map */}
-                <div className="h-full">
+                <div className="h-[calc(100vh-165px)] sticky top-0">
                   <Map
                     setMap={setMap}
                     map={map}
@@ -4227,137 +4227,131 @@ function App() {
                 </div>
 
                 {/* Right Side - Assignment Details */}
-                <div className="bg-white border-l border-gray-200 h-full flex flex-col">
-                  <div className="flex-1 overflow-y-auto">
-                    <div className="p-4 space-y-2">
-                      {dispatchData.map((item, dispatchIndex) => (
+                <div className="bg-white border-l border-gray-200 overflow-y-auto">
+                  <div className="p-4 space-y-2">
+                    {dispatchData.map((item, dispatchIndex) => (
+                      <div
+                        key={`dispatch-${dispatchIndex}`}
+                        className={`p-3 border rounded-lg transition-colors ${
+                          activeEmployeeId === item.employeeId
+                            ? "bg-blue-50 border-blue-200"
+                            : "border-gray-200"
+                        }`}
+                      >
                         <div
-                          key={`dispatch-${dispatchIndex}`}
-                          className={`p-3 border rounded-lg transition-colors ${
-                            activeEmployeeId === item.employeeId
-                              ? "bg-blue-50 border-blue-200"
-                              : "border-gray-200"
-                          }`}
+                          className="flex items-start"
+                          onClick={() => handleEmployeeSelect(item.employeeId)}
                         >
                           <div
-                            className="flex items-start"
-                            onClick={() =>
-                              handleEmployeeSelect(item.employeeId)
-                            }
+                            key={item.employeeId}
+                            className="flex-shrink-0 font-medium w-20"
+                            style={{
+                              color:
+                                activeEmployeeId &&
+                                activeEmployeeId !== item.employeeId
+                                  ? "#D1D5DB"
+                                  : randomColors[
+                                      dispatchIndex % randomColors.length
+                                    ],
+                            }}
                           >
-                            <div
-                              key={item.employeeId}
-                              className="flex-shrink-0 font-medium w-20"
-                              style={{
-                                color:
-                                  activeEmployeeId &&
-                                  activeEmployeeId !== item.employeeId
-                                    ? "#D1D5DB"
-                                    : randomColors[
-                                        dispatchIndex % randomColors.length
-                                      ],
-                              }}
-                            >
-                              {item.employeeName}
-                              {item.isDriver && (
-                                <span className="inline-flex items-center text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
-                                  운전원
-                                </span>
-                              )}
-                            </div>
+                            {item.employeeName}
+                            {item.isDriver && (
+                              <span className="inline-flex items-center text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
+                                운전원
+                              </span>
+                            )}
+                          </div>
 
-                            <div className="flex-1 min-w-0">
-                              <Droppable
-                                droppableId={`${dispatchIndex}`}
-                                direction="horizontal"
-                              >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                    className="flex flex-wrap gap-1.5 mb-2"
-                                  >
-                                    {item.assignmentElders.map(
-                                      (elder, elderIndex) => (
-                                        <Draggable
-                                          key={`elder-${
-                                            elder.id || elderIndex
-                                          }`}
-                                          draggableId={`${dispatchIndex}-${
-                                            elder.id || elderIndex
-                                          }`}
-                                          index={elderIndex}
-                                        >
-                                          {(provided, snapshot) => (
-                                            <div
-                                              ref={provided.innerRef}
-                                              {...provided.draggableProps}
-                                              {...provided.dragHandleProps}
-                                              className={`px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap cursor-move
+                          <div className="flex-1 min-w-0">
+                            <Droppable
+                              droppableId={`${dispatchIndex}`}
+                              direction="horizontal"
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.droppableProps}
+                                  className="flex flex-wrap gap-1.5 mb-2"
+                                >
+                                  {item.assignmentElders.map(
+                                    (elder, elderIndex) => (
+                                      <Draggable
+                                        key={`elder-${elder.id || elderIndex}`}
+                                        draggableId={`${dispatchIndex}-${
+                                          elder.id || elderIndex
+                                        }`}
+                                        index={elderIndex}
+                                      >
+                                        {(provided, snapshot) => (
+                                          <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            className={`px-2 py-1 bg-gray-100 rounded text-sm whitespace-nowrap cursor-move
                                         ${
                                           snapshot.isDragging
                                             ? "shadow-lg bg-blue-50"
                                             : ""
                                         }`}
-                                            >
-                                              {elder.name}
-                                            </div>
-                                          )}
-                                        </Draggable>
-                                      )
-                                    )}
-                                    {provided.placeholder}
-                                  </div>
-                                )}
-                              </Droppable>
+                                          >
+                                            {elder.name}
+                                          </div>
+                                        )}
+                                      </Draggable>
+                                    )
+                                  )}
+                                  {provided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
 
-                              <div className="flex items-center text-sm text-gray-600">
-                                {!(
-                                  activeEmployeeId &&
-                                  activeEmployeeId !== item.employeeId
-                                ) && (
-                                  <>
-                                    <svg
-                                      className="w-4 h-4 mr-1 flex-shrink-0"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                      />
-                                    </svg>
-                                    예상 소요시간:
-                                    <span className="font-medium ml-1">
-                                      {(() => {
-                                        const cacheKey = `${
-                                          item.employeeId
-                                        }-${item.assignmentElders
-                                          .map((e) => e.id)
-                                          .join("-")}`;
-                                        return directionsCache[cacheKey]
-                                          ? `약 ${(
-                                              directionsCache[cacheKey]
-                                                .routes[0].summary.duration / 60
-                                            ).toFixed(0)}분`
-                                          : isNaN(durations[dispatchIndex])
-                                          ? "계산중..."
-                                          : `약 ${(
-                                              durations[dispatchIndex] / 60
-                                            ).toFixed(0)}분`;
-                                      })()}
-                                    </span>
-                                  </>
-                                )}
-                              </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              {!(
+                                activeEmployeeId &&
+                                activeEmployeeId !== item.employeeId
+                              ) && (
+                                <>
+                                  <svg
+                                    className="w-4 h-4 mr-1 flex-shrink-0"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                  예상 소요시간:
+                                  <span className="font-medium ml-1">
+                                    {(() => {
+                                      const cacheKey = `${
+                                        item.employeeId
+                                      }-${item.assignmentElders
+                                        .map((e) => e.id)
+                                        .join("-")}`;
+                                      return directionsCache[cacheKey]
+                                        ? `약 ${(
+                                            directionsCache[cacheKey].routes[0]
+                                              .summary.duration / 60
+                                          ).toFixed(0)}분`
+                                        : isNaN(durations[dispatchIndex])
+                                        ? "계산중..."
+                                        : `약 ${(
+                                            durations[dispatchIndex] / 60
+                                          ).toFixed(0)}분`;
+                                    })()}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
