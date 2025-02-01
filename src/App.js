@@ -3518,7 +3518,7 @@ function App() {
           const params = new URLSearchParams({
             origin: `${currentOrigin.longitude},${currentOrigin.latitude}`,
             destination: `${chunkDestination.longitude},${chunkDestination.latitude}`,
-            departure_time: "202502071800",
+            departure_time: "202501311800",
           });
 
           if (waypointsStr) {
@@ -3867,7 +3867,7 @@ function App() {
                     "destination",
                     `${currentDestination.x},${currentDestination.y}`
                   );
-                  params.append("departure_time", "202502071800");
+                  params.append("departure_time", "202501311800");
                   params.append("alternatives", true);
 
                   if (currentWaypoints.length > 0) {
@@ -3930,7 +3930,7 @@ function App() {
                 const params = new URLSearchParams({
                   origin: `${origin.x},${origin.y}`,
                   destination: `${destination.x},${destination.y}`,
-                  departure_time: "202502071800",
+                  departure_time: "202501311800",
                   alternatives: true,
                 });
 
