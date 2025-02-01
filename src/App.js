@@ -3487,7 +3487,77 @@ function App() {
 
     // 호출방식의 URL을 입력합니다.
     const url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions";
+    const MAX_WAYPOINTS = 5; // 카카오 API 경유지 제한
 
+    async function calculateRouteInChunks(origin, destination, waypoints) {
+      let totalDuration = 0;
+      let currentOrigin = { ...origin };
+
+      // waypoints를 5개씩 나누어 처리
+      for (let i = 0; i < waypoints.length; i += MAX_WAYPOINTS) {
+        // 현재 청크의 경유지들
+        const chunkWaypoints = waypoints.slice(
+          i,
+          Math.min(i + MAX_WAYPOINTS, waypoints.length)
+        );
+
+        // 다음 시작점 결정
+        const nextStartIndex = i + MAX_WAYPOINTS;
+        const chunkDestination =
+          nextStartIndex >= waypoints.length
+            ? destination
+            : waypoints[nextStartIndex];
+
+        try {
+          // 현재 청크의 경유지들을 문자열로 변환
+          const waypointsStr = chunkWaypoints
+            .map((point) => `${point.longitude},${point.latitude}`)
+            .join("|");
+
+          const params = new URLSearchParams({
+            origin: `${currentOrigin.longitude},${currentOrigin.latitude}`,
+            destination: `${chunkDestination.longitude},${chunkDestination.latitude}`,
+            departure_time: "202502071800",
+          });
+
+          if (waypointsStr) {
+            params.append("waypoints", waypointsStr);
+          }
+
+          console.log(
+            "Request URL:",
+            `https://apis-navi.kakaomobility.com/v1/future/directions?${params}`
+          );
+
+          const response = await fetch(
+            `https://apis-navi.kakaomobility.com/v1/future/directions?${params}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `KakaoAK ${REST_API_KEY}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("API Error Response:", errorText);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          totalDuration += data.routes[0].summary.duration;
+
+          // 다음 요청의 시작점을 현재 청크의 도착점으로 설정
+          currentOrigin = chunkDestination;
+        } catch (error) {
+          console.error("Error in chunk calculation:", error);
+          throw error;
+        }
+      }
+
+      return totalDuration;
+    }
     function OffsetPolyline(path) {
       const offsetX = lineIndex * 2;
       // const offsetY = lineIndex * 50;
@@ -3740,33 +3810,152 @@ function App() {
           if (directionsCache[cacheKey] && !isSingleRoute) {
             data = directionsCache[cacheKey];
             dur[index] = data.routes[0].summary.duration;
+            console.log("hello ");
           } else {
             try {
-              const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                  Authorization: `KakaoAK ${REST_API_KEY}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  origin,
-                  destination,
-                  waypoints,
-                  priority: "RECOMMEND",
-                  car_fuel: "GASOLINE",
-                  car_hipass: false,
+              console.log(waypoints);
+              if (waypoints && waypoints.length > 5) {
+                let allSections = []; // 모든 section을 저장할 배열
+
+                console.log("waypoints length > 5");
+                let totalDuration = 0;
+                let currentOrigin = { ...origin };
+                let remainingWaypoints = [...waypoints];
+
+                while (remainingWaypoints.length > 0) {
+                  // 현재 처리할 최대 5개의 waypoint 복사
+                  const currentWaypoints = remainingWaypoints.slice(0, 5);
+                  let currentDestination;
+                  let numConsumed = 0; // 이번 요청에서 소비할 remainingWaypoints의 개수
+
+                  if (remainingWaypoints.length <= 5) {
+                    // 남은 waypoint가 5개 이하이면 최종 목적지 사용
+                    currentDestination = destination;
+                    numConsumed = remainingWaypoints.length;
+                  } else {
+                    // 남은 waypoint가 6개 이상인 경우 6번째 waypoint를 임시 목적지로 설정
+                    currentDestination = remainingWaypoints[5];
+                    // 만약 현재 구간의 origin과 임시 목적지가 동일하다면,
+                    // 5개의 waypoint 중 마지막 것을 목적지로 사용하고 해당 waypoint는 API 호출 시 제거
+                    if (
+                      currentOrigin.x === currentDestination.x &&
+                      currentOrigin.y === currentDestination.y
+                    ) {
+                      if (currentWaypoints.length > 0) {
+                        currentDestination =
+                          currentWaypoints[currentWaypoints.length - 1];
+                        currentWaypoints.pop(); // 사용한 waypoint 제거
+                      } else {
+                        break;
+                      }
+                      // 이 경우에는 5개만 소비
+                      numConsumed = 5;
+                    } else {
+                      // 정상적인 경우 6개 소비 (5개 waypoint + 1개 destination)
+                      numConsumed = 6;
+                    }
+                  }
+
+                  // API 호출을 위한 파라미터 설정
+                  const params = new URLSearchParams();
+                  params.append(
+                    "origin",
+                    `${currentOrigin.x},${currentOrigin.y}`
+                  );
+                  params.append(
+                    "destination",
+                    `${currentDestination.x},${currentDestination.y}`
+                  );
+                  params.append("departure_time", "202502071800");
+                  params.append("alternatives", true);
+
+                  if (currentWaypoints.length > 0) {
+                    const waypointsStr = currentWaypoints
+                      .map((wp) => `${wp.x},${wp.y}`)
+                      .join("|");
+                    params.append("waypoints", waypointsStr);
+                  }
+
+                  // API 요청
+                  const response = await fetch(
+                    `https://apis-navi.kakaomobility.com/v1/future/directions?${params}`,
+                    {
+                      method: "GET",
+                      headers: {
+                        Authorization: `KakaoAK ${REST_API_KEY}`,
+                      },
+                    }
+                  );
+
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+
+                  const chunkData = await response.json();
+                  totalDuration += chunkData.routes[0].summary.duration;
+                  allSections = [
+                    ...allSections,
+                    ...chunkData.routes[0].sections,
+                  ];
+
+                  // 다음 반복을 위한 준비: 현재 목적지를 새 출발지로 지정하고,
+                  // 소비한 waypoint 개수만큼 remainingWaypoints에서 제거
+                  currentOrigin = currentDestination;
+                  remainingWaypoints = remainingWaypoints.slice(numConsumed);
+                }
+
+                console.log(allSections);
+
+                data = {
+                  routes: [
+                    {
+                      summary: {
+                        duration: totalDuration,
+                      },
+                      sections: allSections, // 모든 sections 포함
+                    },
+                  ],
+                };
+                directionsCache[cacheKey] = data;
+                dur[index] = data.routes[0].summary.duration;
+                console.log(data);
+              } else {
+                // 경유지가 5개 이하인 경우 단일 요청
+                const waypointsStr = waypoints
+                  .map((point) => `${point.x},${point.y}`)
+                  .join("|");
+
+                console.log(waypoints);
+                const params = new URLSearchParams({
+                  origin: `${origin.x},${origin.y}`,
+                  destination: `${destination.x},${destination.y}`,
+                  departure_time: "202502071800",
                   alternatives: true,
-                  road_details: false,
-                }),
-              });
+                });
 
-              if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                if (waypointsStr) {
+                  params.append("waypoints", waypointsStr);
+                }
+
+                const response = await fetch(
+                  `https://apis-navi.kakaomobility.com/v1/future/directions?${params}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      Authorization: `KakaoAK ${REST_API_KEY}`,
+                    },
+                  }
+                );
+
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                data = await response.json();
+                directionsCache[cacheKey] = data;
+                dur[index] = data.routes[0].summary.duration;
+                console.log(data);
               }
-
-              data = await response.json();
-              directionsCache[cacheKey] = data;
-              dur[index] = data.routes[0].summary.duration;
             } catch (error) {
               console.error("Error:", error);
               continue;
@@ -3968,7 +4157,9 @@ function App() {
                   <h3 className="text-xl font-bold text-gray-800">
                     차량 배치 결과 {isInbound ? "- 출근" : "- 퇴근"}
                   </h3>
-                  <p className="text-sm text-gray-500">{currentTime} 기준</p>
+                  <p className="text-sm text-gray-500">
+                    출퇴근 시간 도로 혼잡도 반영
+                  </p>
                 </div>
                 <button
                   onClick={handleModalClose}
@@ -4011,7 +4202,8 @@ function App() {
                   </svg>
                   <div className="flex-1 text-sm">
                     <span className="font-medium text-blue-900">
-                      카카오맵 API 기준 예상 운행시간입니다.
+                      카카오맵 미래 운행 정보 길찾기 API 기준 예상
+                      운행시간입니다.
                     </span>
                     <span className="text-blue-800 ml-1">
                       실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
