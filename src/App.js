@@ -1440,6 +1440,7 @@ function App() {
                             </span>
                           )}
                         </td>
+
                         <td className="px-6 py-4">
                           {editingEmployeeId === row.id ? (
                             <input
