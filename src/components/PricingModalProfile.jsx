@@ -8,7 +8,7 @@ import RefundPolicyModal from "./RefundPolicyModal";
 import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
 import config from "../config";
 import useStore from "../store/useStore";
-const clientKey = config.PAYMENT_CLIENT_KEY;
+const clientKey = config.payment_client_key;
 
 const PRICE_PLANS = {
   free: {

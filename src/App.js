@@ -10,7 +10,6 @@ import Modal from "react-bootstrap/Modal";
 import React from "react";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { styled } from "styled-components";
-import ProgressBar from "react-bootstrap/ProgressBar";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { Form } from "react-bootstrap";
 import axios from "axios";

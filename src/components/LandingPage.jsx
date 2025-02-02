@@ -9,7 +9,7 @@ import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
 import useStore from "../store/useStore";
 import config from "../config";
 
-const clientKey = config.PAYMENT_CLIENT_KEY;
+const clientKey = config.payment_client_key;
 
 const AGREEMENT_LINKS = {
   privacyPolicy:
