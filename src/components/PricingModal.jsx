@@ -86,7 +86,7 @@ const SubscriptionBadges = ({ subscriptionType }) => {
     fetchPayment();
   }, [clientKey, customerKey]);
   // ------ '카드 등록하기' 버튼 누르면 결제창 띄우기 ------
-  // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
+  //  @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
   async function requestBillingAuth(plan, selectedBilling) {
     const amount =
       selectedBilling === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
