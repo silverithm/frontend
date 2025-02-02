@@ -32,12 +32,6 @@ const PaymentSuccess = () => {
       const customerName = userName;
       const taxFreeAmount = 0;
 
-      console.log(searchParams);
-      console.log(window.location.search);
-      console.log(amount);
-      console.log(plan.toUpperCase());
-      console.log(billing.toUpperCase());
-
       try {
         await createSubscription(
           plan,
@@ -79,7 +73,6 @@ const PaymentSuccess = () => {
     jwt
   ) => {
     try {
-      console.log(jwt);
       const response = await axios.post(
         `${config.apiUrl}/subscriptions`,
         {

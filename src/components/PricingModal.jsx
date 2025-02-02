@@ -68,11 +68,10 @@ const SubscriptionBadges = ({ subscriptionType }) => {
     async function fetchPayment() {
       try {
         const tossPayments = await loadTossPayments(clientKey);
-        console.log(clientKey);
-        console.log(customerKey);
+
         // 회원 결제
         // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
-        console.log(customerKey);
+
         const payment = tossPayments.payment({
           customerKey,
         });
