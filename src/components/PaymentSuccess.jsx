@@ -6,7 +6,17 @@ import useStore from "../store/useStore";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
-  const { jwt } = useStore();
+
+  const {
+    isSignin,
+    company,
+    jwt,
+    userId,
+    userName,
+    userEmail,
+    selectedElderIds,
+    selectedEmployeeIds,
+  } = useStore();
 
   useEffect(() => {
     const handlePaymentSuccess = async () => {
@@ -15,6 +25,12 @@ const PaymentSuccess = () => {
       const amount = decodeURIComponent(searchParams.get("amount"));
       const plan = decodeURIComponent(searchParams.get("plan"));
       const billing = decodeURIComponent(searchParams.get("billing"));
+      const customerKey = decodeURIComponent(searchParams.get("customerKey"));
+      const authKey = decodeURIComponent(searchParams.get("authKey"));
+      const orderName = plan + "_" + billing;
+      const customerEmail = userEmail;
+      const customerName = userName;
+      const taxFreeAmount = 0;
 
       console.log(searchParams);
       console.log(window.location.search);
@@ -23,7 +39,18 @@ const PaymentSuccess = () => {
       console.log(billing.toUpperCase());
 
       try {
-        await createSubscription(plan, amount, billing, jwt);
+        await createSubscription(
+          plan,
+          amount,
+          billing,
+          customerKey,
+          authKey,
+          orderName,
+          customerEmail,
+          customerName,
+          taxFreeAmount,
+          jwt
+        );
         setTimeout(() => {
           console.log(plan.toString());
           console.log(billing.toString());
@@ -39,7 +66,19 @@ const PaymentSuccess = () => {
     handlePaymentSuccess();
   }, [navigate]);
 
-  const createSubscription = async (plan, amount, billing, jwt) => {
+  const createSubscription = async (
+    plan,
+    amount,
+    billing,
+    customerKey,
+    authKey,
+    orderName,
+    customerEmail,
+    customerName,
+    taxFreeAmount,
+    jwt
+  ) => {
+    console.log(jwt);
     try {
       const response = await axios.post(
         `${config.apiUrl}/subscriptions`,
@@ -47,6 +86,12 @@ const PaymentSuccess = () => {
           planName: plan.toUpperCase(),
           billingType: billing.toUpperCase(),
           amount: amount,
+          customerKey: customerKey,
+          authKey: authKey,
+          orderName: orderName,
+          customerEmail: customerEmail,
+          customerName: customerName,
+          taxFreeAmount: taxFreeAmount,
         },
         {
           headers: {
