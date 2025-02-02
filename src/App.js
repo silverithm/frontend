@@ -38,7 +38,6 @@ function App() {
   const [selectedEmployeeForSingle, setSelectedEmployeeForSingle] =
     useState(null);
   const [selectedEldersForSingle, setSelectedEldersForSingle] = useState([]);
-  const [showSingleRouteResult, setShowSingleRouteResult] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const [view, setView] = useState("current"); // 'current' or 'previous'
