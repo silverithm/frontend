@@ -6,13 +6,14 @@ import { toast } from "react-toastify";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import RefundPolicyModal from "./RefundPolicyModal";
 import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
-
+import config from "../config";
 import useStore from "../store/useStore";
-const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
-const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
+const clientKey = config.PAYMENT_CLIENT_KEY;
+
 const PRICE_PLANS = {
   free: {
     name: "무료 체험판",
+    enlgishName: "FREE",
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
@@ -24,8 +25,9 @@ const PRICE_PLANS = {
   },
   basic: {
     name: "베이직",
-    monthlyPrice: 13000,
-    yearlyPrice: 124800, // 13,000 * 12 * 0.8 = 124,800
+    englishName: "BASIC",
+    monthlyPrice: 9900,
+    yearlyPrice: 95040, // 9900 * 12 * 0.8 = 95040
     features: [
       "무제한 경로 최적화",
       "무제한 단일 경로 찾기",
@@ -35,9 +37,10 @@ const PRICE_PLANS = {
     ],
   },
   enterprise: {
-    name: "프리미엄",
-    monthlyPrice: 24900,
-    yearlyPrice: 239040, // 24,900 * 12 * 0.8 = 239,040
+    name: "엔터프라이즈",
+    englishName: "ENTERPRISE",
+    monthlyPrice: 13000,
+    yearlyPrice: 124800, // 13000 * 12 * 0.8 = 124800
     features: [
       "모든 Basic 기능 포함",
       "무제한 직원 등록",
@@ -53,7 +56,7 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const navigate = useNavigate();
-  const { isSignin } = useStore();
+  const { isSignin, customerKey } = useStore();
   const [selectedBilling, setSelectedBilling] = useState("monthly");
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState(null);
@@ -86,12 +89,12 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
     await payment.requestBillingAuth({
       method: "CARD",
       successUrl: `${window.location.origin}/success?plan=${encodeURIComponent(
-        plan.name
+        plan.englishName
       )}&billing=${encodeURIComponent(
         selectedBilling
       )}&amount=${encodeURIComponent(amount)}`,
       failUrl: `${window.location.origin}/fail?plan=${encodeURIComponent(
-        plan.name
+        plan.englishName
       )}&billing=${encodeURIComponent(
         selectedBilling
       )}&amount=${encodeURIComponent(amount)}`,

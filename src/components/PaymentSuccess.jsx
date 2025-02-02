@@ -78,8 +78,8 @@ const PaymentSuccess = () => {
     taxFreeAmount,
     jwt
   ) => {
-    console.log(jwt);
     try {
+      console.log(jwt);
       const response = await axios.post(
         `${config.apiUrl}/subscriptions`,
         {

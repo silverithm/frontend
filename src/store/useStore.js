@@ -16,7 +16,9 @@ const useStore = create(
       employees: [],
       elders: [],
       durationTimes: [],
+      customerKey: "",
 
+      setCustomerKey: (key) => set({ customerKey: key }),
       setUserName: (name) => set({ userName: name }),
       setEmployees: (employees) => set({ employees: employees }),
       setElders: (elders) => set({ elders: elders }),
@@ -36,17 +38,19 @@ const useStore = create(
       setSubscriptionType: (subscriptionType) =>
         set({ subscriptionType: subscriptionType }),
     }),
+
     {
       name: "app-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        // userId: state.userId,
-        // jwt: state.jwt,
-        // company: state.company,
-        // isSignin: state.isSignin,
-        // userEmail: state.userEmail,
-        // userName: state.userName,
-        // subscriptionType: state.subscriptionType,
+        userId: state.userId,
+        jwt: state.jwt,
+        company: state.company,
+        isSignin: state.isSignin,
+        userEmail: state.userEmail,
+        userName: state.userName,
+        subscriptionType: state.subscriptionType,
+        customerKey: state.customerKey,
         // selectedElderIds: state.selectedElderIds,
         // selectedEmployeeIds: state.selectedEmployeeIds,
         // employees: state.employees,

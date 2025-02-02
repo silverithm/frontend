@@ -32,6 +32,7 @@ function Signin() {
     setUserEmail,
     setUserName,
     setSubscriptionType,
+    setCustomerKey,
   } = useStore();
 
   function handleBack() {
@@ -121,6 +122,7 @@ function Signin() {
           });
           await setJwt(result["tokenInfo"]["accessToken"]);
           await setSubscriptionType(result["subscriptionType"]);
+          await setCustomerKey(result["customerKey"]);
           await setCompany(
             result["companyName"],
             result["companyAddress"],

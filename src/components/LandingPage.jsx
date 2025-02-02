@@ -7,9 +7,10 @@ import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import RefundPolicyModal from "./RefundPolicyModal"; // 환불 정책 모달 가져오기
 import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
 import useStore from "../store/useStore";
+import config from "../config";
 
-const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
-const customerKey = "test_customer_key";
+const clientKey = config.PAYMENT_CLIENT_KEY;
+
 const AGREEMENT_LINKS = {
   privacyPolicy:
     "https://plip.kr/pcc/d9017bf3-00dc-4f8f-b750-f7668e2b7bb7/privacy/1.html",
@@ -17,9 +18,10 @@ const AGREEMENT_LINKS = {
     "https://relic-baboon-412.notion.site/silverithm-13c766a8bb468082b91ddbd2dd6ce45d",
 };
 
-export const PRICE_PLANS = {
+const PRICE_PLANS = {
   free: {
     name: "무료 체험판",
+    enlgishName: "FREE",
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
@@ -31,6 +33,7 @@ export const PRICE_PLANS = {
   },
   basic: {
     name: "베이직",
+    englishName: "BASIC",
     monthlyPrice: 9900,
     yearlyPrice: 95040, // 9900 * 12 * 0.8 = 95040
     features: [
@@ -43,6 +46,7 @@ export const PRICE_PLANS = {
   },
   enterprise: {
     name: "엔터프라이즈",
+    englishName: "ENTERPRISE",
     monthlyPrice: 13000,
     yearlyPrice: 124800, // 13000 * 12 * 0.8 = 124800
     features: [
@@ -56,7 +60,7 @@ export const PRICE_PLANS = {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { isSignin } = useStore();
+  const { isSignin, userName, userEmail, customerKey } = useStore();
   const [selectedBilling, setSelectedBilling] = useState("monthly");
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState(null);
@@ -95,17 +99,17 @@ const LandingPage = () => {
     await payment.requestBillingAuth({
       method: "CARD",
       successUrl: `${window.location.origin}/success?plan=${encodeURIComponent(
-        plan.name
+        plan.englishName
       )}&billing=${encodeURIComponent(
         selectedBilling
       )}&amount=${encodeURIComponent(amount)}`,
       failUrl: `${window.location.origin}/fail?plan=${encodeURIComponent(
-        plan.name
+        plan.englishName
       )}&billing=${encodeURIComponent(
         selectedBilling
       )}&amount=${encodeURIComponent(amount)}`,
-      customerEmail: "customer123@gmail.com",
-      customerName: "김토스",
+      customerEmail: userEmail,
+      customerName: userName,
     });
   }
   const formatPrice = (price) => {

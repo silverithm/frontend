@@ -6,13 +6,15 @@ import { toast } from "react-toastify";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import RefundPolicyModal from "./RefundPolicyModal";
 import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
+import config from "../config";
 
 import useStore from "../store/useStore";
-const clientKey = "test_ck_d46qopOB89NoDMPaJzmO3ZmM75y0";
-const customerKey = "QbkYnhoH48ZxhTFnAHxNn";
+const clientKey = config.PAYMENT_CLIENT_KEY;
+
 const PRICE_PLANS = {
   free: {
     name: "무료 체험판",
+    enlgishName: "FREE",
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
@@ -24,6 +26,7 @@ const PRICE_PLANS = {
   },
   basic: {
     name: "베이직",
+    englishName: "BASIC",
     monthlyPrice: 9900,
     yearlyPrice: 95040, // 9900 * 12 * 0.8 = 95040
     features: [
@@ -36,6 +39,7 @@ const PRICE_PLANS = {
   },
   enterprise: {
     name: "엔터프라이즈",
+    englishName: "ENTERPRISE",
     monthlyPrice: 13000,
     yearlyPrice: 124800, // 13000 * 12 * 0.8 = 124800
     features: [
@@ -53,18 +57,22 @@ const SubscriptionBadges = ({ subscriptionType }) => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const navigate = useNavigate();
-  const { isSignin } = useStore();
+  const { isSignin, userName, userEmail, customerKey } = useStore();
   const [selectedBilling, setSelectedBilling] = useState("monthly");
   const [loading, setLoading] = useState(false);
   const [payment, setPayment] = useState(null);
   const [isRefundPolicyBottomOpen, setIsRefundPolicyBottomOpen] =
     useState(false);
+
   useEffect(() => {
     async function fetchPayment() {
       try {
         const tossPayments = await loadTossPayments(clientKey);
+        console.log(clientKey);
+        console.log(customerKey);
         // 회원 결제
         // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
+        console.log(customerKey);
         const payment = tossPayments.payment({
           customerKey,
         });
@@ -86,17 +94,19 @@ const SubscriptionBadges = ({ subscriptionType }) => {
     await payment.requestBillingAuth({
       method: "CARD",
       successUrl: `${window.location.origin}/success?plan=${encodeURIComponent(
-        plan.name
+        plan.englishName
       )}&billing=${encodeURIComponent(
         selectedBilling
-      )}&amount=${encodeURIComponent(amount)}`,
+      )}&amount=${encodeURIComponent(amount)}&customerKey=${encodeURIComponent(
+        customerKey
+      )}`,
       failUrl: `${window.location.origin}/fail?plan=${encodeURIComponent(
-        plan.name
+        plan.englishName
       )}&billing=${encodeURIComponent(
         selectedBilling
       )}&amount=${encodeURIComponent(amount)}`,
-      customerEmail: "customer123@gmail.com",
-      customerName: "김토스",
+      customerEmail: userEmail,
+      customerName: userName,
     });
   }
   const formatPrice = (price) => {

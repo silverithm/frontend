@@ -496,6 +496,8 @@ function App() {
     const fetchEmployeesAndElders = async () => {
       setLoadingSpinner(true);
 
+      console.log(jwt);
+
       if (jwt === "") {
         return;
       }
@@ -2505,7 +2507,7 @@ function App() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-6">
-              {isSignin && (
+              {jwt && (
                 <div className="flex items-center gap-4">
                   {/* 사용자 정보 */}
                   <div className="flex items-center gap-2 text-sky-100">
@@ -2591,7 +2593,7 @@ function App() {
                 </div>
               )}
 
-              {!isSignin && (
+              {!jwt && (
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={handleSignin}
