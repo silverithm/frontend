@@ -64,7 +64,7 @@ function Signin() {
     }
 
     // Handle Premium plan
-    if (planName === "premium") {
+    if (planName === "enterprise") {
       return billingType === "monthly" ? "premiumMonthly" : "premiumYearly";
     }
 
