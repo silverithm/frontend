@@ -56,13 +56,13 @@ function Signin() {
     const billingType = userData.subscription.billingType.toLowerCase();
 
     // Handle Basic plan
-    if (planName === "basic") {
-      return billingType === "monthly" ? "basicMonthly" : "basicYearly";
+    if (planName === "BASIC") {
+      return billingType === "MONTHLY" ? "basicMonthly" : "basicYearly";
     }
 
     // Handle Premium plan
-    if (planName === "premium") {
-      return billingType === "monthly" ? "premiumMonthly" : "premiumYearly";
+    if (planName === "ENTERPRISE") {
+      return billingType === "MONTHLY" ? "premiumMonthly" : "premiumYearly";
     }
 
     // Default to free if none of the above conditions are met
