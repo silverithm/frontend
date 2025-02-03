@@ -157,6 +157,7 @@ function App() {
     userEmail,
     selectedElderIds,
     selectedEmployeeIds,
+    subscriptionType,
   } = useStore();
 
   const handleSignUp = () => {
@@ -2470,8 +2471,6 @@ function App() {
     { id: "one", label: "단일 경로 길 찾기", icon: "🛣️" },
     { id: "previous", label: "이전 배치 보기", icon: "📋" },
   ];
-
-  var subscriptionType = "premiumYearly";
 
   return (
     <div className="App">

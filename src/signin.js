@@ -41,6 +41,34 @@ function Signin() {
     navigate(from);
   }
 
+  const getSubscriptionType = (userData) => {
+    // If there's no subscription data or status is INACTIVE, return free
+    if (
+      !userData.subscription ||
+      !userData.subscription.planName ||
+      userData.subscription.status === "INACTIVE"
+    ) {
+      return "free";
+    }
+
+    // Get the plan name and billing type
+    const planName = userData.subscription.planName.toLowerCase();
+    const billingType = userData.subscription.billingType.toLowerCase();
+
+    // Handle Basic plan
+    if (planName === "basic") {
+      return billingType === "monthly" ? "basicMonthly" : "basicYearly";
+    }
+
+    // Handle Premium plan
+    if (planName === "premium") {
+      return billingType === "monthly" ? "premiumMonthly" : "premiumYearly";
+    }
+
+    // Default to free if none of the above conditions are met
+    return "free";
+  };
+
   const sendTemporaryPassword = async (email) => {
     setLoadingSpinner(true);
     try {
@@ -121,7 +149,9 @@ function Signin() {
             autoClose: 500, // 2초 후 자동으로 닫힘
           });
           await setJwt(result["tokenInfo"]["accessToken"]);
-          await setSubscriptionType(result["subscriptionType"]);
+          await setSubscriptionType(getSubscriptionType(result));
+          console.log(getSubscriptionType(result));
+
           await setCustomerKey(result["customerKey"]);
           await setCompany(
             result["companyName"],
