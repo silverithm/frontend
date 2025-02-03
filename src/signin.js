@@ -55,6 +55,9 @@ function Signin() {
     const planName = userData.subscription.planName.toLowerCase();
     const billingType = userData.subscription.billingType.toLowerCase();
 
+    console.log(planName);
+    console.log(billingType);
+
     // Handle Basic plan
     if (planName === "basic") {
       return billingType === "monthly" ? "basicMonthly" : "basicYearly";
