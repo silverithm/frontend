@@ -5,6 +5,7 @@ const useStore = create(
   persist(
     (set) => ({
       jwt: "",
+      refreshToken: "",
       userId: "",
       company: { name: "", address: "" },
       isSignin: false,
@@ -28,6 +29,7 @@ const useStore = create(
         set({ durationTimes: durationTimes }),
 
       setJwt: (jwt) => set({ jwt: jwt }),
+      setRefreshToken: (refreshToken) => set({ refreshToken: refreshToken }),
       setUserId: (userId) => set({ userId: userId }),
       setCompany: (name, address, addressName) =>
         set({
@@ -45,6 +47,7 @@ const useStore = create(
       partialize: (state) => ({
         userId: state.userId,
         jwt: state.jwt,
+        refreshToken: state.refreshToken,
         company: state.company,
         isSignin: state.isSignin,
         userEmail: state.userEmail,

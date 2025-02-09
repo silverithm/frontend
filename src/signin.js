@@ -27,6 +27,7 @@ function Signin() {
   const {
     setCompany,
     setJwt,
+    setRefreshToken,
     setUserId,
     setIsSignin,
     setUserEmail,
@@ -149,9 +150,10 @@ function Signin() {
               setLoadingSpinner(false);
               handleBack();
             },
-            autoClose: 500, // 2초 후 자동으로 닫힘
+            autoClose: 1000, // 2초 후 자동으로 닫힘
           });
           await setJwt(result["tokenInfo"]["accessToken"]);
+          await setRefreshToken(result["tokenInfo"]["refreshToken"]);
           await setSubscriptionType(getSubscriptionType(result));
           console.log(getSubscriptionType(result));
 

@@ -21,6 +21,7 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 
 import "./styles/bootstrapcss.css";
+import axiosInstance from "./components/AxiosInstance";
 
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
 
@@ -92,17 +93,19 @@ function App() {
 
   const fetchHistories = async (page) => {
     try {
-      const response = await axios.get(`${config.apiUrl}/history`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+      const response = await axiosInstance.get("/history", {
         params: {
-          page,
+          page: page,
           size: 9,
           sort: "createdAt,desc",
         },
       });
-      console.log(response);
+
+      console.log("History response:", {
+        url: response.config.url,
+        params: response.config.params,
+        data: response.data,
+      });
 
       setDispatchHistories(response.data.content);
       setTotalPages(response.data.totalPages);
@@ -177,23 +180,18 @@ function App() {
 
     console.log(updateData);
 
-    const response = await fetch(`${config.apiUrl}/employee/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updateData),
-    });
+    try {
+      const response = await axiosInstance.put(`/employee/${id}`, updateData);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Something went wrong");
+      await toast.success("직원 수정에 성공하였습니다.");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      throw new Error(errorMessage);
+    } finally {
+      setLoadingSpinner(false);
     }
-    await toast.success("직원 수정에 성공하였습니다.");
-    await setLoadingSpinner(false);
-
-    return response;
   };
 
   const updateElder = async (id, data) => {
@@ -206,24 +204,18 @@ function App() {
 
     console.log(updateData);
 
-    const response = await fetch(`${config.apiUrl}/elder/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updateData),
-    });
+    try {
+      const response = await axiosInstance.put(`/elder/${id}`, updateData);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Something went wrong");
+      await toast.success("어르신 수정에 성공하였습니다.");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      throw new Error(errorMessage);
+    } finally {
+      setLoadingSpinner(false);
     }
-
-    await toast.success("어르신 수정에 성공하였습니다.");
-    await setLoadingSpinner(false);
-
-    return response;
   };
   const updateCouple = async (id, data) => {
     setLoadingSpinner(true);
@@ -235,24 +227,18 @@ function App() {
 
     console.log(updateData);
 
-    const response = await fetch(`${config.apiUrl}/couple/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updateData),
-    });
+    try {
+      const response = await axiosInstance.put(`/couple/${id}`, updateData);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Something went wrong");
+      await toast.success("부부 어르신 수정에 성공하였습니다.");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      throw new Error(errorMessage);
+    } finally {
+      setLoadingSpinner(false);
     }
-
-    await toast.success("부부 어르신 수정에 성공하였습니다.");
-    await setLoadingSpinner(false);
-
-    return response;
   };
 
   const handleEmployeeEdit = async (id) => {
@@ -475,15 +461,13 @@ function App() {
       headers: myHeaders,
       redirect: "follow",
     };
-    const response = await fetch(
-      `${config.apiUrl}/couple/` + userId,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        return result;
-      })
-      .catch((error) => console.error(error));
+    const response = await axiosInstance
+      .get(`/couple/${userId}`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error(error);
+        throw error; // 에러를 상위로 전파
+      });
     console.log(response);
 
     await setLoadingSpinner(false);
@@ -528,15 +512,14 @@ function App() {
       headers: myHeaders,
       redirect: "follow",
     };
-    const response = await fetch(
-      `${config.apiUrl}/employees/` + userId,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        return result;
-      })
-      .catch((error) => console.error(error));
+
+    const response = await axiosInstance
+      .get(`/employees/${userId}`)
+      .then((response) => response.data) // axios는 response.data로 JSON 데이터에 접근
+      .catch((error) => {
+        console.error(error);
+        throw error; // 에러를 다시 throw하여 상위에서 처리할 수 있도록 함
+      });
 
     await setLoadingSpinner(false);
 
@@ -553,15 +536,13 @@ function App() {
       headers: myHeaders,
       redirect: "follow",
     };
-    const response = await fetch(
-      `${config.apiUrl}/elders/` + userId,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        return result;
-      })
-      .catch((error) => console.error(error));
+    const response = await axiosInstance
+      .get(`/elders/${userId}`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error(error);
+        throw error; // 에러를 상위로 전파하여 처리할 수 있도록 함
+      });
     console.log(response);
 
     await setLoadingSpinner(false);
@@ -614,83 +595,70 @@ function App() {
   }
 
   const handleDeleteEmployee = async (id) => {
-    await setLoadingSpinner(true);
+    setLoadingSpinner(true);
 
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer " + jwt);
+    try {
+      await axiosInstance.delete(`/employee/${id}`);
 
-    const requestOptions = {
-      method: "DELETE",
-      headers: myHeaders,
-      redirect: "follow",
-    };
-
-    await fetch(`${config.apiUrl}/employee/` + id, requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-    setEmployees((prevEmployees) =>
-      prevEmployees.filter((employee) => employee.id !== id)
-    );
-    if (selectedEmployeeIds.includes(id)) {
-      setSelectedEmployeeIds(
-        selectedEmployeeIds.filter((employeeId) => employeeId !== id)
+      setEmployees((prevEmployees) =>
+        prevEmployees.filter((employee) => employee.id !== id)
       );
+
+      if (selectedEmployeeIds.includes(id)) {
+        setSelectedEmployeeIds(
+          selectedEmployeeIds.filter((employeeId) => employeeId !== id)
+        );
+      }
+
+      await toast.success("직원 삭제에 성공하였습니다.");
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      toast.error("직원 삭제에 실패하였습니다.");
+    } finally {
+      setLoadingSpinner(false);
     }
-    await toast.success("직원 삭제에 성공하였습니다.");
-    await setLoadingSpinner(false);
   };
 
   const handleDeleteElder = async (id) => {
     setLoadingSpinner(true);
 
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer " + jwt);
+    try {
+      await axiosInstance.delete(`/elder/${id}`);
 
-    const requestOptions = {
-      method: "DELETE",
-      headers: myHeaders,
-      redirect: "follow",
-    };
+      setElders((prevElders) => prevElders.filter((elder) => elder.id !== id));
 
-    await fetch(`${config.apiUrl}/elder/` + id, requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-    setElders((prevElders) => prevElders.filter((elder) => elder.id !== id));
+      if (selectedElderIds.includes(id)) {
+        setSelectedElderIds(
+          selectedElderIds.filter((elderId) => elderId !== id)
+        );
+      }
 
-    if (selectedElderIds.includes(id)) {
-      setSelectedElderIds(selectedElderIds.filter((elderId) => elderId !== id));
+      await toast.success("어르신 삭제에 성공하였습니다.");
+    } catch (error) {
+      console.error("Error deleting elder:", error);
+      toast.error("어르신 삭제에 실패하였습니다.");
+    } finally {
+      setLoadingSpinner(false);
     }
-
-    await toast.success("어르신 삭제에 성공하였습니다.");
-    await setLoadingSpinner(false);
   };
   const handleDeleteCouple = async (id) => {
     setLoadingSpinner(true);
-
     console.log(id);
 
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer " + jwt);
+    try {
+      await axiosInstance.delete(`/couple/${id}`);
 
-    const requestOptions = {
-      method: "DELETE",
-      headers: myHeaders,
-      redirect: "follow",
-    };
+      setCouples((prevCouples) =>
+        prevCouples.filter((couple) => couple.coupleId !== id)
+      );
 
-    await fetch(`${config.apiUrl}/couple/` + id, requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-
-    setCouples((prevCouples) =>
-      prevCouples.filter((couple) => couple.coupleId !== id)
-    );
-
-    await toast.success("부부 어르신 삭제에 성공하였습니다.");
-    await setLoadingSpinner(false);
+      await toast.success("부부 어르신 삭제에 성공하였습니다.");
+    } catch (error) {
+      console.error("Error deleting couple:", error);
+      toast.error("부부 어르신 삭제에 실패하였습니다.");
+    } finally {
+      setLoadingSpinner(false);
+    }
   };
   const handleSignin = () => {
     navigate("/signin");
@@ -852,27 +820,17 @@ function App() {
     await setLoadingSpinner(false);
   };
   const handleSubmit = async (e) => {
-    await setLoadingSpinner(true);
+    setLoadingSpinner(true);
     e.preventDefault();
 
     console.log(formData);
 
     try {
-      const response = await fetch(`${config.apiUrl}/employee/${userId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      await axiosInstance.post(`/employee/${userId}`, formData);
 
       setEmployees(await fetchEmployees());
       await toast.success("직원 추가에 성공하였습니다.");
+
       setFormData({
         name: "",
         workPlace: company.addressName,
@@ -880,11 +838,13 @@ function App() {
         isDriver: false,
       });
 
-      closeAddEmployeeModal(); // 제출 후 모달 닫기
+      closeAddEmployeeModal();
     } catch (error) {
       console.error("There was an error adding the employee!", error);
+      toast.error("직원 추가에 실패하였습니다.");
+    } finally {
+      setLoadingSpinner(false);
     }
-    await setLoadingSpinner(false);
   };
 
   const updateCouples = async () => {
@@ -893,77 +853,62 @@ function App() {
   };
 
   const handleCoupleSubmit = async (e) => {
-    await setLoadingSpinner(true);
+    setLoadingSpinner(true);
     e.preventDefault();
-    if (coupleFormData.elderId1 && coupleFormData.elderId2) {
-      console.log(coupleFormData);
 
-      try {
-        const response = await fetch(`${config.apiUrl}/couple/${userId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          body: JSON.stringify(coupleFormData),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        await toast.success("부부 어르신 추가에 성공하였습니다.");
-        setCouples(await fetchCouples());
-        setCoupleFormData({
-          elderId1: "",
-          elderId2: "",
-        });
-        closeAddEmployeeModal(); // 제출 후 모달 닫기
-      } catch (error) {
-        console.error("There was an error adding the couple!", error);
-      }
-    } else {
+    if (!coupleFormData.elderId1 || !coupleFormData.elderId2) {
       alert("두 명의 어르신을 모두 선택해주세요.");
+      setLoadingSpinner(false);
+      return;
     }
 
-    await setLoadingSpinner(false);
+    console.log(coupleFormData);
+
+    try {
+      await axiosInstance.post(`/couple/${userId}`, coupleFormData);
+
+      await toast.success("부부 어르신 추가에 성공하였습니다.");
+      setCouples(await fetchCouples());
+
+      setCoupleFormData({
+        elderId1: "",
+        elderId2: "",
+      });
+
+      closeAddEmployeeModal();
+    } catch (error) {
+      console.error("There was an error adding the couple!", error);
+      toast.error("부부 어르신 추가에 실패하였습니다.");
+    } finally {
+      setLoadingSpinner(false);
+    }
   };
 
   const handleElderSubmit = async (e) => {
-    await setLoadingSpinner(true);
+    setLoadingSpinner(true);
     e.preventDefault();
 
-    console.log(formData);
+    console.log(elderFormData);
 
     try {
-      const response = await fetch(`${config.apiUrl}/elder/${userId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify(elderFormData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      await axiosInstance.post(`/elder/${userId}`, elderFormData);
 
       setElders(await fetchElders());
       await toast.success("어르신 추가에 성공하였습니다.");
 
-      await setElderFormData({
+      setElderFormData({
         name: "",
         homeAddress: "",
         requiredFrontSeat: false,
       });
 
-      closeAddElderModal(); // 제출 후 모달 닫기
-      setElderFormData({ name: "", homeAddress: "", requiredFrontSeat: false });
+      closeAddElderModal();
     } catch (error) {
-      console.error("There was an error adding the employee!", error);
+      console.error("There was an error adding the elder!", error);
+      toast.error("어르신 추가에 실패하였습니다.");
+    } finally {
+      setLoadingSpinner(false);
     }
-    await setLoadingSpinner(false);
   };
 
   function handleCloseAddElderModal() {
@@ -991,15 +936,10 @@ function App() {
   const fetchDispatchHistories = async () => {
     setLoadingSpinner(true);
     try {
-      const response = await fetch(`${config.apiUrl}/history`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch dispatch histories");
-      }
-      const data = await response.json();
+      const response = await axiosInstance.get("/history");
+      console.log(response);
+
+      const data = await response.data;
 
       console.log(data);
 
@@ -1017,15 +957,9 @@ function App() {
   const fetchHistoryDetail = async (historyId) => {
     setLoadingSpinner(true);
     try {
-      const response = await fetch(`${config.apiUrl}/history/${historyId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch history detail");
-      }
-      const data = await response.json();
+      const response = await axiosInstance.get(`/history/${historyId}`);
+
+      const data = await response.data;
       setHistoryDetail(data);
       setSelectedHistoryId(historyId);
 
@@ -3178,28 +3112,29 @@ function App() {
     console.log(requestData);
 
     try {
-      var result = await axios.post(`${config.apiUrl}/dispatch`, requestData, {
-        validateStatus: function (status) {
-          return true;
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        timeout: 600000,
+      const result = await axiosInstance.post("/dispatch", requestData, {
+        timeout: 600000, // 10분 타임아웃
       });
-      console.log(result.data);
-      getProgressSSE(result.data);
 
+      console.log(result.data);
+      if (result.status >= 200 && result.status < 300) {
+        getProgressSSE(result.data);
+      }
       console.log(result);
       console.log(result.status);
-      if (result.status === 400) {
-        console.log(result.status);
+
+      if (result.status === 400 || result.status === 401) {
+        console.log("배차 실패 알림" + result.status);
         toast.error(result.data);
         setLoading(false);
       }
     } catch (error) {
-      toast.error(error);
+      console.error("Dispatch error:", error);
+      const errorMessage =
+        error.response?.data ||
+        error.message ||
+        "배차 처리 중 오류가 발생했습니다.";
+      toast.error(errorMessage);
       setLoading(false);
     }
   }
@@ -3251,28 +3186,29 @@ function App() {
     console.log(requestData);
 
     try {
-      var result = await axios.post(`${config.apiUrl}/dispatch`, requestData, {
-        validateStatus: function (status) {
-          return true;
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
+      const result = await axiosInstance.post("/dispatch", requestData, {
         timeout: 600000,
       });
 
-      getProgressSSE(result.data);
+      if (result.status >= 200 && result.status < 300) {
+        getProgressSSE(result.data);
+      }
       console.log(result.data);
       console.log(result);
       console.log(result.status);
-      if (result.status === 400) {
-        console.log(result.status);
+
+      if (result.status === 400 || result.status === 401) {
+        console.log("배차 실패 알림" + result.status);
         toast.error(result.data);
         setLoading(false);
       }
     } catch (error) {
-      toast.error(error);
+      console.error("Dispatch error:", error);
+      const errorMessage =
+        error.response?.data ||
+        error.message ||
+        "배차 처리 중 오류가 발생했습니다.";
+      toast.error(errorMessage);
       setLoading(false);
     }
   }
