@@ -54,6 +54,7 @@ const PaymentSuccess = () => {
         // }
       } catch (error) {
         console.error("Payment verification failed:", error);
+        navigate("/fail");
       }
     };
 
@@ -101,6 +102,7 @@ const PaymentSuccess = () => {
         data: error.response?.data,
         message: error.message,
       });
+
       throw error;
     }
   };

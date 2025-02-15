@@ -42,8 +42,7 @@ const PaymentFail = () => {
           결제에 실패했습니다
         </h2>
         <p className="text-gray-600 mb-8">
-          죄송합니다. 결제 중 문제가 발생했습니다. 잠시 후 메인 페이지로
-          이동합니다.
+          결제 중 문제가 발생했습니다. 잠시 후 메인 페이지로 이동합니다.
         </p>
         <div className="animate-pulse flex justify-center">
           <div className="w-2 h-2 bg-red-600 rounded-full mx-1"></div>
