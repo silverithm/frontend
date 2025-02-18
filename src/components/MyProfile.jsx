@@ -102,11 +102,9 @@ const MyProfile = () => {
   const handleCancelSubscription = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/cancel/subscription`,
-        {
-          email: userEmail,
-        },
+      const response = await axios.put(
+        `${config.apiUrl}/subscriptions/cancel`,
+        {}, // request body (비어있는 경우도 명시)
         {
           headers: {
             "Content-Type": "application/json",
@@ -118,7 +116,10 @@ const MyProfile = () => {
       if (response.status === 200) {
         toast.success("구독이 성공적으로 취소되었습니다.");
       }
+
+      console.log(response);
     } catch (error) {
+      console.log(error);
       toast.error(error.response?.data?.message || "구독 취소에 실패했습니다");
     } finally {
       setIsLoading(false);
