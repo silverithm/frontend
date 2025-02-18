@@ -18,6 +18,7 @@ const MyProfile = () => {
     subscriptionType,
     subscriptionStartDate,
     subscriptionEndDate,
+    subscriptionStatus,
   } = useStore();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isManagingSubscription, setIsManagingSubscription] = useState(false);
@@ -266,6 +267,20 @@ const MyProfile = () => {
     }
   };
 
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case "ACTIVE":
+        return "bg-green-50 text-green-700";
+      case "CANCELLED":
+        return "bg-orange-50 text-orange-700";
+      case "EXPIRED":
+        return "bg-red-50 text-red-700";
+      case "INACTIVE":
+        return "bg-gray-50 text-gray-600";
+      default:
+        return "bg-gray-50 text-gray-600";
+    }
+  };
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}년 ${
@@ -352,7 +367,11 @@ const MyProfile = () => {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-gray-900">현재 구독</h2>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${getStatusStyles(
+                      subscriptionStatus
+                    )}`}
+                  >
                     <svg
                       className="w-3 h-3 mr-1"
                       fill="none"
@@ -366,7 +385,7 @@ const MyProfile = () => {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    활성
+                    {subscriptionStatus}
                   </span>
                 </div>
 

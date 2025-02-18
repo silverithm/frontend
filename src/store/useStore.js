@@ -18,7 +18,11 @@ const useStore = create(
       elders: [],
       durationTimes: [],
       customerKey: "",
+      subscriptionStatus: "",
+      subscriptionStartDate: "",
+      subscriptionEndDate: "",
 
+      setSubscriptionStatus: (status) => set({ subscriptionStatus: status }),
       setSubscriptionStartDate: (startTime) =>
         set({ subscriptionStartDate: startTime }),
       setSubscriptionEndDate: (endTime) =>

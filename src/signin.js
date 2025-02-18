@@ -34,6 +34,7 @@ function Signin() {
     setUserName,
     setSubscriptionType,
     setCustomerKey,
+    setSubscriptionStatus,
     setSubscriptionStartDate,
     setSubscriptionEndDate,
   } = useStore();
@@ -157,6 +158,7 @@ function Signin() {
           await setJwt(result["tokenInfo"]["accessToken"]);
           await setRefreshToken(result["tokenInfo"]["refreshToken"]);
           await setSubscriptionType(getSubscriptionType(result));
+          await setSubscriptionStatus(result["subscription"]["status"]);
           await setSubscriptionStartDate(
             result["subscription"]["subscriptionStartDate"]
           );
