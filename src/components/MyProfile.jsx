@@ -10,12 +10,18 @@ import { AlertCircle } from "lucide-react";
 
 const MyProfile = () => {
   const navigate = useNavigate();
-  const { userName, userEmail, company, jwt } = useStore();
+  const {
+    userName,
+    userEmail,
+    company,
+    jwt,
+    subscriptionType,
+    subscriptionStartDate,
+    subscriptionEndDate,
+  } = useStore();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isManagingSubscription, setIsManagingSubscription] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  const subscriptionType = "premiumYearly";
 
   const [isLoading, setIsLoading] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
@@ -259,6 +265,13 @@ const MyProfile = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}년 ${
+      date.getMonth() + 1
+    }월 ${date.getDate()}일`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <ToastContainer
@@ -403,191 +416,31 @@ const MyProfile = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                        />
-                      </svg>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              결제 수단
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              신용카드 (•••• •••• •••• 4578)
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => setIsChangingPayment(true)}
-                            className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={isLoading}
-                          >
-                            변경
-                          </button>
-                        </div>
-
-                        {isChangingPayment && (
-                          <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                            <form
-                              onSubmit={handlePaymentSubmit}
-                              className="space-y-4"
-                            >
-                              <div className="relative">
-                                <label
-                                  className="block text-sm font-medium text-gray-700 mb-1"
-                                  htmlFor="cardNumber"
-                                >
-                                  카드 번호
-                                </label>
-                                <div className="relative">
-                                  <input
-                                    id="cardNumber"
-                                    type="text"
-                                    value={cardNumber}
-                                    onChange={handleCardNumberChange}
-                                    className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="0000 0000 0000 0000"
-                                    maxLength="19"
-                                    autoComplete="cc-number"
-                                    disabled={isLoading}
-                                  />
-                                  {cardType && (
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                      {cardType}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <label
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                    htmlFor="expiryDate"
-                                  >
-                                    만료일
-                                  </label>
-                                  <input
-                                    id="expiryDate"
-                                    type="text"
-                                    value={expiryDate}
-                                    onChange={handleExpiryDateChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="MM/YY"
-                                    maxLength="5"
-                                    autoComplete="cc-exp"
-                                    disabled={isLoading}
-                                  />
-                                </div>
-                                <div>
-                                  <label
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                    htmlFor="cvc"
-                                  >
-                                    CVC
-                                    <span className="ml-1 text-xs text-gray-500">
-                                      (카드 뒷면 3자리)
-                                    </span>
-                                  </label>
-                                  <input
-                                    id="cvc"
-                                    type="password"
-                                    value={cvc}
-                                    onChange={handleCvcChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="000"
-                                    maxLength="4"
-                                    autoComplete="cc-csc"
-                                    disabled={isLoading}
-                                  />
-                                </div>
-                              </div>
-
-                              {error && (
-                                <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">
-                                  {error}
-                                </div>
-                              )}
-
-                              <div className="flex justify-end space-x-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setIsChangingPayment(false)}
-                                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200 disabled:opacity-50"
-                                  disabled={isLoading}
-                                >
-                                  취소
-                                </button>
-                                <button
-                                  type="submit"
-                                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 flex items-center"
-                                  disabled={isLoading}
-                                >
-                                  {isLoading ? (
-                                    <>
-                                      <svg
-                                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <circle
-                                          className="opacity-25"
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                        />
-                                        <path
-                                          className="opacity-75"
-                                          fill="currentColor"
-                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        />
-                                      </svg>
-                                      처리중...
-                                    </>
-                                  ) : (
-                                    "저장"
-                                  )}
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <svg
-                        className="w-5 h-5 mt-1 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            구독 시작일
-                          </p>
-                          <p className="text-sm text-gray-500 mt-1">
-                            2023년 1월 1일
-                          </p>
+                      {subscriptionStartDate && subscriptionEndDate ? (
+                        <div className="space-y-3">
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              구독 시작일
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              {formatDate(subscriptionStartDate)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              다음 결제일
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              {formatDate(subscriptionEndDate)}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            다음 결제일
-                          </p>
-                          <p className="text-sm text-gray-500 mt-1">
-                            2023년 12월 1일
-                          </p>
-                        </div>
-                      </div>
+                      ) : (
+                        <p className="text-gray-500">무료 체험 이용 중</p>
+                      )}
                     </div>
                   </div>
                   {/* 구독 취소 버튼 추가 */}

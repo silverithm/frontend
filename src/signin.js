@@ -34,6 +34,8 @@ function Signin() {
     setUserName,
     setSubscriptionType,
     setCustomerKey,
+    setSubscriptionStartDate,
+    setSubscriptionEndDate,
   } = useStore();
 
   function handleBack() {
@@ -155,6 +157,13 @@ function Signin() {
           await setJwt(result["tokenInfo"]["accessToken"]);
           await setRefreshToken(result["tokenInfo"]["refreshToken"]);
           await setSubscriptionType(getSubscriptionType(result));
+          await setSubscriptionStartDate(
+            result["subscription"]["subscriptionStartDate"]
+          );
+
+          await setSubscriptionEndDate(
+            result["subscription"]["subscriptionEndDate"]
+          );
           console.log(getSubscriptionType(result));
 
           await setCustomerKey(result["customerKey"]);

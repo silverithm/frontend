@@ -19,6 +19,10 @@ const useStore = create(
       durationTimes: [],
       customerKey: "",
 
+      setSubscriptionStartDate: (startTime) =>
+        set({ subscriptionStartDate: startTime }),
+      setSubscriptionEndDate: (endTime) =>
+        set({ subscriptionEndDate: endTime }),
       setCustomerKey: (key) => set({ customerKey: key }),
       setUserName: (name) => set({ userName: name }),
       setEmployees: (employees) => set({ employees: employees }),
