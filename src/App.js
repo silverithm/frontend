@@ -2551,6 +2551,13 @@ function App() {
                 <button
                   key={item.id}
                   onClick={() => {
+                    if (item.id === "previous" && subscriptionType === "free") {
+                      toast.warn(
+                        "무료체험 사용자는 이전 배치 기록을 확인할 수 없습니다."
+                      );
+                      return;
+                    }
+
                     setView(item.id);
                     if (item.id === "previous" && jwt) {
                       fetchDispatchHistories();
