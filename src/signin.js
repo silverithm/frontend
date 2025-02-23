@@ -159,13 +159,9 @@ function Signin() {
           await setRefreshToken(result["tokenInfo"]["refreshToken"]);
           await setSubscriptionType(getSubscriptionType(result));
           await setSubscriptionStatus(result["subscription"]["status"]);
-          await setSubscriptionStartDate(
-            result["subscription"]["subscriptionStartDate"]
-          );
+          await setSubscriptionStartDate(result["subscription"]["startDate"]);
 
-          await setSubscriptionEndDate(
-            result["subscription"]["subscriptionEndDate"]
-          );
+          await setSubscriptionEndDate(result["subscription"]["endDate"]);
           console.log(getSubscriptionType(result));
 
           await setCustomerKey(result["customerKey"]);

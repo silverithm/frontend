@@ -132,6 +132,10 @@ const MyProfile = () => {
   };
 
   const handleManageSubscription = () => {
+    console.log(subscriptionType);
+    console.log(subscriptionStartDate);
+    console.log(subscriptionEndDate);
+
     setIsManagingSubscription(!isManagingSubscription); // 구독 관리 상태 토글
   };
 
