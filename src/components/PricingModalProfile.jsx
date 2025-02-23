@@ -8,47 +8,9 @@ import RefundPolicyModal from "./RefundPolicyModal";
 import RefundPolicyModalBottom from "./RefundPolicyModalBottom";
 import config from "../config";
 import useStore from "../store/useStore";
+import { PRICE_PLANS } from "../constants/pricePlans";
 const clientKey = config.payment_client_key;
 
-const PRICE_PLANS = {
-  free: {
-    name: "무료 체험판",
-    enlgishName: "FREE",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    features: [
-      "일간 경로 최적화 기능 1회",
-      "일간 단일 경로 찾기 5회",
-      "직원 최대 10명 관리",
-      "어르신 최대 30명 관리",
-    ],
-  },
-  basic: {
-    name: "베이직",
-    englishName: "BASIC",
-    monthlyPrice: 9900,
-    yearlyPrice: 95040, // 9900 * 12 * 0.8 = 95040
-    features: [
-      "무제한 경로 최적화",
-      "무제한 단일 경로 찾기",
-      "직원 최대 10명 관리",
-      "어르신 최대 30명 관리",
-      "이전 배치 보기 대시보드",
-    ],
-  },
-  enterprise: {
-    name: "엔터프라이즈",
-    englishName: "ENTERPRISE",
-    monthlyPrice: 13000,
-    yearlyPrice: 124800, // 13000 * 12 * 0.8 = 124800
-    features: [
-      "모든 Basic 기능 포함",
-      "무제한 직원 등록",
-      "무제한 어르신 등록",
-      "이전 배치 보기 대시보드",
-    ],
-  },
-};
 const SubscriptionBadgesProfile = ({ subscriptionType }) => {
   const [show, setShow] = useState(false);
   const [isRefundPolicyOpen, setIsRefundPolicyOpen] = useState(false);
@@ -478,7 +440,8 @@ const SubscriptionBadgesProfile = ({ subscriptionType }) => {
                 <div className="flex items-center gap-1">
                   <span className="text-sm text-gray-600">*</span>
                   <span className="text-sm text-gray-600">
-                    위 상품의 최대 이용기간은 1년입니다.
+                    구독 서비스는 요금제에 따라 매월 또는 매년 자동 갱신되며,
+                    별도의 해지 조치가 없는 한 정해진 구독 요금이 청구됩니다.{" "}
                   </span>
                 </div>
                 <button
