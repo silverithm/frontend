@@ -7,6 +7,8 @@ import config from "../config";
 import { ToastContainer } from "react-toastify";
 import SubscriptionBadgesProfile from "./PricingModalProfile";
 import { AlertCircle } from "lucide-react";
+import axiosInstance from "./AxiosInstance";
+import { MapPin } from "lucide-react";
 
 const MyProfile = () => {
   const navigate = useNavigate();
@@ -34,6 +36,33 @@ const MyProfile = () => {
     newPassword: "",
     confirmPassword: "",
   });
+
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState("");
+
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        const addr = data.address;
+        setNewAddress(addr);
+      },
+    }).open();
+  };
+
+  const handleAddressUpdate = async () => {
+    try {
+      await axiosInstance.put("/users/company-address", {
+        companyAddress: newAddress,
+      });
+
+      company.addressName = newAddress;
+      setIsEditingAddress(false);
+      toast.success("주소가 성공적으로 변경되었습니다");
+    } catch (error) {
+      console.error("주소 업데이트 실패:", error);
+      toast.error("주소 업데이트에 실패했습니다");
+    }
+  };
 
   const validatePassword = (password) => {
     if (password.length < 8) {
@@ -359,9 +388,75 @@ const MyProfile = () => {
                   <label className="text-sm text-gray-500">회사명</label>
                   <p className="text-gray-900 mt-1">{company.name}</p>
                 </div>
-                <div>
-                  <label className="text-sm text-gray-500">주소</label>
-                  <p className="text-gray-900 mt-1">{company.addressName}</p>
+                <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-gray-400" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        주소 정보
+                      </h3>
+                    </div>
+                    {!isEditingAddress && (
+                      <button
+                        onClick={() => {
+                          setIsEditingAddress(true);
+                          setNewAddress(company.addressName);
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1.5"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                          />
+                        </svg>
+                        수정
+                      </button>
+                    )}
+                  </div>
+
+                  {isEditingAddress ? (
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={newAddress}
+                          readOnly
+                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                          placeholder="주소 검색을 클릭하세요"
+                          onClick={handleAddressSearch}
+                        />
+                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={handleAddressUpdate}
+                          className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                          disabled={!newAddress}
+                        >
+                          변경사항 저장
+                        </button>
+                        <button
+                          onClick={() => setIsEditingAddress(false)}
+                          className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-gray-700">{company.addressName}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
