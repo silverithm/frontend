@@ -2976,6 +2976,26 @@ function App() {
     const selectedEldersCount = selectedElderIds.length;
     const selectedEmployeeCount = selectedEmployeeIds.length;
 
+    console.log(subscriptionType);
+
+    if (
+      ((subscriptionType === "free" ||
+        subscriptionType === "basicMonthly" ||
+        subscriptionType === "basicYearly") &&
+        selectedEmployeeCount <= 10) ||
+      selectedEldersCount <= 30
+    ) {
+      subscriptionType === "free"
+        ? toast.warn(
+            "무료 체험판 요금제는 직원 10명, 어르신 30명까지 선택할 수 있습니다."
+          )
+        : toast.warn(
+            "베이직 요금제는 직원 10명, 어르신 30명까지 선택할 수 있습니다."
+          );
+
+      return;
+    }
+
     if (selectedEmployeeCount > selectedEldersCount) {
       toast.warn("선택된 어르신 수는 직원들의 수보다 적을 수 없습니다.");
       return;
@@ -3009,10 +3029,34 @@ function App() {
 
     // 선택된 어르신 수
     const selectedEldersCount = selectedElderIds.length;
+    const selectedEmployeeCount = selectedEmployeeIds.length;
+
+    if (
+      ((subscriptionType === "free" ||
+        subscriptionType === "basicMonthly" ||
+        subscriptionType === "basicYearly") &&
+        selectedEmployeeCount <= 10) ||
+      selectedEldersCount <= 30
+    ) {
+      subscriptionType === "free"
+        ? toast.warn(
+            "무료 체험판 요금제는 직원 10명, 어르신 30명까지 선택할 수 있습니다."
+          )
+        : toast.warn(
+            "베이직 요금제는 직원 10명, 어르신 30명까지 선택할 수 있습니다."
+          );
+
+      return;
+    }
 
     // 체크 로직
     if (selectedEldersCount > totalEmployeeCapacity) {
       toast.warn("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
+      return;
+    }
+
+    if (selectedEmployeeCount > selectedEldersCount) {
+      toast.warn("선택된 어르신 수는 직원들의 수보다 적을 수 없습니다.");
       return;
     }
 
