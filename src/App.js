@@ -3171,21 +3171,19 @@ function App() {
       if (result.status >= 200 && result.status < 300) {
         getProgressSSE(result.data);
       }
-      console.log(result);
-      console.log(result.status);
 
-      if (result.status === 400 || result.status === 401) {
+      if (
+        result.status === 400 ||
+        result.status === 401 ||
+        result.status === 500
+      ) {
         console.log("배차 실패 알림" + result.status);
         toast.error(result.data);
         setLoading(false);
       }
     } catch (error) {
       console.error("Dispatch error:", error);
-      const errorMessage =
-        error.response?.data ||
-        error.message ||
-        "배차 처리 중 오류가 발생했습니다.";
-      toast.error(errorMessage);
+      toast.error("배차 처리 중 오류가 발생했습니다.");
       setLoading(false);
     }
   }
@@ -3248,18 +3246,18 @@ function App() {
       console.log(result);
       console.log(result.status);
 
-      if (result.status === 400 || result.status === 401) {
+      if (
+        result.status === 400 ||
+        result.status === 401 ||
+        result.status === 500
+      ) {
         console.log("배차 실패 알림" + result.status);
         toast.error(result.data);
         setLoading(false);
       }
     } catch (error) {
       console.error("Dispatch error:", error);
-      const errorMessage =
-        error.response?.data ||
-        error.message ||
-        "배차 처리 중 오류가 발생했습니다.";
-      toast.error(errorMessage);
+      toast.error("배차 처리 중 오류가 발생했습니다.");
       setLoading(false);
     }
   }
