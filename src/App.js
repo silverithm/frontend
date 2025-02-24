@@ -3035,8 +3035,8 @@ function App() {
       ((subscriptionType === "free" ||
         subscriptionType === "basicMonthly" ||
         subscriptionType === "basicYearly") &&
-        selectedEmployeeCount <= 10) ||
-      selectedEldersCount <= 30
+        selectedEmployeeCount > 10) ||
+      selectedEldersCount > 30
     ) {
       subscriptionType === "free"
         ? toast.warn(
