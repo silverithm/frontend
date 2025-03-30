@@ -198,13 +198,31 @@ function App() {
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = xlsx.utils.sheet_to_json(worksheet);
           
-          // 데이터 형식 변환
-          const formattedData = jsonData.map(row => ({
-            name: row['이름'] || '',
-            isDriver: row['유형'] === '운전원',
-            homeAddressName: row['주소'] || '',
-            maximumCapacity: parseInt(row['최대 인원'] || 0, 10)
-          }));
+          // 데이터 형식 변환 및 유효성 검사
+          let hasInvalidData = false;
+          
+          const formattedData = jsonData.map(row => {
+            // 최대 인원 값을 추출하고 유효성 검사
+            let maxCapacity = parseInt(row['최대 인원'] || 0, 10);
+            
+            // 최대 인원이 0이거나 유효하지 않은 경우
+            if (isNaN(maxCapacity) || maxCapacity <= 0) {
+              hasInvalidData = true;
+              maxCapacity = 1; // 기본값 1로 설정
+            }
+            
+            return {
+              name: row['이름'] || '',
+              isDriver: row['유형'] === '운전원',
+              homeAddressName: row['주소'] || '',
+              maximumCapacity: maxCapacity
+            };
+          });
+          
+          // 유효하지 않은 데이터가 있는 경우 경고 메시지 표시
+          if (hasInvalidData) {
+            toast.warning('일부 직원의 최대 인원이 0명 또는 유효하지 않아 1명으로 설정되었습니다.');
+          }
           
           // API 호출로 직원 일괄 추가
           const response = await axiosInstance.post('/employees/bulk', formattedData);
@@ -295,8 +313,8 @@ function App() {
       headers = ['이름', '유형', '주소', '최대 인원'];
       exampleData = [
         ['홍길동', '운전원', '서울시 강남구 역삼동 123-45', 4],
-        ['김철수', '직원', '서울시 서초구 방배동 789-10', 0],
-        ['이영희', '직원', '서울시 마포구 합정동 456-78', 0]
+        ['김철수', '직원', '서울시 서초구 방배동 789-10', 2],
+        ['이영희', '직원', '서울시 마포구 합정동 456-78', 1]
       ];
     } else if (type === 'elder') {
       headers = ['이름', '주소', '앞자리 탑승 여부'];
@@ -3124,6 +3142,7 @@ function App() {
                 value={formData.maxCapacity}
                 onChange={handleAddEmployeeModalChange}
                 required
+                min="1"
               />
             </Form.Group>
             <div className="h-6"></div>
