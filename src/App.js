@@ -152,22 +152,11 @@ function App() {
         const rows = jsonData.slice(1).filter(row => row.some(cell => cell !== undefined && cell !== ''));
         
         // 비어있는 컬럼 제거 - 유효한 헤더 인덱스 찾기
-        const validHeaderIndexes = [];
-        
-        for (let i = 0; i < headers.length; i++) {
-          // 헤더가 존재하고
-          if (headers[i] && headers[i].toString().trim() !== '') {
-            // 해당 열에 최소 하나의 행에 데이터가 있는지 확인
-            const hasData = rows.some(row => {
-              return row[i] !== undefined && row[i] !== '' && row[i] !== null;
-            });
-            
-            // 데이터가 있는 열만 유효한 인덱스에 추가
-            if (hasData) {
-              validHeaderIndexes.push(i);
-            }
-          }
-        }
+        const validHeaderIndexes = headers.map((header, index) => {
+          // 헤더가 있고, 최소 하나의 행에 데이터가 있으면 유효한 컬럼으로 간주
+          const hasData = rows.some(row => row[index] !== undefined && row[index] !== '');
+          return header && hasData ? index : -1;
+        }).filter(index => index !== -1);
         
         // 유효한 헤더만 선택
         const validHeaders = validHeaderIndexes.map(index => headers[index]);
@@ -3161,79 +3150,99 @@ function App() {
         </Modal.Body>
       </Modal>
 
-      <Modal show={showEmployeeExcelModal} onHide={() => setShowEmployeeExcelModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>직원 데이터 엑셀 업로드</Modal.Title>
+      <Modal show={showEmployeeExcelModal} onHide={() => setShowEmployeeExcelModal(false)} centered size="lg" className="modern-modal">
+        <Modal.Header closeButton className="bg-gradient-to-r from-sky-600 to-sky-400 text-white border-0">
+          <Modal.Title className="text-xl font-medium">직원 데이터 엑셀 업로드</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-2">
+        <Modal.Body className="p-5">
+          <div className="mb-5">
+            <p className="text-sm text-gray-600 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-2 text-sky-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
+              </svg>
               올바른 형식으로 데이터를 업로드하려면 아래 예시 파일을 참고하세요:
             </p>
             <button
               onClick={() => getExampleExcel('employee')}
-              className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded hover:bg-sky-200 transition-colors"
+              className="text-sm bg-sky-50 text-sky-700 px-4 py-2 rounded-md border border-sky-100 hover:bg-sky-100 hover:border-sky-200 transition-colors shadow-sm flex items-center"
             >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
               예시 데이터 다운로드
             </button>
           </div>
 
           <div
-            className={`border-2 border-dashed border-gray-300 rounded-lg p-4 text-center ${
-              dragActive ? 'bg-blue-100' : 'bg-gray-100'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+              dragActive ? 'border-sky-400 bg-sky-50' : 'border-gray-300 bg-gray-50'
+            } hover:border-sky-400 hover:bg-sky-50`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <p className="text-gray-500">파일을 드래그 앤 드롭하거나</p>
-            <label
-              htmlFor="employee-file-input"
-              className="cursor-pointer text-blue-500 hover:underline"
-            >
-              파일 선택하기
-            </label>
-            <input
-              id="employee-file-input"
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
+            <div className="flex flex-col items-center">
+              <svg className={`w-14 h-14 mb-3 ${dragActive ? 'text-sky-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <p className="text-gray-500 mb-3">파일을 드래그 앤 드롭하거나</p>
+              <label
+                htmlFor="employee-file-input"
+                className="cursor-pointer text-sky-600 hover:text-sky-800 hover:underline transition-colors px-4 py-2 bg-white border border-sky-200 rounded-md shadow-sm"
+              >
+                파일 선택하기
+              </label>
+              <input
+                id="employee-file-input"
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <p className="mt-3 text-xs text-gray-500">지원 파일: .xlsx, .xls</p>
+            </div>
           </div>
+          
           {excelPreviewData.length > 0 && (
-            <div className="mt-4">
-              <h5>미리보기:</h5>
-              <table className="table">
-                <thead>
-                  <tr>
-                    {Object.keys(excelPreviewData[0]).map((header) => (
-                      <th key={header}>{header}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {excelPreviewData.map((row, index) => (
-                    <tr key={index}>
-                      {Object.values(row).map((value, colIndex) => (
-                        <td key={colIndex}>{value}</td>
+            <div className="mt-5">
+              <h5 className="font-medium text-gray-700 mb-2 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                미리보기:
+              </h5>
+              <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                <table className="table min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {Object.keys(excelPreviewData[0]).map((header) => (
+                        <th key={header} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {excelPreviewData.map((row, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        {Object.values(row).map((value, colIndex) => (
+                          <td key={colIndex} className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{value || '-'}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="bg-gray-50 border-t border-gray-100">
           <button
-            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500"
+            className="text-sm bg-sky-600 text-white w-32 h-10 rounded-md hover:bg-sky-500 transition-colors shadow-sm"
             onClick={handleEmployeeExcelUpload}
           >
             업로드
           </button>
           <button
-            className="text-sm bg-gray-300 text-gray-700 w-32 h-10 rounded hover:bg-gray-400"
+            className="text-sm bg-gray-200 text-gray-700 w-32 h-10 rounded-md hover:bg-gray-300 transition-colors ml-2"
             onClick={() => setShowEmployeeExcelModal(false)}
           >
             닫기
@@ -3241,79 +3250,99 @@ function App() {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showElderExcelModal} onHide={() => setShowElderExcelModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>어르신 데이터 엑셀 업로드</Modal.Title>
+      <Modal show={showElderExcelModal} onHide={() => setShowElderExcelModal(false)} centered size="lg" className="modern-modal">
+        <Modal.Header closeButton className="bg-gradient-to-r from-sky-600 to-sky-400 text-white border-0">
+          <Modal.Title className="text-xl font-medium">어르신 데이터 엑셀 업로드</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-2">
+        <Modal.Body className="p-5">
+          <div className="mb-5">
+            <p className="text-sm text-gray-600 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-2 text-sky-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
+              </svg>
               올바른 형식으로 데이터를 업로드하려면 아래 예시 파일을 참고하세요:
             </p>
             <button
               onClick={() => getExampleExcel('elder')}
-              className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded hover:bg-sky-200 transition-colors"
+              className="text-sm bg-sky-50 text-sky-700 px-4 py-2 rounded-md border border-sky-100 hover:bg-sky-100 hover:border-sky-200 transition-colors shadow-sm flex items-center"
             >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
               예시 데이터 다운로드
             </button>
           </div>
 
           <div
-            className={`border-2 border-dashed border-gray-300 rounded-lg p-4 text-center ${
-              dragActive ? 'bg-blue-100' : 'bg-gray-100'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+              dragActive ? 'border-sky-400 bg-sky-50' : 'border-gray-300 bg-gray-50'
+            } hover:border-sky-400 hover:bg-sky-50`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <p className="text-gray-500">파일을 드래그 앤 드롭하거나</p>
-            <label
-              htmlFor="elder-file-input"
-              className="cursor-pointer text-blue-500 hover:underline"
-            >
-              파일 선택하기
-            </label>
-            <input
-              id="elder-file-input"
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
+            <div className="flex flex-col items-center">
+              <svg className={`w-14 h-14 mb-3 ${dragActive ? 'text-sky-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <p className="text-gray-500 mb-3">파일을 드래그 앤 드롭하거나</p>
+              <label
+                htmlFor="elder-file-input"
+                className="cursor-pointer text-sky-600 hover:text-sky-800 hover:underline transition-colors px-4 py-2 bg-white border border-sky-200 rounded-md shadow-sm"
+              >
+                파일 선택하기
+              </label>
+              <input
+                id="elder-file-input"
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <p className="mt-3 text-xs text-gray-500">지원 파일: .xlsx, .xls</p>
+            </div>
           </div>
+          
           {excelPreviewData.length > 0 && (
-            <div className="mt-4">
-              <h5>미리보기:</h5>
-              <table className="table">
-                <thead>
-                  <tr>
-                    {Object.keys(excelPreviewData[0]).map((header) => (
-                      <th key={header}>{header}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {excelPreviewData.map((row, index) => (
-                    <tr key={index}>
-                      {Object.values(row).map((value, colIndex) => (
-                        <td key={colIndex}>{value}</td>
+            <div className="mt-5">
+              <h5 className="font-medium text-gray-700 mb-2 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                미리보기:
+              </h5>
+              <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                <table className="table min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {Object.keys(excelPreviewData[0]).map((header) => (
+                        <th key={header} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {excelPreviewData.map((row, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        {Object.values(row).map((value, colIndex) => (
+                          <td key={colIndex} className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{value || '-'}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="bg-gray-50 border-t border-gray-100">
           <button
-            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500"
+            className="text-sm bg-sky-600 text-white w-32 h-10 rounded-md hover:bg-sky-500 transition-colors shadow-sm"
             onClick={handleElderExcelUpload}
           >
             업로드
           </button>
           <button
-            className="text-sm bg-gray-300 text-gray-700 w-32 h-10 rounded hover:bg-gray-400"
+            className="text-sm bg-gray-200 text-gray-700 w-32 h-10 rounded-md hover:bg-gray-300 transition-colors ml-2"
             onClick={() => setShowElderExcelModal(false)}
           >
             닫기
@@ -4611,7 +4640,7 @@ function App() {
                     <span className="font-medium text-blue-900">
                       카카오맵 미래 운행 정보 길찾기 API 기준 예상
                       운행시간입니다.
-                    </span>
+                  </span>
                     <span className="text-blue-800 ml-1">
                       실제 도로 혼잡도에 따라 ±10분 정도 차이날 수 있습니다.
                     </span>
