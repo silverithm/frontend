@@ -1,10 +1,15 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import CheckIcon from "@mui/icons-material/Check";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { toast, ToastContainer } from "react-toastify";
 import config from "./config";
-import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
 import useStore from "./store/useStore";
 import Modal from "react-bootstrap/Modal";
 import React from "react";
@@ -24,6 +29,7 @@ import "./styles/bootstrapcss.css";
 import axiosInstance from "./components/AxiosInstance";
 
 import LoadingSpinnerOverlay from "./components/LoadingSpinner";
+import * as xlsx from 'xlsx';
 
 const { kakao } = window;
 const AGREEMENT_LINKS = {
@@ -87,8 +93,238 @@ function App() {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
 
+  // 엑셀 업로드 모달 상태
+  const [showEmployeeExcelModal, setShowEmployeeExcelModal] = useState(false);
+  const [showElderExcelModal, setShowElderExcelModal] = useState(false);
+  const [excelFile, setExcelFile] = useState(null);
+  const [excelPreviewData, setExcelPreviewData] = useState([]);
+  const [dragActive, setDragActive] = useState(false);
+  const employeeFileInputRef = useRef(null);
+  const elderFileInputRef = useRef(null);
+
   const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
     fetchHistories(newPage);
+  };
+
+  // 엑셀 관련 함수들
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleExcelFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleExcelFile(e.target.files[0]);
+    }
+  };
+
+  const handleExcelFile = (file) => {
+    setExcelFile(file);
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = xlsx.read(data, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        // 첫 번째 행은 헤더로 간주
+        const headers = jsonData[0];
+        const rows = jsonData.slice(1).filter(row => row.some(cell => cell !== undefined && cell !== ''));
+        
+        // 비어있는 컬럼 제거 - 유효한 헤더 인덱스 찾기
+        const validHeaderIndexes = [];
+        
+        for (let i = 0; i < headers.length; i++) {
+          // 헤더가 존재하고
+          if (headers[i] && headers[i].toString().trim() !== '') {
+            // 해당 열에 최소 하나의 행에 데이터가 있는지 확인
+            const hasData = rows.some(row => {
+              return row[i] !== undefined && row[i] !== '' && row[i] !== null;
+            });
+            
+            // 데이터가 있는 열만 유효한 인덱스에 추가
+            if (hasData) {
+              validHeaderIndexes.push(i);
+            }
+          }
+        }
+        
+        // 유효한 헤더만 선택
+        const validHeaders = validHeaderIndexes.map(index => headers[index]);
+        
+        // 미리보기용 데이터 (최대 5행) - 유효한 컬럼만 포함
+        const previewData = rows.slice(0, 5).map(row => {
+          const rowData = {};
+          validHeaderIndexes.forEach(index => {
+            rowData[headers[index]] = row[index] !== undefined ? row[index] : '';
+          });
+          return rowData;
+        });
+        
+        setExcelPreviewData(previewData);
+      } catch (error) {
+        console.error('엑셀 파일 처리 오류:', error);
+        toast.error('엑셀 파일을 처리하는 중 오류가 발생했습니다.');
+      }
+    };
+    
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleEmployeeExcelUpload = async () => {
+    if (!excelFile) {
+      toast.error('엑셀 파일을 선택해주세요.');
+      return;
+    }
+
+    setLoadingSpinner(true);
+    
+    try {
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = xlsx.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = xlsx.utils.sheet_to_json(worksheet);
+          
+          // 데이터 형식 변환
+          const formattedData = jsonData.map(row => ({
+            name: row['이름'] || '',
+            isDriver: row['유형'] === '운전원',
+            homeAddressName: row['주소'] || '',
+            maximumCapacity: parseInt(row['최대 인원'] || 0, 10)
+          }));
+          
+          // API 호출로 직원 일괄 추가
+          const response = await axiosInstance.post('/employees/bulk', formattedData);
+          
+          if (response.status === 200 || response.status === 201) {
+            toast.success('직원 데이터가 성공적으로 업로드되었습니다.');
+            // 직원 목록 새로고침
+            const employees = await fetchEmployees();
+            setEmployees(employees);
+            setShowEmployeeExcelModal(false);
+            setExcelFile(null);
+            setExcelPreviewData([]);
+          }
+        } catch (error) {
+          console.error('직원 데이터 업로드 오류:', error);
+          toast.error('직원 데이터를 업로드하는 중 오류가 발생했습니다.');
+        } finally {
+          setLoadingSpinner(false);
+        }
+      };
+      
+      reader.readAsArrayBuffer(excelFile);
+    } catch (error) {
+      console.error('엑셀 파일 처리 오류:', error);
+      toast.error('엑셀 파일을 처리하는 중 오류가 발생했습니다.');
+      setLoadingSpinner(false);
+    }
+  };
+
+  const handleElderExcelUpload = async () => {
+    if (!excelFile) {
+      toast.error('엑셀 파일을 선택해주세요.');
+      return;
+    }
+
+    setLoadingSpinner(true);
+    
+    try {
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = xlsx.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = xlsx.utils.sheet_to_json(worksheet);
+          
+          // 데이터 형식 변환
+          const formattedData = jsonData.map(row => ({
+            name: row['이름'] || '',
+            homeAddressName: row['주소'] || '',
+            requiredFrontSeat: row['앞자리 탑승 여부'] === '필요' || false
+          }));
+          
+          // API 호출로 어르신 일괄 추가
+          const response = await axiosInstance.post('/elders/bulk', formattedData);
+          
+          if (response.status === 200 || response.status === 201) {
+            toast.success('어르신 데이터가 성공적으로 업로드되었습니다.');
+            // 어르신 목록 새로고침
+            const elders = await fetchElders();
+            setElders(elders);
+            setShowElderExcelModal(false);
+            setExcelFile(null);
+            setExcelPreviewData([]);
+          }
+        } catch (error) {
+          console.error('어르신 데이터 업로드 오류:', error);
+          toast.error('어르신 데이터를 업로드하는 중 오류가 발생했습니다.');
+        } finally {
+          setLoadingSpinner(false);
+        }
+      };
+      
+      reader.readAsArrayBuffer(excelFile);
+    } catch (error) {
+      console.error('엑셀 파일 처리 오류:', error);
+      toast.error('엑셀 파일을 처리하는 중 오류가 발생했습니다.');
+      setLoadingSpinner(false);
+    }
+  };
+
+  const getExampleExcel = (type) => {
+    let headers = [];
+    let exampleData = [];
+    
+    if (type === 'employee') {
+      headers = ['이름', '유형', '주소', '최대 인원'];
+      exampleData = [
+        ['홍길동', '운전원', '서울시 강남구 역삼동 123-45', 4],
+        ['김철수', '직원', '서울시 서초구 방배동 789-10', 0],
+        ['이영희', '직원', '서울시 마포구 합정동 456-78', 0]
+      ];
+    } else if (type === 'elder') {
+      headers = ['이름', '주소', '앞자리 탑승 여부'];
+      exampleData = [
+        ['박노인', '서울시 종로구 인사동 12-34', '필요'],
+        ['최어르신', '서울시 용산구 한남동 56-78', '필요 없음'],
+        ['정할머니', '서울시 강서구 화곡동 90-12', '필요']
+      ];
+    }
+    
+    // 엑셀 워크시트 생성
+    const ws = xlsx.utils.aoa_to_sheet([headers, ...exampleData]);
+    const wb = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, ws, '예시 데이터');
+    
+    // 엑셀 파일 다운로드
+    xlsx.writeFile(wb, `${type === 'employee' ? '직원' : '어르신'}_업로드_예시.xlsx`);
   };
 
   const fetchHistories = async (page) => {
@@ -1281,6 +1517,19 @@ function App() {
                   >
                     직원 추가
                   </button>
+                  <div className="w-4"></div>
+
+                  <button
+                    disabled={!jwt}
+                    onClick={() => setShowEmployeeExcelModal(true)}
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    }`}
+                  >
+                    엑셀 업로드
+                  </button>
                 </div>
               </div>
 
@@ -1495,6 +1744,19 @@ function App() {
                     }`}
                   >
                     어르신 추가
+                  </button>
+                  <div className="w-4"></div>
+
+                  <button
+                    disabled={!jwt}
+                    onClick={() => setShowElderExcelModal(true)}
+                    className={`text-sm w-20 h-8 rounded ${
+                      jwt
+                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    }`}
+                  >
+                    엑셀 업로드
                   </button>
                 </div>
               </div>
@@ -2897,6 +3159,166 @@ function App() {
             </div>
           </Form>
         </Modal.Body>
+      </Modal>
+
+      <Modal show={showEmployeeExcelModal} onHide={() => setShowEmployeeExcelModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>직원 데이터 엑셀 업로드</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="mb-4">
+            <p className="text-sm text-gray-600 mb-2">
+              올바른 형식으로 데이터를 업로드하려면 아래 예시 파일을 참고하세요:
+            </p>
+            <button
+              onClick={() => getExampleExcel('employee')}
+              className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded hover:bg-sky-200 transition-colors"
+            >
+              예시 데이터 다운로드
+            </button>
+          </div>
+
+          <div
+            className={`border-2 border-dashed border-gray-300 rounded-lg p-4 text-center ${
+              dragActive ? 'bg-blue-100' : 'bg-gray-100'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <p className="text-gray-500">파일을 드래그 앤 드롭하거나</p>
+            <label
+              htmlFor="employee-file-input"
+              className="cursor-pointer text-blue-500 hover:underline"
+            >
+              파일 선택하기
+            </label>
+            <input
+              id="employee-file-input"
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
+          {excelPreviewData.length > 0 && (
+            <div className="mt-4">
+              <h5>미리보기:</h5>
+              <table className="table">
+                <thead>
+                  <tr>
+                    {Object.keys(excelPreviewData[0]).map((header) => (
+                      <th key={header}>{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {excelPreviewData.map((row, index) => (
+                    <tr key={index}>
+                      {Object.values(row).map((value, colIndex) => (
+                        <td key={colIndex}>{value}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500"
+            onClick={handleEmployeeExcelUpload}
+          >
+            업로드
+          </button>
+          <button
+            className="text-sm bg-gray-300 text-gray-700 w-32 h-10 rounded hover:bg-gray-400"
+            onClick={() => setShowEmployeeExcelModal(false)}
+          >
+            닫기
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showElderExcelModal} onHide={() => setShowElderExcelModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>어르신 데이터 엑셀 업로드</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="mb-4">
+            <p className="text-sm text-gray-600 mb-2">
+              올바른 형식으로 데이터를 업로드하려면 아래 예시 파일을 참고하세요:
+            </p>
+            <button
+              onClick={() => getExampleExcel('elder')}
+              className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded hover:bg-sky-200 transition-colors"
+            >
+              예시 데이터 다운로드
+            </button>
+          </div>
+
+          <div
+            className={`border-2 border-dashed border-gray-300 rounded-lg p-4 text-center ${
+              dragActive ? 'bg-blue-100' : 'bg-gray-100'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <p className="text-gray-500">파일을 드래그 앤 드롭하거나</p>
+            <label
+              htmlFor="elder-file-input"
+              className="cursor-pointer text-blue-500 hover:underline"
+            >
+              파일 선택하기
+            </label>
+            <input
+              id="elder-file-input"
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
+          {excelPreviewData.length > 0 && (
+            <div className="mt-4">
+              <h5>미리보기:</h5>
+              <table className="table">
+                <thead>
+                  <tr>
+                    {Object.keys(excelPreviewData[0]).map((header) => (
+                      <th key={header}>{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {excelPreviewData.map((row, index) => (
+                    <tr key={index}>
+                      {Object.values(row).map((value, colIndex) => (
+                        <td key={colIndex}>{value}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="text-sm bg-sky-950 text-white w-32 h-10 rounded hover:bg-sky-500"
+            onClick={handleElderExcelUpload}
+          >
+            업로드
+          </button>
+          <button
+            className="text-sm bg-gray-300 text-gray-700 w-32 h-10 rounded hover:bg-gray-400"
+            onClick={() => setShowElderExcelModal(false)}
+          >
+            닫기
+          </button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
