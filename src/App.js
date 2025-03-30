@@ -97,7 +97,8 @@ function App() {
   const [showEmployeeExcelModal, setShowEmployeeExcelModal] = useState(false);
   const [showElderExcelModal, setShowElderExcelModal] = useState(false);
   const [excelFile, setExcelFile] = useState(null);
-  const [excelPreviewData, setExcelPreviewData] = useState([]);
+  const [employeeExcelPreviewData, setEmployeeExcelPreviewData] = useState([]);
+  const [elderExcelPreviewData, setElderExcelPreviewData] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const employeeFileInputRef = useRef(null);
   const elderFileInputRef = useRef(null);
@@ -126,17 +127,19 @@ function App() {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleExcelFile(e.dataTransfer.files[0]);
+      const modalType = showEmployeeExcelModal ? 'employee' : 'elder';
+      handleExcelFile(e.dataTransfer.files[0], modalType);
     }
   };
 
   const handleFileSelect = (e) => {
     if (e.target.files && e.target.files[0]) {
-      handleExcelFile(e.target.files[0]);
+      const modalType = showEmployeeExcelModal ? 'employee' : 'elder';
+      handleExcelFile(e.target.files[0], modalType);
     }
   };
 
-  const handleExcelFile = (file) => {
+  const handleExcelFile = (file, type) => {
     setExcelFile(file);
     const reader = new FileReader();
     
@@ -150,6 +153,46 @@ function App() {
         // 첫 번째 행은 헤더로 간주
         const headers = jsonData[0];
         const rows = jsonData.slice(1).filter(row => row.some(cell => cell !== undefined && cell !== ''));
+        
+        // 헤더 형식 검증
+        let isValidFormat = true;
+        let expectedHeaders = [];
+        
+        if (type === 'employee') {
+          // 직원 엑셀 파일의 필수 헤더
+          expectedHeaders = ['이름', '유형', '주소', '최대 인원'];
+          // 헤더에 필수 항목이 포함되어 있는지 확인
+          isValidFormat = expectedHeaders.every(header => headers.includes(header));
+        } else if (type === 'elder') {
+          // 어르신 엑셀 파일의 필수 헤더
+          expectedHeaders = ['이름', '주소', '앞자리 탑승 여부'];
+          // 헤더에 필수 항목이 포함되어 있는지 확인
+          isValidFormat = expectedHeaders.every(header => headers.includes(header));
+        }
+        
+        if (!isValidFormat) {
+          // 형식이 맞지 않을 경우 오류 메시지 표시
+          toast.error(`올바른 ${type === 'employee' ? '직원' : '어르신'} 데이터 형식이 아닙니다. 예시 파일을 참고하세요.`);
+          return;
+        }
+        
+        // 직원 데이터의 경우 최대 인원 값 검증
+        if (type === 'employee') {
+          const maxCapacityIndex = headers.indexOf('최대 인원');
+          
+          if (maxCapacityIndex !== -1) {
+            // 최대 인원 값이 0 또는 음수인 행이 있는지 확인
+            const hasInvalidCapacity = rows.some(row => {
+              const maxCapacity = row[maxCapacityIndex];
+              return maxCapacity !== undefined && (maxCapacity <= 0 || isNaN(parseInt(maxCapacity)));
+            });
+            
+            if (hasInvalidCapacity) {
+              toast.error('직원 데이터의 최대 인원은 1명 이상이어야 합니다.');
+              return;
+            }
+          }
+        }
         
         // 비어있는 컬럼 제거 - 유효한 헤더 인덱스 찾기
         const validHeaderIndexes = headers.map((header, index) => {
@@ -170,7 +213,12 @@ function App() {
           return rowData;
         });
         
-        setExcelPreviewData(previewData);
+        // 모달 타입에 따라 다른 상태 업데이트
+        if (type === 'employee') {
+          setEmployeeExcelPreviewData(previewData);
+        } else if (type === 'elder') {
+          setElderExcelPreviewData(previewData);
+        }
       } catch (error) {
         console.error('엑셀 파일 처리 오류:', error);
         toast.error('엑셀 파일을 처리하는 중 오류가 발생했습니다.');
@@ -183,6 +231,36 @@ function App() {
   const handleEmployeeExcelUpload = async () => {
     if (!excelFile) {
       toast.error('엑셀 파일을 선택해주세요.');
+      return;
+    }
+
+    // 데이터 미리보기가 없으면 형식이 맞지 않는 것으로 간주
+    if (employeeExcelPreviewData.length === 0) {
+      toast.error('올바른 직원 데이터 형식이 아닙니다. 예시 파일을 참고하세요.');
+      return;
+    }
+
+    // 필수 필드가 모든 행에 있는지 확인
+    const requiredFields = ['이름', '유형', '주소', '최대 인원'];
+    const isMissingRequiredFields = employeeExcelPreviewData.some(row => 
+      !requiredFields.every(field => 
+        Object.keys(row).includes(field) && row[field] !== ''
+      )
+    );
+
+    if (isMissingRequiredFields) {
+      toast.warning('일부 행에 필수 정보가 누락되었습니다. 모든 필드를 채워주세요.');
+      return;
+    }
+
+    // 최대 인원 값이 0 또는 음수인지 확인
+    const hasInvalidCapacity = employeeExcelPreviewData.some(row => {
+      const maxCapacity = parseInt(row['최대 인원'], 10);
+      return isNaN(maxCapacity) || maxCapacity <= 0;
+    });
+
+    if (hasInvalidCapacity) {
+      toast.error('직원 데이터의 최대 인원은 1명 이상이어야 합니다.');
       return;
     }
 
@@ -205,11 +283,7 @@ function App() {
             // 최대 인원 값을 추출하고 유효성 검사
             let maxCapacity = parseInt(row['최대 인원'] || 0, 10);
             
-            // 최대 인원이 0이거나 유효하지 않은 경우
-            if (isNaN(maxCapacity) || maxCapacity <= 0) {
-              hasInvalidData = true;
-              maxCapacity = 1; // 기본값 1로 설정
-            }
+            // 이 시점에서는 이미 모든 값이 1 이상인지 확인했으므로 추가 검증 불필요
             
             return {
               name: row['이름'] || '',
@@ -218,11 +292,6 @@ function App() {
               maximumCapacity: maxCapacity
             };
           });
-          
-          // 유효하지 않은 데이터가 있는 경우 경고 메시지 표시
-          if (hasInvalidData) {
-            toast.warning('일부 직원의 최대 인원이 0명 또는 유효하지 않아 1명으로 설정되었습니다.');
-          }
           
           // API 호출로 직원 일괄 추가
           const response = await axiosInstance.post('/employees/bulk', formattedData);
@@ -234,7 +303,7 @@ function App() {
             setEmployees(employees);
             setShowEmployeeExcelModal(false);
             setExcelFile(null);
-            setExcelPreviewData([]);
+            setEmployeeExcelPreviewData([]);
           }
         } catch (error) {
           console.error('직원 데이터 업로드 오류:', error);
@@ -256,6 +325,24 @@ function App() {
     if (!excelFile) {
       toast.error('엑셀 파일을 선택해주세요.');
       return;
+    }
+
+    // 데이터 미리보기가 없으면 형식이 맞지 않는 것으로 간주
+    if (elderExcelPreviewData.length === 0) {
+      toast.error('올바른 어르신 데이터 형식이 아닙니다. 예시 파일을 참고하세요.');
+      return;
+    }
+
+    // 필수 필드가 모든 행에 있는지 확인
+    const requiredFields = ['이름', '주소'];
+    const isMissingRequiredFields = elderExcelPreviewData.some(row => 
+      !requiredFields.every(field => 
+        Object.keys(row).includes(field) && row[field] !== ''
+      )
+    );
+
+    if (isMissingRequiredFields) {
+      toast.warning('일부 행에 필수 정보가 누락되었습니다. 모든 필드를 채워주세요.');
     }
 
     setLoadingSpinner(true);
@@ -287,7 +374,7 @@ function App() {
             setElders(elders);
             setShowElderExcelModal(false);
             setExcelFile(null);
-            setExcelPreviewData([]);
+            setElderExcelPreviewData([]);
           }
         } catch (error) {
           console.error('어르신 데이터 업로드 오류:', error);
@@ -3198,7 +3285,14 @@ function App() {
             } hover:border-sky-400 hover:bg-sky-50`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragActive(false);
+              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleExcelFile(e.dataTransfer.files[0], 'employee');
+              }
+            }}
           >
             <div className="flex flex-col items-center">
               <svg className={`w-14 h-14 mb-3 ${dragActive ? 'text-sky-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3215,14 +3309,18 @@ function App() {
                 id="employee-file-input"
                 type="file"
                 accept=".xlsx, .xls"
-                onChange={handleFileSelect}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handleExcelFile(e.target.files[0], 'employee');
+                  }
+                }}
                 className="hidden"
               />
               <p className="mt-3 text-xs text-gray-500">지원 파일: .xlsx, .xls</p>
             </div>
           </div>
           
-          {excelPreviewData.length > 0 && (
+          {employeeExcelPreviewData.length > 0 && (
             <div className="mt-5">
               <h5 className="font-medium text-gray-700 mb-2 flex items-center">
                 <svg className="w-4 h-4 mr-2 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3234,13 +3332,13 @@ function App() {
                 <table className="table min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      {Object.keys(excelPreviewData[0]).map((header) => (
+                      {Object.keys(employeeExcelPreviewData[0]).map((header) => (
                         <th key={header} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {excelPreviewData.map((row, index) => (
+                    {employeeExcelPreviewData.map((row, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                         {Object.values(row).map((value, colIndex) => (
                           <td key={colIndex} className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{value || '-'}</td>
@@ -3262,7 +3360,7 @@ function App() {
           </button>
           <button
             className="text-sm bg-gray-200 text-gray-700 w-32 h-10 rounded-md hover:bg-gray-300 transition-colors ml-2"
-            onClick={() => setShowEmployeeExcelModal(false)}
+            onClick={() => {setShowEmployeeExcelModal(false); setElderExcelPreviewData([]); setEmployeeExcelPreviewData([])}}
           >
             닫기
           </button>
@@ -3298,7 +3396,14 @@ function App() {
             } hover:border-sky-400 hover:bg-sky-50`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragActive(false);
+              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleExcelFile(e.dataTransfer.files[0], 'elder');
+              }
+            }}
           >
             <div className="flex flex-col items-center">
               <svg className={`w-14 h-14 mb-3 ${dragActive ? 'text-sky-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3315,14 +3420,18 @@ function App() {
                 id="elder-file-input"
                 type="file"
                 accept=".xlsx, .xls"
-                onChange={handleFileSelect}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handleExcelFile(e.target.files[0], 'elder');
+                  }
+                }}
                 className="hidden"
               />
               <p className="mt-3 text-xs text-gray-500">지원 파일: .xlsx, .xls</p>
             </div>
           </div>
           
-          {excelPreviewData.length > 0 && (
+          {elderExcelPreviewData.length > 0 && (
             <div className="mt-5">
               <h5 className="font-medium text-gray-700 mb-2 flex items-center">
                 <svg className="w-4 h-4 mr-2 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3334,13 +3443,13 @@ function App() {
                 <table className="table min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      {Object.keys(excelPreviewData[0]).map((header) => (
+                      {Object.keys(elderExcelPreviewData[0]).map((header) => (
                         <th key={header} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {excelPreviewData.map((row, index) => (
+                    {elderExcelPreviewData.map((row, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                         {Object.values(row).map((value, colIndex) => (
                           <td key={colIndex} className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{value || '-'}</td>
@@ -3362,7 +3471,7 @@ function App() {
           </button>
           <button
             className="text-sm bg-gray-200 text-gray-700 w-32 h-10 rounded-md hover:bg-gray-300 transition-colors ml-2"
-            onClick={() => setShowElderExcelModal(false)}
+            onClick={() => {setShowElderExcelModal(false); setElderExcelPreviewData([]); setEmployeeExcelPreviewData([])}}
           >
             닫기
           </button>
