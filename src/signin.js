@@ -41,17 +41,10 @@ function Signin() {
   } = useStore();
 
   function handleBack() {
-    console.log(location.state?.from);
-    console.log(from);
     navigate(from);
   }
 
   const getSubscriptionType = (userData) => {
-    // If there's no subscription data or status is INACTIVE, return free
-
-    console.log(userData.subscription);
-    console.log(isExpiredSubscription(userData.subscription));
-
     if (
       !userData.subscription ||
       !userData.subscription.planName ||
@@ -64,9 +57,6 @@ function Signin() {
     // Get the plan name and billing type
     const planName = userData.subscription.planName.toLowerCase();
     const billingType = userData.subscription.billingType.toLowerCase();
-
-    console.log(planName);
-    console.log(billingType);
 
     // Handle Basic plan
     if (planName === "basic") {
@@ -131,9 +121,7 @@ function Signin() {
   };
   const handleSignin = async (event) => {
     await setLoadingSpinner(true);
-    console.log("submit!!!");
     event.preventDefault();
-    console.log("submit!!!");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -152,7 +140,6 @@ function Signin() {
     await fetch(`${config.apiUrl}/signin`, requestOptions)
       .then((response) => response.json())
       .then(async (result) => {
-        console.log(result);
         if (result.status !== 500) {
           toast.success("로그인에 성공하였습니다.", {
             onClose: () => {
@@ -169,7 +156,6 @@ function Signin() {
           await setSubscriptionStartDate(result["subscription"]["startDate"]);
 
           await setSubscriptionEndDate(result["subscription"]["endDate"]);
-          console.log(getSubscriptionType(result));
 
           await setCustomerKey(result["customerKey"]);
           await setCompany(
@@ -177,7 +163,6 @@ function Signin() {
             result["companyAddress"],
             result["companyAddressName"]
           );
-          console.log(result["companyAddressName"]);
           await setUserId(result["userId"]);
           await setUserName(result["userName"]);
           await setUserEmail(email);

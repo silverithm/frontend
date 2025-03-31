@@ -146,10 +146,7 @@ const MyProfile = () => {
       if (response.status === 200) {
         toast.success("구독이 성공적으로 취소되었습니다.");
       }
-
-      console.log(response);
     } catch (error) {
-      console.log(error);
       toast.error(error.response?.data?.message || "구독 취소에 실패했습니다");
     } finally {
       setIsLoading(false);
@@ -161,10 +158,6 @@ const MyProfile = () => {
   };
 
   const handleManageSubscription = () => {
-    console.log(subscriptionType);
-    console.log(subscriptionStartDate);
-    console.log(subscriptionEndDate);
-
     setIsManagingSubscription(!isManagingSubscription); // 구독 관리 상태 토글
   };
 

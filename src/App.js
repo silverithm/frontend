@@ -318,8 +318,6 @@ function App() {
             };
           });
 
-          console.log(formattedData);
-
           // API 호출로 직원 일괄 추가
           const response = await axiosInstance.post(
             "/employees/bulk",
@@ -472,12 +470,6 @@ function App() {
         },
       });
 
-      console.log("History response:", {
-        url: response.config.url,
-        params: response.config.params,
-        data: response.data,
-      });
-
       setDispatchHistories(response.data.content);
       setTotalPages(response.data.totalPages);
       setCurrentPage(response.data.number);
@@ -500,7 +492,6 @@ function App() {
   }, [setLoading, progress]);
 
   const openAgreement = (url) => {
-    console.log(url);
     window.open(url, "_blank");
   };
 
@@ -549,8 +540,6 @@ function App() {
       isDriver: data.isDriver,
     };
 
-    console.log(updateData);
-
     try {
       const response = await axiosInstance.put(`/employee/${id}`, updateData);
 
@@ -573,8 +562,6 @@ function App() {
       requiredFrontSeat: data.requiredFrontSeat,
     };
 
-    console.log(updateData);
-
     try {
       const response = await axiosInstance.put(`/elder/${id}`, updateData);
 
@@ -590,13 +577,10 @@ function App() {
   };
   const updateCouple = async (id, data) => {
     setLoadingSpinner(true);
-    console.log(data);
     const updateData = {
       elderId1: data.elder1.id,
       elderId2: data.elder2.id,
     };
-
-    console.log(updateData);
 
     try {
       const response = await axiosInstance.put(`/couple/${id}`, updateData);
@@ -677,23 +661,10 @@ function App() {
 
   const handleCoupleEdit = async (id) => {
     setLoadingSpinner(true);
-    console.log(editedCouple);
     if (editingCoupleId === id) {
-      // 수정 완료
       try {
         const response = await updateCouple(id, editedCouple);
         if (response.ok) {
-          console.log("response.ok");
-          console.log(id);
-          console.log(couples);
-          console.log(editedCouple);
-
-          // setCouples(
-          //   couples.map((couple) =>
-          //     couple.id === id ? { ...couple, ...editedCouple } : couple
-          //   )
-          // );
-
           setCouples(await fetchCouples());
 
           setEditingCoupleId(null);
@@ -728,12 +699,8 @@ function App() {
   };
 
   const handleElderInputChange = (e, field) => {
-    console.log(e.target.value);
-    console.log(field);
-
     setEditedElder((prevState) => {
       const newState = { ...prevState, [field]: e.target.value };
-      console.log("Updated state:", newState); // 디버깅을 위한 로그
       return newState;
     });
   };
@@ -775,9 +742,6 @@ function App() {
       } else {
         setMaxDispatchStatus("under");
       }
-
-      console.log(maxDispatchCount);
-      console.log(selectedElderIds.length);
     }
 
     if (employees.length > 0 && elders.length > 0) {
@@ -800,13 +764,11 @@ function App() {
     if (allEmployeeSelected) {
       await setSelectedEmployeeIds([]);
     } else {
-      console.log(employees);
       await setSelectedEmployeeIds(
         await employees.map((employee) => employee.id)
       );
     }
     await setAllEmployeeSelected(!allEmployeeSelected);
-    await console.log(selectedEmployeeIds);
     await setLoadingSpinner(false);
   };
 
@@ -839,7 +801,6 @@ function App() {
         console.error(error);
         throw error; // 에러를 상위로 전파
       });
-    console.log(response);
 
     await setLoadingSpinner(false);
 
@@ -850,16 +811,12 @@ function App() {
     const fetchEmployeesAndElders = async () => {
       setLoadingSpinner(true);
 
-      console.log(jwt);
-
       if (jwt === "") {
         return;
       }
       var employees = await fetchEmployees();
       var elders = await fetchElders();
       var couples = await fetchCouples();
-
-      console.log(employees);
 
       await setEmployees(employees);
       await setElders(elders);
@@ -914,7 +871,6 @@ function App() {
         console.error(error);
         throw error; // 에러를 상위로 전파하여 처리할 수 있도록 함
       });
-    console.log(response);
 
     await setLoadingSpinner(false);
 
@@ -956,9 +912,6 @@ function App() {
           assignment.sequence !== fixedAssignment.sequence ||
           assignment.employee_id !== fixedAssignment.employee_id
       );
-
-      console.log(fixedAssignment);
-      console.log(filteredAssignments);
 
       await setFixedAssignments([...filteredAssignments, fixedAssignment]);
       await setLoadingSpinner(false);
@@ -1014,7 +967,6 @@ function App() {
   };
   const handleDeleteCouple = async (id) => {
     setLoadingSpinner(true);
-    console.log(id);
 
     try {
       await axiosInstance.delete(`/couple/${id}`);
@@ -1051,8 +1003,6 @@ function App() {
       }
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
-    console.log(fullAddress);
-    console.log(type);
 
     if (type === "employee") {
       setEditedEmployee((prevState) => ({
@@ -1122,12 +1072,10 @@ function App() {
 
   const handleAddCoupleModalChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setCoupleFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
-    console.log(coupleFormData);
   };
 
   const openAddCoupleModal = () => setAddCoupleModalIsOpen(true);
@@ -1194,8 +1142,6 @@ function App() {
     setLoadingSpinner(true);
     e.preventDefault();
 
-    console.log(formData);
-
     try {
       await axiosInstance.post(`/employee/${userId}`, formData);
 
@@ -1233,8 +1179,6 @@ function App() {
       return;
     }
 
-    console.log(coupleFormData);
-
     try {
       await axiosInstance.post(`/couple/${userId}`, coupleFormData);
 
@@ -1258,8 +1202,6 @@ function App() {
   const handleElderSubmit = async (e) => {
     setLoadingSpinner(true);
     e.preventDefault();
-
-    console.log(elderFormData);
 
     try {
       await axiosInstance.post(`/elder/${userId}`, elderFormData);
@@ -1308,11 +1250,8 @@ function App() {
     setLoadingSpinner(true);
     try {
       const response = await axiosInstance.get("/history");
-      console.log(response);
 
       const data = await response.data;
-
-      console.log(data);
 
       setDispatchHistories(data.content);
       setTotalPages(data.totalPages);
@@ -1335,7 +1274,6 @@ function App() {
       setSelectedHistoryId(historyId);
 
       await setDispatchResult(data.assignments);
-      await console.log(data.assignments);
       await setModalShow(true);
     } catch (error) {
       console.error("Error fetching history detail:", error);
@@ -1403,7 +1341,6 @@ function App() {
 
     const formatTotalTime = (seconds) => {
       if (!seconds && seconds !== 0) return "시간 정보 없음";
-      console.log(seconds);
 
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
@@ -2152,10 +2089,7 @@ function App() {
                   <text className="text-2xl font-bold">배치 고정</text>
                   <div className="w-6"></div>
 
-                  <button
-                    onClick={() => console.log(fixedAssignments)}
-                    className="text-sm hover:underline text-gray-400"
-                  >
+                  <button className="text-sm hover:underline text-gray-400">
                     현재 고정 인원 {fixedAssignments.length}명 +
                   </button>
                   <div className="w-6"></div>
@@ -2372,8 +2306,6 @@ function App() {
                 isSingleRoute: true,
               },
             ];
-
-            console.log(singleRouteResult);
 
             // 기존 모달에 사용할 데이터 설정
             setDispatchResult(singleRouteResult);
@@ -2608,47 +2540,6 @@ function App() {
   };
   useEffect(() => {
     setLoadingSpinner(true);
-    // const savedSelections = localStorage.getItem(
-    //   `employeeSelections_${userId}`
-    // );
-
-    // if (savedSelections) {
-    //   const parsedSelections = JSON.parse(savedSelections);
-    //   setSelections(parsedSelections);
-    //   console.log(parsedSelections);
-
-    //   let newAssignments = [...fixedAssignments]; // 기존 배열을 복사
-
-    //   Object.entries(parsedSelections).forEach(
-    //     ([employeeId, employeeSelections]) => {
-    //       Object.entries(employeeSelections).forEach(([sequence, elderId]) => {
-    //         const selectedAssignment = {
-    //           employee_id: employeeId === "없음" ? "없음" : Number(employeeId),
-    //           elderly_id: elderId,
-    //           sequence: Number(sequence),
-    //         };
-
-    //         // 중복 확인
-    //         const existingIndex = newAssignments.findIndex(
-    //           (assignment) =>
-    //             assignment.employee_id === selectedAssignment.employee_id &&
-    //             assignment.sequence === selectedAssignment.sequence
-    //         );
-
-    //         if (existingIndex !== -1) {
-    //           // 이미 존재하는 경우 업데이트
-    //           newAssignments[existingIndex] = selectedAssignment;
-    //         } else {
-    //           // 새로운 경우 추가
-    //           newAssignments.push(selectedAssignment);
-    //         }
-    //       });
-    //     }
-    //   );
-
-    //   console.log(newAssignments);
-    //   setFixedAssignments(newAssignments);
-    // }
     setLoadingSpinner(false);
   }, [userId]);
 
@@ -2760,8 +2651,6 @@ function App() {
     employeeLongitude,
     employeeLatitude,
   }) => {
-    console.log(isSingleRoute, employeeLongitude, employeeLatitude);
-
     useEffect(() => {
       const mapContainer = document.getElementById("map");
       const mapOptions = !isSingleRoute
@@ -3743,8 +3632,6 @@ function App() {
     const selectedEldersCount = selectedElderIds.length;
     const selectedEmployeeCount = selectedEmployeeIds.length;
 
-    console.log(subscriptionType);
-
     if (
       ((subscriptionType === "free" ||
         subscriptionType === "basicMonthly" ||
@@ -3853,8 +3740,6 @@ function App() {
     });
 
     eventSource.addEventListener("sse", (event) => {
-      console.log(event);
-
       if (!event.data.includes("EventStream Created")) {
         setProgress(Number(event.data));
       }
@@ -3865,8 +3750,6 @@ function App() {
     });
 
     eventSource.addEventListener("dispatch", (event) => {
-      console.log("Dispatch Result Event:", event);
-
       try {
         const dispatchResult = JSON.parse(event.data);
         setDispatchResult(dispatchResult);
@@ -3927,14 +3810,11 @@ function App() {
         ? baseRequestData
         : { ...baseRequestData, fixedAssignments };
 
-    console.log(requestData);
-
     try {
       const result = await axiosInstance.post("/dispatch", requestData, {
         timeout: 600000, // 10분 타임아웃
       });
 
-      console.log(result.data);
       if (result.status >= 200 && result.status < 300) {
         getProgressSSE(result.data);
       }
@@ -3944,7 +3824,6 @@ function App() {
         result.status === 401 ||
         result.status === 500
       ) {
-        console.log("배차 실패 알림" + result.status);
         toast.error(result.data);
         setLoading(false);
       }
@@ -3999,8 +3878,6 @@ function App() {
         ? baseRequestData
         : { ...baseRequestData, fixedAssignments };
 
-    console.log(requestData);
-
     try {
       const result = await axiosInstance.post("/dispatch", requestData, {
         timeout: 600000,
@@ -4009,16 +3886,12 @@ function App() {
       if (result.status >= 200 && result.status < 300) {
         getProgressSSE(result.data);
       }
-      console.log(result.data);
-      console.log(result);
-      console.log(result.status);
 
       if (
         result.status === 400 ||
         result.status === 401 ||
         result.status === 500
       ) {
-        console.log("배차 실패 알림" + result.status);
         toast.error(result.data);
         setLoading(false);
       }
@@ -4112,7 +3985,6 @@ function App() {
     const handleEmployeeSelect = (employeeId) => {
       setActiveEmployeeId((prev) => {
         const newId = prev === employeeId ? null : employeeId;
-        console.log("New activeEmployeeId:", newId); // 업데이트 된 값 확인
         return newId;
       });
     };
@@ -4172,7 +4044,6 @@ function App() {
     const firstResult = dispatchData?.[0];
     const isSingleRoute = firstResult?.isSingleRoute || false;
 
-    console.log(props);
     const handleDragEnd = async (result) => {
       if (!result.destination) return;
 
@@ -4275,11 +4146,6 @@ function App() {
           if (waypointsStr) {
             params.append("waypoints", waypointsStr);
           }
-
-          console.log(
-            "Request URL:",
-            `https://apis-navi.kakaomobility.com/v1/future/directions?${params}`
-          );
 
           const response = await fetch(
             `https://apis-navi.kakaomobility.com/v1/future/directions?${params}`,
@@ -4433,9 +4299,6 @@ function App() {
       });
       setMapOverlays([]);
 
-      console.log("active??");
-      console.log(activeEmployeeId);
-
       for (const [index, result] of dispatchData.entries()) {
         if (
           activeEmployeeId === null ||
@@ -4485,8 +4348,6 @@ function App() {
                 type: "경유",
               });
             }
-            console.log(result);
-            console.log("this is single route");
           } else if (
             result.dispatchType === "DISTANCE_IN" ||
             result.dispatchType === "DURATION_IN"
@@ -4562,14 +4423,11 @@ function App() {
           if (directionsCache[cacheKey] && !isSingleRoute) {
             data = directionsCache[cacheKey];
             dur[index] = data.routes[0].summary.duration;
-            console.log("hello ");
           } else {
             try {
-              console.log(waypoints);
               if (waypoints && waypoints.length > 5) {
                 let allSections = []; // 모든 section을 저장할 배열
 
-                console.log("waypoints length > 5");
                 let totalDuration = 0;
                 let currentOrigin = { ...origin };
                 let remainingWaypoints = [...waypoints];
@@ -4656,8 +4514,6 @@ function App() {
                   remainingWaypoints = remainingWaypoints.slice(numConsumed);
                 }
 
-                console.log(allSections);
-
                 data = {
                   routes: [
                     {
@@ -4670,14 +4526,12 @@ function App() {
                 };
                 directionsCache[cacheKey] = data;
                 dur[index] = data.routes[0].summary.duration;
-                console.log(data);
               } else {
                 // 경유지가 5개 이하인 경우 단일 요청
                 const waypointsStr = waypoints
                   .map((point) => `${point.x},${point.y}`)
                   .join("|");
 
-                console.log(waypoints);
                 const params = new URLSearchParams({
                   origin: `${origin.x},${origin.y}`,
                   destination: `${destination.x},${destination.y}`,
@@ -4706,7 +4560,6 @@ function App() {
                 data = await response.json();
                 directionsCache[cacheKey] = data;
                 dur[index] = data.routes[0].summary.duration;
-                console.log(data);
               }
             } catch (error) {
               console.error("Error:", error);

@@ -42,7 +42,6 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log("Original request:", originalRequest);
     if (
       error.response?.status === 401 &&
       error.response?.data?.error === "Token expired" &&
@@ -96,7 +95,6 @@ axiosInstance.interceptors.response.use(
           }
         }
 
-        console.log("New request config:", newRequest);
         return axiosInstance(newRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);

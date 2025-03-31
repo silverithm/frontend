@@ -46,9 +46,6 @@ const PaymentSuccess = () => {
           jwt
         );
         setTimeout(() => {
-          console.log(plan.toString());
-          console.log(billing.toString());
-          console.log(amount.toString());
           navigate("/main");
         }, 3000);
         // }
