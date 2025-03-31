@@ -8,6 +8,7 @@ import FindModal from "./components/FindModal";
 import axios from "axios";
 
 import config from "./config";
+import { isExpiredSubscription } from "./utils/SubscriptionUtils";
 function Signin() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -47,10 +48,15 @@ function Signin() {
 
   const getSubscriptionType = (userData) => {
     // If there's no subscription data or status is INACTIVE, return free
+
+    console.log(userData.subscription);
+    console.log(isExpiredSubscription(userData.subscription));
+
     if (
       !userData.subscription ||
       !userData.subscription.planName ||
-      userData.subscription.status === "INACTIVE"
+      userData.subscription.status === "INACTIVE" ||
+      isExpiredSubscription(userData.subscription)
     ) {
       return "free";
     }
@@ -157,6 +163,7 @@ function Signin() {
           });
           await setJwt(result["tokenInfo"]["accessToken"]);
           await setRefreshToken(result["tokenInfo"]["refreshToken"]);
+
           await setSubscriptionType(getSubscriptionType(result));
           await setSubscriptionStatus(result["subscription"]["status"]);
           await setSubscriptionStartDate(result["subscription"]["startDate"]);
