@@ -543,8 +543,7 @@ function App() {
     try {
       const response = await axiosInstance.put(`/employee/${id}`, updateData);
 
-      await toast.success("직원 수정에 성공하였습니다.");
-      return response.data;
+      return response;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Something went wrong";
@@ -565,8 +564,7 @@ function App() {
     try {
       const response = await axiosInstance.put(`/elder/${id}`, updateData);
 
-      await toast.success("어르신 수정에 성공하였습니다.");
-      return response.data;
+      return response;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Something went wrong";
@@ -585,8 +583,7 @@ function App() {
     try {
       const response = await axiosInstance.put(`/couple/${id}`, updateData);
 
-      await toast.success("부부 어르신 수정에 성공하였습니다.");
-      return response.data;
+      return response;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Something went wrong";
@@ -601,8 +598,9 @@ function App() {
     if (editingEmployeeId === id) {
       try {
         const response = await updateEmployee(id, editedEmployee);
-        if (response.ok) {
-          // 수정 완료
+        console.log(response);
+        console.log(response.status);
+        if (response.status === 200) {
           setEmployees(
             employees.map((emp) =>
               emp.id === id ? { ...emp, ...editedEmployee } : emp
@@ -610,10 +608,12 @@ function App() {
           );
           setEditingEmployeeId(null);
           setEditedEmployee({});
+          await toast.success("직원 수정에 성공하였습니다.");
         } else {
           throw new Error("Server responded with an error");
         }
       } catch (error) {
+        await toast.error("직원 수정에 실패하였습니다.");
         console.error("Error updating employee:", error);
       }
     } else {
@@ -630,7 +630,7 @@ function App() {
       // 수정 완료
       try {
         const response = await updateElder(id, editedElder);
-        if (response.ok) {
+        if (response.status === 200) {
           setElders(
             elders.map((elder) =>
               elder.id === id ? { ...elder, ...editedElder } : elder
@@ -638,10 +638,12 @@ function App() {
           );
           setEditingElderId(null);
           setEditedElder({});
+          await toast.success("어르신 수정에 성공하였습니다.");
         } else {
           throw new Error("Server responded with an error");
         }
       } catch (error) {
+        await toast.error("어르신 수정에 실패하였습니다.");
         console.error("Error updating elder:", error);
       }
     } else {
@@ -664,11 +666,12 @@ function App() {
     if (editingCoupleId === id) {
       try {
         const response = await updateCouple(id, editedCouple);
-        if (response.ok) {
+        if (response.status === 200) {
           setCouples(await fetchCouples());
 
           setEditingCoupleId(null);
           setEditedCouple({});
+          await toast.success("부부 어르신 수정에 성공하였습니다.");
         } else {
           throw new Error("Server responded with an error");
         }
@@ -676,7 +679,6 @@ function App() {
         console.error("Error updating elder:", error);
       }
     } else {
-      // 수정 시작
       setEditingCoupleId(id);
       setEditedCouple(couples.find((couple) => couple.coupleId === id));
     }
