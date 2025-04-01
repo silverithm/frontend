@@ -21,6 +21,7 @@ const MyProfile = () => {
     subscriptionStartDate,
     subscriptionEndDate,
     subscriptionStatus,
+    setCompany,
   } = useStore();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isManagingSubscription, setIsManagingSubscription] = useState(false);
@@ -51,11 +52,16 @@ const MyProfile = () => {
 
   const handleAddressUpdate = async () => {
     try {
-      await axiosInstance.put("/users/company-address", {
+      const response = await axiosInstance.put("/users/company-address", {
         companyAddress: newAddress,
       });
 
-      company.addressName = newAddress;
+      await setCompany(
+        company.name,
+        response.data.companyAddress,
+        response.data.companyAddressName
+      );
+
       setIsEditingAddress(false);
       toast.success("주소가 성공적으로 변경되었습니다");
     } catch (error) {
