@@ -3831,7 +3831,7 @@ function App() {
       }
     } catch (error) {
       console.error("Dispatch error:", error);
-      toast.error("배차 처리 중 오류가 발생했습니다.");
+      toast.error(error.response.data);
       setLoading(false);
     }
   }
@@ -3899,7 +3899,7 @@ function App() {
       }
     } catch (error) {
       console.error("Dispatch error:", error);
-      toast.error("배차 처리 중 오류가 발생했습니다.");
+      toast.error(error.response.data);
       setLoading(false);
     }
   }
