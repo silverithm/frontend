@@ -1,11 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import CheckIcon from "@mui/icons-material/Check";
+import { UNSAFE_ErrorResponseImpl, useNavigate } from "react-router-dom";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { toast, ToastContainer } from "react-toastify";
@@ -19,6 +13,8 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 import { Form } from "react-bootstrap";
 import axios from "axios";
 import SubscriptionBadges from "./components/PricingModal";
+import { isExpiredSubscription } from "./utils/SubscriptionUtils";
+
 import {
   DragDropContext,
   Droppable,
@@ -506,6 +502,9 @@ function App() {
     setSelectedElderIds,
     setSelectedEmployeeIds,
     setSubscriptionType,
+    setSubscriptionStatus,
+    setSubscriptionStartDate,
+    setSubscriptionEndDate,
   } = useStore();
 
   const {
@@ -814,6 +813,12 @@ function App() {
       var employees = await fetchEmployees();
       var elders = await fetchElders();
       var couples = await fetchCouples();
+      var subscription = await getUserSubscription();
+
+      await setSubscriptionType(getSubscriptionType(subscription));
+      await setSubscriptionStatus(subscription.status);
+      await setSubscriptionStartDate(subscription.startDate);
+      await setSubscriptionEndDate(subscription.endDate);
 
       await setEmployees(employees);
       await setElders(elders);
@@ -826,17 +831,54 @@ function App() {
     fetchEmployeesAndElders();
   }, []);
 
+  const getSubscriptionType = (subscription) => {
+    if (
+      !subscription ||
+      !subscription.planName ||
+      subscription.status === "INACTIVE" ||
+      isExpiredSubscription(subscription)
+    ) {
+      return "free";
+    }
+
+    // Get the plan name and billing type
+    const planName = subscription.planName.toLowerCase();
+    const billingType = subscription.billingType.toLowerCase();
+
+    // Handle Basic plan
+    if (planName === "basic") {
+      return billingType === "monthly" ? "basicMonthly" : "basicYearly";
+    }
+
+    // Handle Premium plan
+    if (planName === "enterprise") {
+      return billingType === "monthly" ? "premiumMonthly" : "premiumYearly";
+    }
+
+    // Default to free if none of the above conditions are met
+    return "free";
+  };
+
+  const getUserSubscription = async () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + jwt);
+
+    const response = await axiosInstance
+      .get(`/user/subscription`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error(error);
+        throw error;
+      });
+
+    return response;
+  };
+
   const fetchEmployees = async () => {
     await setLoadingSpinner(true);
 
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + jwt);
-
-    const requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow",
-    };
 
     const response = await axiosInstance
       .get(`/employees/${userId}`)
