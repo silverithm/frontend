@@ -585,7 +585,7 @@ function App() {
     try {
       const response = await axiosInstance.put(`/couple/${id}`, updateData);
 
-      await toast.success("부부 어르신 수정에 성공하였습니다. ");
+      await toast.success("부부 어르신 수정에 성공하였습니다.");
       return response.data;
     } catch (error) {
       const errorMessage =
