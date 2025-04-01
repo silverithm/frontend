@@ -301,20 +301,15 @@ function App() {
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = xlsx.utils.sheet_to_json(worksheet);
 
-          // 데이터 형식 변환 및 유효성 검사
-          let hasInvalidData = false;
-
           const formattedData = jsonData.map((row) => {
-            // 최대 인원 값을 추출하고 유효성 검사
             let maxCapacity = parseInt(row["최대 인원"] || 0, 10);
 
-            // 이 시점에서는 이미 모든 값이 1 이상인지 확인했으므로 추가 검증 불필요
-
             return {
-              name: row["이름"] || "",
+              name: row["이름"],
+              workPlace: company.addressName,
+              homeAddress: row["주소"],
+              maxCapacity: maxCapacity,
               isDriver: row["유형"] === "운전원",
-              homeAddressName: row["주소"] || "",
-              maximumCapacity: maxCapacity,
             };
           });
 
@@ -392,8 +387,8 @@ function App() {
 
           // 데이터 형식 변환
           const formattedData = jsonData.map((row) => ({
-            name: row["이름"] || "",
-            homeAddressName: row["주소"] || "",
+            name: row["이름"],
+            homeAddress: row["주소"],
             requiredFrontSeat: row["앞자리 탑승 여부"] === "필요" || false,
           }));
 
