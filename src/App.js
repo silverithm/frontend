@@ -99,6 +99,9 @@ function App() {
   const employeeFileInputRef = useRef(null);
   const elderFileInputRef = useRef(null);
 
+  const [employeeSearchTerm, setEmployeeSearchTerm] = useState('');
+  const [elderSearchTerm, setElderSearchTerm] = useState('');
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     fetchHistories(newPage);
@@ -1600,6 +1603,23 @@ function App() {
                 </div>
 
                 <div className="flex flex-row mr-1">
+                  <div className="relative mr-4">
+                    <input 
+                      type="text" 
+                      placeholder="이름 또는 주소 검색" 
+                      value={employeeSearchTerm || ''}
+                      onChange={(e) => setEmployeeSearchTerm(e.target.value)}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5"
+                    />
+                    {employeeSearchTerm && (
+                      <button 
+                        onClick={() => setEmployeeSearchTerm('')}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                   <button
                     disabled={!jwt}
                     onClick={() =>
@@ -1685,104 +1705,129 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {employees.map((row) => (
-                      <tr key={row.id} className="hover:bg-blue-100">
-                        <td className="w-4 p-4">
-                          <div className="flex items-center">
-                            <input
-                              checked={selectedEmployeeIds.includes(row.id)}
-                              onChange={() => handleSelectEmployee(row.id)}
-                              id={`employeeCheckbox-table-${row.id}`}
-                              type="checkbox"
-                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            />
-                            <label
-                              htmlFor={`checkbox-table-${row.id}`}
-                              className="sr-only"
-                            >
-                              checkbox
-                            </label>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingEmployeeId === row.id ? (
-                            <input
-                              value={editedEmployee.name}
-                              onChange={(e) =>
-                                handleEmployeeInputChange(e, "name")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            />
-                          ) : (
-                            row.name
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingEmployeeId === row.id ? (
-                            <select
-                              value={editedEmployee.isDriver}
-                              onChange={(e) =>
-                                handleEmployeeInputChange(e, "isDriver")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            >
-                              <option value={false}>직원</option>
-                              <option value={true}>운전원</option>
-                            </select>
-                          ) : (
-                            <span className={`px-2 py-1 rounded text-sm`}>
-                              {row.isDriver ? "운전원" : "직원"}
-                            </span>
-                          )}
-                        </td>
+                    {employees
+                      .filter(employee => {
+                        if (!employeeSearchTerm) return true;
+                        
+                        const searchTermLower = employeeSearchTerm.toLowerCase();
+                        return (
+                          (employee.name && employee.name.toLowerCase().includes(searchTermLower)) ||
+                          (employee.homeAddressName && employee.homeAddressName.toLowerCase().includes(searchTermLower))
+                        );
+                      })
+                      .map((row) => (
+                        <tr key={row.id} className="hover:bg-blue-100">
+                          <td className="w-4 p-4">
+                            <div className="flex items-center">
+                              <input
+                                checked={selectedEmployeeIds.includes(row.id)}
+                                onChange={() => handleSelectEmployee(row.id)}
+                                id={`employeeCheckbox-table-${row.id}`}
+                                type="checkbox"
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                              />
+                              <label
+                                htmlFor={`checkbox-table-${row.id}`}
+                                className="sr-only"
+                              >
+                                checkbox
+                              </label>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingEmployeeId === row.id ? (
+                              <input
+                                value={editedEmployee.name}
+                                onChange={(e) =>
+                                  handleEmployeeInputChange(e, "name")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              />
+                            ) : (
+                              row.name
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingEmployeeId === row.id ? (
+                              <select
+                                value={editedEmployee.isDriver}
+                                onChange={(e) =>
+                                  handleEmployeeInputChange(e, "isDriver")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              >
+                                <option value={false}>직원</option>
+                                <option value={true}>운전원</option>
+                              </select>
+                            ) : (
+                              <span className={`px-2 py-1 rounded text-sm`}>
+                                {row.isDriver ? "운전원" : "직원"}
+                              </span>
+                            )}
+                          </td>
 
-                        <td className="px-6 py-4">
-                          {editingEmployeeId === row.id ? (
-                            <input
-                              onClick={() => openPostcode("employee")}
-                              value={editedEmployee.homeAddressName}
-                              onChange={(e) =>
-                                handleEmployeeInputChange(e, "homeAddressName")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            />
-                          ) : (
-                            row.homeAddressName
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingEmployeeId === row.id ? (
-                            <input
-                              type="number"
-                              value={editedEmployee.maximumCapacity}
-                              onChange={(e) =>
-                                handleEmployeeInputChange(e, "maximumCapacity")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            />
-                          ) : (
-                            row.maximumCapacity
-                          )}
-                        </td>
+                          <td className="px-6 py-4">
+                            {editingEmployeeId === row.id ? (
+                              <input
+                                onClick={() => openPostcode("employee")}
+                                value={editedEmployee.homeAddressName}
+                                onChange={(e) =>
+                                  handleEmployeeInputChange(e, "homeAddressName")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              />
+                            ) : (
+                              row.homeAddressName
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingEmployeeId === row.id ? (
+                              <input
+                                type="number"
+                                value={editedEmployee.maximumCapacity}
+                                onChange={(e) =>
+                                  handleEmployeeInputChange(e, "maximumCapacity")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              />
+                            ) : (
+                              row.maximumCapacity
+                            )}
+                          </td>
 
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() =>
-                              handleEmployeeEdit(row.id, "employee")
-                            }
-                            className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                          >
-                            {editingEmployeeId === row.id ? "완료" : "수정"}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteEmployee(row.id)}
-                            className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
-                          >
-                            삭제
-                          </button>
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={() =>
+                                handleEmployeeEdit(row.id, "employee")
+                              }
+                              className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                            >
+                              {editingEmployeeId === row.id ? "완료" : "수정"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteEmployee(row.id)}
+                              className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    {employees.filter(employee => {
+                      if (!employeeSearchTerm) return false; // 검색어가 없으면 '결과 없음' 메시지를 표시하지 않음
+                      
+                      const searchTermLower = employeeSearchTerm.toLowerCase();
+                      return !(
+                        (employee.name && employee.name.toLowerCase().includes(searchTermLower)) ||
+                        (employee.homeAddressName && employee.homeAddressName.toLowerCase().includes(searchTermLower))
+                      );
+                    }).length === employees.length && (
+                      <tr>
+                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                          검색 결과가 없습니다.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1828,6 +1873,23 @@ function App() {
                 </div>
 
                 <div className="flex flex-row mr-1">
+                  <div className="relative mr-4">
+                    <input 
+                      type="text" 
+                      placeholder="이름 또는 주소 검색" 
+                      value={elderSearchTerm || ''}
+                      onChange={(e) => setElderSearchTerm(e.target.value)}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5"
+                    />
+                    {elderSearchTerm && (
+                      <button 
+                        onClick={() => setElderSearchTerm('')}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                   <button
                     disabled={!jwt}
                     onClick={() =>
@@ -1910,87 +1972,112 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {elders.map((row) => (
-                      <tr key={row.id} className={"hover:bg-blue-100"}>
-                        <td className="w-4 p-4">
-                          <div className="flex items-center">
-                            <input
-                              onChange={() => handleSelectElder(row.id)}
-                              checked={selectedElderIds.includes(row.id)}
-                              id={`elderCheckbox-table-${row.id}`}
-                              type="checkbox"
-                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            />
-                            <label
-                              htmlFor={`checkbox-table-${row.id}`}
-                              className="sr-only"
-                            >
-                              checkbox
-                            </label>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingElderId === row.id ? (
-                            <input
-                              value={editedElder.name}
-                              onChange={(e) =>
-                                handleElderInputChange(e, "name")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            />
-                          ) : (
-                            row.name
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingElderId === row.id ? (
-                            <input
-                              onClick={() => openPostcode("elder")}
-                              value={editedElder.homeAddressName}
-                              onChange={(e) =>
-                                handleElderInputChange(e, "address")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            />
-                          ) : (
-                            row.homeAddressName
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {editingElderId === row.id ? (
-                            <select
-                              value={editedElder.requiredFrontSeat}
-                              onChange={(e) =>
-                                handleSelectChange(e, "requiredFrontSeat")
-                              }
-                              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
-                            >
-                              <option value="true">필요</option>
-                              <option value="false">필요 없음</option>
-                            </select>
-                          ) : row.requiredFrontSeat ? (
-                            "필요"
-                          ) : (
-                            "필요 없음"
-                          )}
-                        </td>
+                    {elders
+                      .filter(elder => {
+                        if (!elderSearchTerm) return true;
+                        
+                        const searchTermLower = elderSearchTerm.toLowerCase();
+                        return (
+                          (elder.name && elder.name.toLowerCase().includes(searchTermLower)) ||
+                          (elder.homeAddressName && elder.homeAddressName.toLowerCase().includes(searchTermLower))
+                        );
+                      })
+                      .map((row) => (
+                        <tr key={row.id} className={"hover:bg-blue-100"}>
+                          <td className="w-4 p-4">
+                            <div className="flex items-center">
+                              <input
+                                onChange={() => handleSelectElder(row.id)}
+                                checked={selectedElderIds.includes(row.id)}
+                                id={`elderCheckbox-table-${row.id}`}
+                                type="checkbox"
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                              />
+                              <label
+                                htmlFor={`checkbox-table-${row.id}`}
+                                className="sr-only"
+                              >
+                                checkbox
+                              </label>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingElderId === row.id ? (
+                              <input
+                                value={editedElder.name}
+                                onChange={(e) =>
+                                  handleElderInputChange(e, "name")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              />
+                            ) : (
+                              row.name
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingElderId === row.id ? (
+                              <input
+                                onClick={() => openPostcode("elder")}
+                                value={editedElder.homeAddressName}
+                                onChange={(e) =>
+                                  handleElderInputChange(e, "address")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              />
+                            ) : (
+                              row.homeAddressName
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingElderId === row.id ? (
+                              <select
+                                value={editedElder.requiredFrontSeat}
+                                onChange={(e) =>
+                                  handleSelectChange(e, "requiredFrontSeat")
+                                }
+                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                              >
+                                <option value="true">필요</option>
+                                <option value="false">필요 없음</option>
+                              </select>
+                            ) : row.requiredFrontSeat ? (
+                              "필요"
+                            ) : (
+                              "필요 없음"
+                            )}
+                          </td>
 
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => handleElderEdit(row.id)}
-                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
-                          >
-                            {editingElderId === row.id ? "완료" : "수정"}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteElder(row.id)}
-                            className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
-                          >
-                            삭제
-                          </button>
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={() => handleElderEdit(row.id)}
+                              className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
+                            >
+                              {editingElderId === row.id ? "완료" : "수정"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteElder(row.id)}
+                              className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
+                            >
+                              삭제
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    {elders.filter(elder => {
+                      if (!elderSearchTerm) return false; // 검색어가 없으면 '결과 없음' 메시지를 표시하지 않음
+                      
+                      const searchTermLower = elderSearchTerm.toLowerCase();
+                      return !(
+                        (elder.name && elder.name.toLowerCase().includes(searchTermLower)) ||
+                        (elder.homeAddressName && elder.homeAddressName.toLowerCase().includes(searchTermLower))
+                      );
+                    }).length === elders.length && (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                          검색 결과가 없습니다.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
