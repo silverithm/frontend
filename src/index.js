@@ -7,6 +7,7 @@ import * as Sentry from "@sentry/react";
 
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
+import { app, analytics } from "./config/firebase";
 
 import RoutesApp from "./RoutesApp";
 
