@@ -3774,12 +3774,13 @@ function App() {
     const selectedEldersCount = selectedElderIds.length;
     const selectedEmployeeCount = selectedEmployeeIds.length;
 
+    // 엔터프라이즈 요금제가 아닐 경우에만 인원수 제한 체크
     if (
-      ((subscriptionType === "free" ||
-        subscriptionType === "basicMonthly" ||
-        subscriptionType === "basicYearly") &&
-        selectedEmployeeCount > 10) ||
-      selectedEldersCount > 30
+      subscriptionType !== "premiumMonthly" && 
+      subscriptionType !== "premiumYearly" && 
+      (
+        (selectedEmployeeCount > 10 || selectedEldersCount > 30)
+      )
     ) {
       subscriptionType === "free"
         ? toast.warn(
@@ -3827,12 +3828,13 @@ function App() {
     const selectedEldersCount = selectedElderIds.length;
     const selectedEmployeeCount = selectedEmployeeIds.length;
 
+    // 엔터프라이즈 요금제가 아닐 경우에만 인원수 제한 체크
     if (
-      ((subscriptionType === "free" ||
-        subscriptionType === "basicMonthly" ||
-        subscriptionType === "basicYearly") &&
-        selectedEmployeeCount > 10) ||
-      selectedEldersCount > 30
+      subscriptionType !== "premiumMonthly" && 
+      subscriptionType !== "premiumYearly" && 
+      (
+        (selectedEmployeeCount > 10 || selectedEldersCount > 30)
+      )
     ) {
       subscriptionType === "free"
         ? toast.warn(
@@ -3845,7 +3847,6 @@ function App() {
       return;
     }
 
-    // 체크 로직
     if (selectedEldersCount > totalEmployeeCapacity) {
       toast.warn("선택된 어르신 수가 직원들의 최대 수용 인원을 초과했습니다.");
       return;
