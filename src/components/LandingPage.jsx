@@ -296,7 +296,7 @@ const LandingPage = () => {
                 </button>
                 <a 
                   href="#features" 
-                  className="px-8 py-4 border border-white/30 backdrop-blur-sm rounded-full font-medium hover:bg-white/10 transition-all"
+                  className="px-8 py-4 bg-white text-sky-900 rounded-full font-bold hover:bg-sky-50 transition-colors flex items-center gap-2 shadow-lg no-underline"
                 >
                   자세히 알아보기
                 </a>
@@ -335,8 +335,8 @@ const LandingPage = () => {
                       <Users className="w-6 h-6 text-sky-600" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">사용자 만족도</p>
-                      <p className="text-sm font-bold text-gray-800">97% 만족</p>
+                      <p className="text-xs text-gray-500">업무 효율 향상</p>
+                      <p className="text-sm font-bold text-gray-800">97% 이상</p>
                     </div>
                   </div>
                 </div>
