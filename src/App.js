@@ -834,6 +834,29 @@ function App() {
     fetchEmployeesAndElders();
   }, []);
 
+  // 앱이 시작될 때 로그인 상태일 경우 구독 정보를 새로 가져오는 useEffect
+  useEffect(() => {
+    const refreshSubscriptionInfo = async () => {
+      if (jwt !== "" && isSignin) {
+        try {
+          const subscription = await getUserSubscription();
+          
+          // 구독 정보 업데이트
+          await setSubscriptionType(getSubscriptionType(subscription));
+          await setSubscriptionStatus(subscription.status);
+          await setSubscriptionStartDate(subscription.startDate);
+          await setSubscriptionEndDate(subscription.endDate);
+          
+          console.log("구독 정보가 새로 업데이트되었습니다.");
+        } catch (error) {
+          console.error("구독 정보 가져오기 실패:", error);
+        }
+      }
+    };
+
+    refreshSubscriptionInfo();
+  }, [jwt, isSignin]);
+
   const getSubscriptionType = (subscription) => {
     if (
       !subscription ||

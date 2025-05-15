@@ -62,6 +62,10 @@ const useStore = create(
         userName: state.userName,
         subscriptionType: state.subscriptionType,
         customerKey: state.customerKey,
+        // 구독 관련 정보는 로컬 스토리지에 저장하지 않고 로그인마다 새로 가져오도록 함
+        // subscriptionStatus: state.subscriptionStatus,
+        // subscriptionStartDate: state.subscriptionStartDate,
+        // subscriptionEndDate: state.subscriptionEndDate,
         // selectedElderIds: state.selectedElderIds,
         // selectedEmployeeIds: state.selectedEmployeeIds,
         // employees: state.employees,

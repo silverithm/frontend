@@ -151,10 +151,10 @@ function Signin() {
           await setJwt(result["tokenInfo"]["accessToken"]);
           await setRefreshToken(result["tokenInfo"]["refreshToken"]);
 
+          // 서버에서 최신 구독 정보 가져오기
           await setSubscriptionType(getSubscriptionType(result));
           await setSubscriptionStatus(result["subscription"]["status"]);
           await setSubscriptionStartDate(result["subscription"]["startDate"]);
-
           await setSubscriptionEndDate(result["subscription"]["endDate"]);
 
           await setCustomerKey(result["customerKey"]);
