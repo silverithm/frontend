@@ -2906,8 +2906,9 @@ function App() {
     setShowLogoutModal(false); // 모달 닫기
     await setLoadingSpinner(true);
 
-    // localStorage에서 fixedAssignments 삭제
+    // localStorage에서 fixedAssignments 및 employeeSelections 삭제
     localStorage.removeItem(`fixedAssignments_${userId}`);
+    localStorage.removeItem(`employeeSelections_${userId}`);
 
     navigate("/");
     setJwt("");
@@ -2990,6 +2991,23 @@ function App() {
           setFixedAssignments(parsedAssignments);
         } catch (error) {
           console.error("저장된 배치 고정 데이터를 불러오는데 실패했습니다:", error);
+        }
+      }
+    }
+  }, [userId]); // userId가 변경될 때만 실행
+
+  // employeeSelections를 localStorage에서 불러오는 useEffect 추가
+  useEffect(() => {
+    // 사용자가 로그인되어 있고 userId가 있을 때만 실행
+    if (userId) {
+      const savedSelections = localStorage.getItem(`employeeSelections_${userId}`);
+      if (savedSelections) {
+        try {
+          const parsedSelections = JSON.parse(savedSelections);
+          console.log("저장된 selections 데이터 불러옴:", parsedSelections);
+          setSelections(parsedSelections);
+        } catch (error) {
+          console.error("저장된 selections 데이터를 불러오는데 실패했습니다:", error);
         }
       }
     }
