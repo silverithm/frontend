@@ -306,6 +306,7 @@ const LandingPage = () => {
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
                 <p className="text-blue-700 font-semibold mb-2">🚀 기능 향상</p>
                 <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                  <li><span className="font-medium">차량 배치 실행 버그 해결</span> - 차량 배치 실행 버그가 해결되었습니다.</li>
                   <li><span className="font-medium">배치 고정 기능 개선</span> - 새로고침 후에도 배치 고정 설정이 유지됩니다.</li>
                   <li><span className="font-medium">메인 UI 디자인 개선</span> - 더 직관적이고 보기 좋게 디자인이 개선되었습니다.</li>
                   <li><span className="font-medium">랜딩 페이지 UI 디자인 개선</span> - 메인 랜딩 페이지 UI UX가 개선되었습니다.</li>
