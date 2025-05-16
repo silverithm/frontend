@@ -1601,18 +1601,19 @@ function App() {
     switch (view) {
       case "current":
         return (
-          <div className="p-4 md:p-8">
+          <div className="p-4 md:p-8 bg-gray-50">
             <div className="mb-6">
               <div className="flex flex-row items-center justify-between py-4">
                 <div className="flex flex-row items-center">
-                  <h2 className="text-2xl font-bold">직원 목록</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">직원 목록</h2>
                   <div className="w-6"></div>
-                  <button className="text-sm hover:underline text-gray-400">
+                  <button className="text-sm hover:underline text-blue-500 font-medium transition-colors">
                     현재 선택 인원 {selectedEmployeeIds.length}명 +
                   </button>
                   <div className="w-6"></div>
-                  <text className="text-sm text-gray-400">
+                  <span className="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-100">
                     최대 배차 인원 &nbsp;
+                    <strong>
                     {employees
                       .filter((employee) =>
                         selectedEmployeeIds.includes(employee.id)
@@ -1622,7 +1623,8 @@ function App() {
                         return sum + (employee.maximumCapacity || 0);
                       }, 0)}
                     {""}명
-                  </text>
+                    </strong>
+                  </span>
                 </div>
 
                 <div className="flex flex-row mr-1">
@@ -1632,7 +1634,7 @@ function App() {
                       placeholder="이름 또는 주소 검색" 
                       value={employeeSearchTerm || ''}
                       onChange={(e) => setEmployeeSearchTerm(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5"
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5 shadow-sm"
                     />
                     {employeeSearchTerm && (
                       <button 
@@ -1650,9 +1652,9 @@ function App() {
                         ? setIsEmployeeCollapsed(!isEmployeeCollapsed)
                         : null
                     }
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -1663,9 +1665,9 @@ function App() {
                   <button
                     disabled={!jwt}
                     onClick={openAddEmployeeModal}
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -1676,9 +1678,9 @@ function App() {
                   <button
                     disabled={!jwt}
                     onClick={() => setShowEmployeeExcelModal(true)}
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -1688,12 +1690,12 @@ function App() {
               </div>
 
               <div
-                className={`relative overflow-x-auto shadow-md rounded-xl ${
+                className={`relative overflow-x-auto shadow-xl rounded-xl ${
                   isEmployeeCollapsed ? "h-80 overflow-y-scroll" : ""
-                }`}
+                } bg-white border border-gray-100`}
               >
-                <table className="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 table-auto">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <table className="w-full text-sm text-center rtl:text-right text-gray-600 table-auto">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th scope="col" className="p-4">
                         <div className="flex items-center">
@@ -1739,7 +1741,7 @@ function App() {
                         );
                       })
                       .map((row) => (
-                        <tr key={row.id} className="hover:bg-blue-100">
+                        <tr key={row.id} className="hover:bg-blue-50 border-b border-gray-100 transition-colors">
                           <td className="w-4 p-4">
                             <div className="flex items-center">
                               <input
@@ -1757,14 +1759,14 @@ function App() {
                               </label>
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 font-medium">
                             {editingEmployeeId === row.id ? (
                               <input
                                 value={editedEmployee.name}
                                 onChange={(e) =>
                                   handleEmployeeInputChange(e, "name")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               />
                             ) : (
                               row.name
@@ -1777,13 +1779,13 @@ function App() {
                                 onChange={(e) =>
                                   handleEmployeeInputChange(e, "isDriver")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               >
                                 <option value={false}>직원</option>
                                 <option value={true}>운전원</option>
                               </select>
                             ) : (
-                              <span className={`px-2 py-1 rounded text-sm`}>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.isDriver ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                 {row.isDriver ? "운전원" : "직원"}
                               </span>
                             )}
@@ -1797,12 +1799,15 @@ function App() {
                                 onChange={(e) =>
                                   handleEmployeeInputChange(e, "homeAddressName")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               />
                             ) : (
-                              row.homeAddressName
+                              <div className="max-w-xs truncate mx-auto">
+                                {row.homeAddressName}
+                              </div>
                             )}
                           </td>
+
                           <td className="px-6 py-4">
                             {editingEmployeeId === row.id ? (
                               <input
@@ -1811,28 +1816,58 @@ function App() {
                                 onChange={(e) =>
                                   handleEmployeeInputChange(e, "maximumCapacity")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               />
                             ) : (
-                              row.maximumCapacity
+                              <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">
+                                {row.maximumCapacity}명
+                              </span>
                             )}
                           </td>
 
                           <td className="px-6 py-4">
-                            <button
-                              onClick={() =>
-                                handleEmployeeEdit(row.id, "employee")
-                              }
-                              className="mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            >
-                              {editingEmployeeId === row.id ? "완료" : "수정"}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteEmployee(row.id)}
-                              className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
-                            >
-                              삭제
-                            </button>
+                            {editingEmployeeId === row.id ? (
+                              <div className="flex justify-center space-x-2">
+                                <button
+                                  onClick={() => handleEmployeeEdit(row.id, "employee")}
+                                  className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                >
+                                  완료
+                                </button>
+                                <button
+                                  onClick={() => setEditingEmployeeId(null)}
+                                  className="font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                                >
+                                  취소
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex justify-center space-x-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingEmployeeId(row.id);
+                                    setEditedEmployee({
+                                      id: row.id,
+                                      name: row.name,
+                                      homeAddressName: row.homeAddressName,
+                                      maximumCapacity: row.maximumCapacity,
+                                      homeAddressLongitude: row.homeAddressLongitude,
+                                      homeAddressLatitude: row.homeAddressLatitude,
+                                      isDriver: row.isDriver,
+                                    });
+                                  }}
+                                  className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                >
+                                  수정
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteEmployee(row.id)}
+                                  className="font-medium text-red-600 hover:text-red-800 transition-colors"
+                                >
+                                  삭제
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -1860,14 +1895,15 @@ function App() {
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
                 <div className="flex flex-row items-center">
-                  <text className="text-2xl font-bold">어르신 목록</text>
+                  <h2 className="text-2xl font-bold text-gray-800">어르신 목록</h2>
                   <div className="w-6"></div>
-                  <button className="text-sm hover:underline text-gray-400">
+                  <button className="text-sm hover:underline text-blue-500 font-medium transition-colors">
                     현재 선택 인원 {selectedElderIds.length}명 +
                   </button>
                   <div className="w-6"></div>
-                  <text className="text-sm text-gray-400">
+                  <span className="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-100">
                     최대 배차 인원 &nbsp;
+                    <strong>
                     {employees
                       .filter((employee) =>
                         selectedEmployeeIds.includes(employee.id)
@@ -1881,17 +1917,22 @@ function App() {
                         return sum + (employee.maximumCapacity || 0);
                       }, 0)}
                     {""}명
-                  </text>
+                    </strong>
+                  </span>
                   <div className="w-4"></div>
 
                   {maxDisaptchStatus === "over" ? (
-                    <ReportProblemIcon
-                      style={{ color: "orange", fontSize: 20 }}
-                    />
+                    <span className="flex items-center p-1.5 bg-amber-50 rounded-full border border-amber-100">
+                      <ReportProblemIcon
+                        style={{ color: "orange", fontSize: 20 }}
+                      />
+                    </span>
                   ) : (
-                    <CheckCircleIcon
-                      style={{ color: "#4ade80", fontSize: 20 }}
-                    />
+                    <span className="flex items-center p-1.5 bg-green-50 rounded-full border border-green-100">
+                      <CheckCircleIcon
+                        style={{ color: "#4ade80", fontSize: 20 }}
+                      />
+                    </span>
                   )}
                 </div>
 
@@ -1902,7 +1943,7 @@ function App() {
                       placeholder="이름 또는 주소 검색" 
                       value={elderSearchTerm || ''}
                       onChange={(e) => setElderSearchTerm(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5"
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5 shadow-sm"
                     />
                     {elderSearchTerm && (
                       <button 
@@ -1920,9 +1961,9 @@ function App() {
                         ? setIsElderCollapsed(!isElderCollapsed)
                         : null
                     }
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -1933,9 +1974,9 @@ function App() {
                   <button
                     disabled={!jwt}
                     onClick={openAddElderModal}
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -1946,9 +1987,9 @@ function App() {
                   <button
                     disabled={!jwt}
                     onClick={() => setShowElderExcelModal(true)}
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -1962,8 +2003,8 @@ function App() {
                   isElderCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
-                <table className="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 table-auto">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <table className="w-full text-sm text-center rtl:text-right text-gray-600 table-auto">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th scope="col" className="p-4">
                         <div className="flex items-center">
@@ -2006,7 +2047,7 @@ function App() {
                         );
                       })
                       .map((row) => (
-                        <tr key={row.id} className={"hover:bg-blue-100"}>
+                        <tr key={row.id} className={"hover:bg-blue-50 border-b border-gray-100 transition-colors"}>
                           <td className="w-4 p-4">
                             <div className="flex items-center">
                               <input
@@ -2024,14 +2065,14 @@ function App() {
                               </label>
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 font-medium">
                             {editingElderId === row.id ? (
                               <input
                                 value={editedElder.name}
                                 onChange={(e) =>
                                   handleElderInputChange(e, "name")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               />
                             ) : (
                               row.name
@@ -2045,10 +2086,12 @@ function App() {
                                 onChange={(e) =>
                                   handleElderInputChange(e, "address")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               />
                             ) : (
-                              row.homeAddressName
+                              <div className="max-w-xs truncate mx-auto">
+                                {row.homeAddressName}
+                              </div>
                             )}
                           </td>
                           <td className="px-6 py-4">
@@ -2058,31 +2101,62 @@ function App() {
                                 onChange={(e) =>
                                   handleSelectChange(e, "requiredFrontSeat")
                                 }
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center"
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                               >
                                 <option value="true">필요</option>
                                 <option value="false">필요 없음</option>
                               </select>
-                            ) : row.requiredFrontSeat ? (
-                              "필요"
                             ) : (
-                              "필요 없음"
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.requiredFrontSeat ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                                {row.requiredFrontSeat ? "필요" : "필요 없음"}
+                              </span>
                             )}
                           </td>
 
                           <td className="px-6 py-4">
-                            <button
-                              onClick={() => handleElderEdit(row.id)}
-                              className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
-                            >
-                              {editingElderId === row.id ? "완료" : "수정"}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteElder(row.id)}
-                              className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
-                            >
-                              삭제
-                            </button>
+                            <div className="flex justify-center space-x-2">
+                              {editingElderId === row.id ? (
+                                <>
+                                  <button
+                                    onClick={() => handleElderEdit(row.id)}
+                                    className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                  >
+                                    저장
+                                  </button>
+                                  <button
+                                    onClick={() => setEditingElderId(null)}
+                                    className="font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                                  >
+                                    취소
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      setEditingElderId(row.id);
+                                      setEditedElder({
+                                        id: row.id,
+                                        name: row.name,
+                                        homeAddressName: row.homeAddressName,
+                                        homeAddressLongitude: row.homeAddressLongitude,
+                                        homeAddressLatitude: row.homeAddressLatitude,
+                                        requiredFrontSeat: row.requiredFrontSeat,
+                                      });
+                                    }}
+                                    className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                  >
+                                    수정
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteElder(row.id)}
+                                    className="font-medium text-red-600 hover:text-red-800 transition-colors"
+                                  >
+                                    삭제
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -2110,7 +2184,7 @@ function App() {
             <div>
               <div className="flex flex-row items-center justify-between mb-4">
                 <div className="flex flex-row items-center">
-                  <text className="text-2xl font-bold">부부 어르신 목록</text>
+                  <h2 className="text-2xl font-bold text-gray-800">부부 어르신 목록</h2>
                 </div>
 
                 <div className="flex flex-row mr-1">
@@ -2121,9 +2195,9 @@ function App() {
                         ? setIsCoupleCollapsed(!isCoupleCollapsed)
                         : null
                     }
-                    className={`text-sm w-20 h-8 rounded ${
+                    className={`text-sm w-20 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -2133,9 +2207,9 @@ function App() {
 
                   <button
                     onClick={openAddCoupleModal}
-                    className={`text-sm w-32 h-8 rounded ${
+                    className={`text-sm w-32 h-8 rounded-lg transition-all ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -2145,12 +2219,12 @@ function App() {
               </div>
 
               <div
-                className={`relative overflow-x-auto shadow-md rounded-xl ${
+                className={`relative overflow-x-auto shadow-xl rounded-xl ${
                   isCoupleCollapsed ? "h-80 overflow-y-scroll" : ""
-                }`}
+                } bg-white border border-gray-100`}
               >
-                <table className="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 table-auto">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 h-16">
+                <table className="w-full text-sm text-center rtl:text-right text-gray-600 table-auto">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th scope="col" className="px-6 py-3">
                         이름
@@ -2164,68 +2238,123 @@ function App() {
                       </th>
                     </tr>
                   </thead>
+                  <tbody>
                   {couples.map((row) => (
-                    <tr key={row.coupleId} className="hover:bg-blue-100">
-                      <td className="px-6 py-4">
+                    <tr key={row.coupleId} className="hover:bg-blue-50 border-b border-gray-100 transition-colors">
+                      <td className="px-6 py-4 font-medium">
                         {editingCoupleId === row.coupleId ? (
                           <select
-                            style={{
-                              textAlign: "center",
-                            }}
-                            value={editedCouple.elder1.id}
-                            onChange={(e) =>
-                              handleCoupleInputChange(e, "elder1")
+                            value={
+                              editedCouple.firstElderId === undefined
+                                ? row.firstElderId
+                                : editedCouple.firstElderId
                             }
-                            className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            onChange={(e) =>
+                              handleCoupleInputChange(e, "firstElderId")
+                            }
+                            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                           >
-                            {elders.map((elder) => (
-                              <option key={elder.id} value={elder.id}>
-                                {elder.name}
-                              </option>
-                            ))}
+                            <option value="">선택하세요</option>
+                            {elders
+                              .filter(
+                                (elder) =>
+                                  !couples.some(
+                                    (couple) =>
+                                      (couple.firstElderId === elder.id ||
+                                        couple.secondElderId === elder.id) &&
+                                      couple.coupleId !== row.coupleId
+                                  )
+                              )
+                              .map((elder) => (
+                                <option key={elder.id} value={elder.id}>
+                                  {elder.name}
+                                </option>
+                              ))}
                           </select>
                         ) : (
-                          row.elder1.name
+                          row.firstElder?.name || "-"
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 font-medium">
                         {editingCoupleId === row.coupleId ? (
                           <select
-                            style={{
-                              textAlign: "center",
-                            }}
-                            value={editedCouple.elder2.id}
-                            onChange={(e) =>
-                              handleCoupleInputChange(e, "elder2")
+                            value={
+                              editedCouple.secondElderId === undefined
+                                ? row.secondElderId
+                                : editedCouple.secondElderId
                             }
-                            className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            onChange={(e) =>
+                              handleCoupleInputChange(e, "secondElderId")
+                            }
+                            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center shadow-sm"
                           >
-                            {elders.map((elder) => (
-                              <option key={elder.id} value={elder.id}>
-                                {elder.name}
-                              </option>
-                            ))}
+                            <option value="">선택하세요</option>
+                            {elders
+                              .filter(
+                                (elder) =>
+                                  !couples.some(
+                                    (couple) =>
+                                      (couple.firstElderId === elder.id ||
+                                        couple.secondElderId === elder.id) &&
+                                      couple.coupleId !== row.coupleId
+                                  )
+                              )
+                              .map((elder) => (
+                                <option key={elder.id} value={elder.id}>
+                                  {elder.name}
+                                </option>
+                              ))}
                           </select>
                         ) : (
-                          row.elder2.name
+                          row.secondElder?.name || "-"
                         )}
                       </td>
+
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleCoupleEdit(row.coupleId)}
-                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2"
-                        >
-                          {editingCoupleId === row.coupleId ? "완료" : "수정"}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCouple(row.coupleId)}
-                          className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline"
-                        >
-                          삭제
-                        </button>
+                        <div className="flex justify-center space-x-2">
+                          {editingCoupleId === row.coupleId ? (
+                            <>
+                              <button
+                                onClick={() => handleCoupleEdit(row.coupleId)}
+                                className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                              >
+                                저장
+                              </button>
+                              <button
+                                onClick={() => setEditingCoupleId(null)}
+                                className="font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                              >
+                                취소
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditingCoupleId(row.coupleId);
+                                  setEditedCouple({
+                                    coupleId: row.coupleId,
+                                    firstElderId: row.firstElderId,
+                                    secondElderId: row.secondElderId,
+                                  });
+                                }}
+                                className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                              >
+                                수정
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCouple(row.coupleId)}
+                                className="font-medium text-red-600 hover:text-red-800 transition-colors"
+                              >
+                                삭제
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -2268,8 +2397,8 @@ function App() {
                   isFixCollapsed ? "h-80 overflow-y-scroll" : ""
                 }`}
               >
-                <table className="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 table-auto">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 h-16">
+                <table className="w-full text-sm text-center rtl:text-right text-gray-600 table-auto">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th scope="col" className="px-6 py-3">
                         이름
@@ -2282,7 +2411,7 @@ function App() {
                   </thead>
                   <tbody>
                     {employees.map((employee) => (
-                      <tr key={employee.id} className="hover:bg-blue-100">
+                      <tr key={employee.id} className="hover:bg-blue-50 border-b border-gray-100 transition-colors">
                         <td className="px-6 py-4">{employee.name}</td>
                         <td className="px-6 py-4">
                           {Array.from(
@@ -2328,9 +2457,9 @@ function App() {
               <button
                 disabled={!jwt}
                 onClick={checkDispatchInData}
-                className={`text-sm w-60 h-12 rounded ${
+                className={`text-sm w-60 h-12 rounded-lg transition-all ${
                   jwt
-                    ? "bg-sky-950 text-white hover:bg-sky-500"
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -2340,9 +2469,9 @@ function App() {
               <button
                 disabled={!jwt}
                 onClick={checkDispatchOutData}
-                className={`text-sm w-60 h-12 rounded ${
+                className={`text-sm w-60 h-12 rounded-lg transition-all ${
                   jwt
-                    ? "bg-sky-950 text-white hover:bg-sky-500"
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
               >
