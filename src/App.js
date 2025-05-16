@@ -102,9 +102,7 @@ function App() {
   const [employeeSearchTerm, setEmployeeSearchTerm] = useState('');
   const [elderSearchTerm, setElderSearchTerm] = useState('');
 
-  // 공지사항 팝업 관련 상태
-  const [showNoticeModal, setShowNoticeModal] = useState(false);
-  const [dontShowToday, setDontShowToday] = useState(false);
+
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -3018,45 +3016,7 @@ function App() {
   }, [userId]); // userId가 변경될 때만 실행
 
   // 공지사항 팝업 표시 로직
-  useEffect(() => {
-    // 공지사항 팝업 표시 여부 결정
-    const checkNoticePopup = () => {
-      const lastClosedDate = localStorage.getItem('noticePopupLastClosed');
-      
-      if (lastClosedDate) {
-        // 오늘 날짜 구하기 (YYYY-MM-DD 형식)
-        const today = new Date().toISOString().split('T')[0];
-        
-        // 마지막으로 닫은 날짜와 오늘 날짜 비교
-        if (lastClosedDate === today) {
-          // 오늘 이미 닫았으면 표시하지 않음
-          return;
-        }
-      }
-      
-      // 그 외 경우에는 팝업 표시
-      setShowNoticeModal(true);
-    };
-    
-    // 페이지 로드 후 약간의 지연 시간을 두고 공지사항 표시 (UX 개선)
-    const timer = setTimeout(() => {
-      checkNoticePopup();
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
-  
-  // 공지사항 팝업 닫기 함수
-  const handleCloseNoticeModal = () => {
-    if (dontShowToday) {
-      // "오늘 하루 보지 않음" 체크되어 있으면 오늘 날짜 저장
-      const today = new Date().toISOString().split('T')[0];
-      localStorage.setItem('noticePopupLastClosed', today);
-    }
-    
-    setShowNoticeModal(false);
-    setDontShowToday(false); // 상태 초기화
-  };
+ 
 
   return (
     <div className="App">
@@ -3914,111 +3874,6 @@ function App() {
         </Modal.Footer>
       </Modal>
 
-      {/* 공지사항 팝업 모달 */}
-      <Modal
-        show={showNoticeModal}
-        onHide={handleCloseNoticeModal}
-        centered
-        size="lg"
-      >
-        <div className="bg-white rounded-lg overflow-hidden relative">
-          {/* 헤더 */}
-          <div className="bg-gradient-to-r from-sky-600 to-blue-700 px-6 py-4">
-            <h3 className="text-xl font-bold text-white flex items-center">
-              <span className="bg-white text-blue-600 w-8 h-8 flex items-center justify-center rounded-full mr-2">
-                📢
-              </span>
-              공지사항
-            </h3>
-          </div>
-          
-          {/* 본문 */}
-          <div className="p-6">
-            <div className="mb-6">
-              <h4 className="text-lg font-bold mb-2 text-sky-800">실버리즘 차량 배차 시스템 업데이트 안내 (2025/05/16일)</h4>
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
-                <p className="text-blue-700 font-semibold mb-2">🚀 기능 향상</p>
-                <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                  <li><span className="font-medium">배치 고정 기능 개선</span> - 새로고침 후에도 배치 고정 설정이 유지됩니다.</li>
-                  <li><span className="font-medium">메인 UI 디자인 개선</span> - 더 직관적이고 보기 좋게 디자인이 개선되었습니다.</li>
-                  <li><span className="font-medium">랜딩 페이지 UI 디자인 개선</span> - 메인 랜딩 페이지 UI UX가 개선되었습니다.</li>
-                </ul>
-              </div>
-              
-              <div className="bg-green-50 p-4 rounded-lg border border-green-100 mb-6">
-                <p className="text-green-700 font-semibold mb-2">📋 사용자 안내</p>
-                <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                  <li>새롭게 개선된 기능들을 이용해보세요!</li>
-                  <li>문의사항이 있으시면 <span className="text-blue-600">ggprgrkjh@naver.com</span>으로 연락주세요.</li>
-                  <li>더 나은 서비스를 위해 항상 노력하겠습니다.</li>
-                </ul>
-              </div>
-
-              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100 mb-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start">
-                  <div className="flex-1 mr-4">
-                    <div className="flex items-center mb-2">
-                      <span className="bg-yellow-400 text-yellow-800 font-bold px-2 py-1 text-xs rounded-md mr-2 flex items-center justify-center">EVENT</span>
-                      <p className="text-yellow-800 font-bold m-0 flex items-center">설문조사 참여하고 엔터프라이즈 이용권 받기!</p>
-                    </div>
-                    <p className="text-sm text-gray-700 mb-3 sm:mb-0">
-                      실버리즘 서비스 개선을 위한 짧은 설문조사에 참여해주시면<br/>
-                      <span className="font-bold text-red-500">무료 엔터프라이즈 30일 이용권</span>을 드립니다! (13,000원 상당)
-                    </p>
-                  </div>
-                  <div className="flex justify-center items-center sm:self-center mt-3 sm:mt-0">
-                    <a 
-                      href="https://zrr.kr/e4xDuS" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="px-4 py-2 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition-colors shadow-sm flex items-center whitespace-nowrap no-underline"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                      설문조사 참여하기
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 오늘 하루 보지 않기 체크박스 */}
-            <div className="flex items-center mb-2">
-              <input
-                id="dontShowToday"
-                type="checkbox"
-                checked={dontShowToday}
-                onChange={(e) => setDontShowToday(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="dontShowToday" className="ml-2 text-sm text-gray-600">
-                오늘 하루 보지 않기
-              </label>
-            </div>
-          </div>
-          
-          {/* 푸터 */}
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
-            <button
-              onClick={handleCloseNoticeModal}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              확인
-            </button>
-          </div>
-          
-          {/* 닫기 버튼 */}
-          <button
-            onClick={handleCloseNoticeModal}
-            className="absolute top-4 right-4 text-white hover:text-gray-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 
