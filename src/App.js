@@ -971,6 +971,8 @@ function App() {
       );
 
       await setFixedAssignments(filteredAssignments);
+      // localStorage에 저장
+      localStorage.setItem(`fixedAssignments_${userId}`, JSON.stringify(filteredAssignments));
     } else {
       const filteredAssignments = await fixedAssignments.filter(
         (assignment) =>
@@ -978,7 +980,10 @@ function App() {
           assignment.employee_id !== fixedAssignment.employee_id
       );
 
-      await setFixedAssignments([...filteredAssignments, fixedAssignment]);
+      const updatedAssignments = [...filteredAssignments, fixedAssignment];
+      await setFixedAssignments(updatedAssignments);
+      // localStorage에 저장
+      localStorage.setItem(`fixedAssignments_${userId}`, JSON.stringify(updatedAssignments));
       await setLoadingSpinner(false);
     }
   }
@@ -2901,6 +2906,9 @@ function App() {
     setShowLogoutModal(false); // 모달 닫기
     await setLoadingSpinner(true);
 
+    // localStorage에서 fixedAssignments 삭제
+    localStorage.removeItem(`fixedAssignments_${userId}`);
+
     navigate("/");
     setJwt("");
     setSubscriptionType("");
@@ -2969,6 +2977,23 @@ function App() {
     { id: "one", label: "단일 경로 길 찾기", icon: "🛣️" },
     { id: "previous", label: "이전 배치 보기", icon: "📋" },
   ];
+
+  // useEffect에서 localStorage에서 fixedAssignments 불러오기 추가
+  // App 컴포넌트 내의 적절한 위치에 추가
+  useEffect(() => {
+    // 사용자가 로그인되어 있고 userId가 있을 때만 실행
+    if (userId) {
+      const savedFixedAssignments = localStorage.getItem(`fixedAssignments_${userId}`);
+      if (savedFixedAssignments) {
+        try {
+          const parsedAssignments = JSON.parse(savedFixedAssignments);
+          setFixedAssignments(parsedAssignments);
+        } catch (error) {
+          console.error("저장된 배치 고정 데이터를 불러오는데 실패했습니다:", error);
+        }
+      }
+    }
+  }, [userId]); // userId가 변경될 때만 실행
 
   return (
     <div className="App">
