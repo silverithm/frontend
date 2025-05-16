@@ -2388,7 +2388,7 @@ function App() {
                     }
                     className={`text-sm w-20 h-8 rounded ${
                       jwt
-                        ? "bg-sky-950 text-white hover:bg-sky-500"
+                        ? "bg-blue-600 text-white hover:bg-blue-700"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
                   >
