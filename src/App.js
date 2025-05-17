@@ -795,17 +795,32 @@ function App() {
       headers: myHeaders,
       redirect: "follow",
     };
-    const response = await axiosInstance
-      .get(`/couple/${userId}`)
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        throw error; // 에러를 상위로 전파
-      });
+    try {
+      const response = await axiosInstance
+        .get(`/couple/${userId}`)
+        .then((response) => response.data)
+        .catch((error) => {
+          console.error(error);
+          throw error; // 에러를 상위로 전파
+        });
+      
+      // 백엔드는 elder1, elder2 필드로 반환하지만 프론트엔드는 firstElder, secondElder를 사용
+      // 필드 이름을 매핑하여 일관성 있게 사용
+      const mappedCouples = response.map(couple => ({
+        ...couple,
+        firstElder: couple.elder1,
+        secondElder: couple.elder2,
+        firstElderId: couple.elder1?.id,
+        secondElderId: couple.elder2?.id
+      }));
 
-    await setLoadingSpinner(false);
-
-    return response;
+      await setLoadingSpinner(false);
+      return mappedCouples;
+    } catch (error) {
+      console.error("부부 어르신 정보를 가져오는데 실패했습니다:", error);
+      await setLoadingSpinner(false);
+      return [];
+    }
   };
 
   useEffect(() => {
