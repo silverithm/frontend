@@ -302,6 +302,40 @@ const LandingPage = () => {
           {/* 본문 */}
           <div className="p-6">
             <div className="mb-6">
+              {/* 서비스 종료 공지 */}
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200 mb-6">
+                <h4 className="text-lg font-bold mb-3 text-red-800 flex items-center">
+                  <span className="mr-2">⚠️</span>
+                  실버리즘 서비스 종료 안내 (2025년 6월 29일)
+                </h4>
+                <div className="bg-white p-4 rounded-lg border border-red-100 mb-4">
+                  <p className="text-red-700 font-semibold mb-2">📢 중요 공지</p>
+                  <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                    <li><span className="font-medium text-red-600">서비스 종료일:</span> 2025년 6월 29일</li>
+                    <li><span className="font-medium">종료 사유:</span> 서비스 운영 정책 변경</li>
+                    <li><span className="font-medium">데이터 백업:</span> 종료일 이전에 필요한 데이터를 미리 백업해 주세요</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <p className="text-blue-700 font-semibold mb-2">💡 개별 서버 지원</p>
+                  <p className="text-sm text-gray-700 mb-2">
+                    서비스 종료 후에도 실버리즘을 이용하고 싶으신 분들을 위해<br/>
+                    <span className="font-bold text-blue-600">개별 서버 지원 서비스</span>를 제공합니다.
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">연락처:</span> 
+                    <a href="mailto:ggprgrkjh@naver.com" className="text-blue-600 underline ml-1">
+                      ggprgrkjh@naver.com
+                    </a>
+                    <br/>
+                    <span className="text-xs text-gray-500 mt-1 block">
+                      * 메일로 연락주시면 개별 서버를 열어드립니다
+                    </span>
+                  </p>
+                </div>
+              </div>
+
               <h4 className="text-lg font-bold mb-2 text-sky-800">실버리즘 차량 배차 시스템 업데이트 안내 (2025/05/16일)</h4>
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
                 <p className="text-blue-700 font-semibold mb-2">🚀 기능 향상</p>
