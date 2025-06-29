@@ -4065,15 +4065,13 @@ function App() {
   }
 
   function getProgressSSE(jobId) {
-    const url = `${config.dispatchUrl}/SSE/subscribe/${jobId}`;
+    // JWT를 URL 파라미터로 전달하여 preflight 요청 방지
+    const url = `${config.dispatchUrl}/SSE/subscribe/${jobId}?token=${encodeURIComponent(jwt)}`;
 
     setProgress(0);
 
-    const eventSource = new EventSourcePolyfill(url, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
+    // 헤더 없이 EventSource 생성 (preflight 요청 방지)
+    const eventSource = new EventSourcePolyfill(url);
 
     eventSource.addEventListener("sse", (event) => {
       if (!event.data.includes("EventStream Created")) {
